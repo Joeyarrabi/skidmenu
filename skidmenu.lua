@@ -1600,6 +1600,9 @@ Citizen.CreateThread(function()
 				ToggleGodmode(Godmode)
 			elseif WarMenu.CheckBox("Demigod Mode", Demigod) then
 				Demigod = not Demigod
+			elseif WarMenu.CheckBox("Invisibility", Invisibility) then
+				Invisibility = not Invisibility
+				SetEntityVisible(PlayerPedId(), not Invisibility)
 			elseif WarMenu.CheckBox("Magneto Mode", ForceTog) then
 				ForceMod()
 			elseif WarMenu.CheckBox("Forcefield", Forcefield) then
