@@ -36,7 +36,7 @@ developers = {
 }
 
 menuName = "SkidMenu"		-- The name of the menu
-version = "1.0"				-- Keep it simple
+version = "1.0"				-- I better not see some gay shit like 8.72b - Keep it simple
 theme = "infamous"				-- Feel free to make your own
 themes = {"infamous", "basic", "dark", "skid"} -- Add themes here if you want them to be in the theme selector
 mpMessage = false			-- Whether or not to use the big mp message
@@ -774,7 +774,6 @@ function ScaleVector(vect, mult)
 	return vector3(vect.x*mult, vect.y*mult, vect.z*mult)
 end
 
--- END UTILITY FUNCTIONS
 
 local function GetKeyboardInput()
 	DisplayOnscreenKeyboard(1, "FMMC_MPM_NA", "", "", "", "", "", 30)
@@ -789,6 +788,10 @@ local function GetKeyboardInput()
 		return result
     end
 end
+
+-- END UTILITY FUNCTIONS
+
+-- MENU FUNCTIONS
 
 local function SpectatePlayer(id)
 	spectating = not spectating
@@ -854,7 +857,7 @@ local function RocketAllPlayers(self)
 	end
 end
 
---[[ OLD FORCEFIELD (Might still be useful to forcefield others)
+--[[ OLD FORCEFIELD (Might still be useful at some point?)
 local function ForcefieldPlayer(target, radius)
 	local player = GetPlayerPed(target)
 	local coords = GetEntityCoords(player)
