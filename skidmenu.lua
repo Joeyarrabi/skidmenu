@@ -815,8 +815,7 @@ end
 
 -- Thanks to Fallen#0811 for the idea
 local function PedAttack(target, attackType)
-	local ped = GetPlayerPed(target)
-	local coords = GetEntityCoords(ped)
+	local coords = GetEntityCoords(GetPlayerPed(target))
 	
 	if attackType == 1 then weparray = allweapons
 	elseif attackType == 2 then weparray = meleeweapons
@@ -825,17 +824,21 @@ local function PedAttack(target, attackType)
 	end
 	
 	for k in EnumeratePeds() do
-		if k ~= PlayerPedId() and not IsPedAPlayer(k) and GetDistanceBetweenCoords(coords, GetEntityCoords(k)) < 500 then
+		if k ~= GetPlayerPed(target) and not IsPedAPlayer(k) and GetDistanceBetweenCoords(coords, GetEntityCoords(k)) < 2000 then
+			local rand = math.ceil(math.random(#weparray))
+			GiveWeaponToPed(k, GetHashKey(weparray[rand]), 9999, 0, 1)
 			ClearPedTasks(k)
-			local rand = math.random(#weparray)
-			GiveWeaponToPed(k, GetHashKey(weparray[math.ceil(rand)]), 9999, 0, 1)
-			TaskCombatPed(k, ped, 0, 16)
-			--SetPedCombatAbility(k, 100)
+			TaskCombatPed(k, GetPlayerPed(target), 0, 16)
+			SetPedCombatAbility(k, 100)
+			SetPedCombatRange(k, 2)
+			SetPedCombatAttributes(k, 46, 1)
+			SetPedCombatAttributes(k, 5, 1)
 		end
 	end
 end
 
 -- Rocket functions unused
+--[[
 local function RocketPlayer(target, force)
 	ClearPedTasksImmediately(GetPlayerPed(target))
 	RequestControlOnce(GetPlayerPed(target))
@@ -850,6 +853,7 @@ local function RocketAllPlayers(self)
 		ApplyForceToEntity(GetPlayerPed(plist[i]), 3, 0, 0, 15.0, 0, 0, 0, 0, false, true, true, false, true)
 	end
 end
+]]
 
 --[[ OLD FORCEFIELD (Might still be useful at some point?)
 local function ForcefieldPlayer(target, radius)
