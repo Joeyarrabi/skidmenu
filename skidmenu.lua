@@ -118,11 +118,6 @@ RotationOps = {0, 45, 90, 135, 180}
 -- Default Rotation
 ObjRotation = 90
 
--- Damage Multiplier options
-DamageOps = {1, 2, 3, 4, 5}
--- Default
-DamageMult = 1
-
 -- Gravity options
 GravityOps = {0.0, 5.0, 50.0, 100.0, 200.0, 500.0, 1000.0, 9999.9}
 -- Default
@@ -1428,9 +1423,6 @@ Citizen.CreateThread(function()
 	local currForcefieldRadiusIndex = 1
 	local selForcefieldRadiusIndex = 1
 	
-	local currDamageIndex = 1
-	local selDamageIndex = 1
-
 	local currObjIndex = 1
 	local selObjIndex = 1
 
@@ -1669,11 +1661,15 @@ Citizen.CreateThread(function()
 				SetPedInfiniteAmmoClip(PlayerPedId(), InfAmmo)
 			elseif WarMenu.CheckBox("Explosive Ammo", ExplosiveAmmo) then
 				ExplosiveAmmo = not ExplosiveAmmo
-			elseif WarMenu.ComboBox("Damage Multiplier", DamageOps, currDamageIndex, selDamageIndex, function(currentIndex, selectedIndex)
-					currDamageIndex = currentIndex
-					selDamageIndex = currentIndex
-					DamageMult = DamageOps[currDamageIndex]
-				end) then
+			elseif WarMenu.CheckBox("Super Damage", SuperDamage) then
+				SuperDamage = not SuperDamage
+				if SuperDamage then
+					local _,wep = GetCurrentPedWeapon(PlayerPedId(), 1)
+					SetPlayerWeaponDamageModifier(PlayerId(), 9999.9)
+				else
+					local _,wep = GetCurrentPedWeapon(PlayerPedId(), 1)
+					SetPlayerWeaponDamageModifier(PlayerId(), 1.0)
+				end
 			elseif WarMenu.CheckBox("Rapid Fire", RapidFire) then
 				RapidFire = not RapidFire
 			elseif WarMenu.CheckBox("Aimbot", Aimbot) then
@@ -2014,20 +2010,6 @@ Citizen.CreateThread(function()
 			for k in EnumerateVehicles() do
 				RequestControlOnce(k)
 				SetVehicleGravityAmount(k, GravAmount)
-			end
-		end
-
-		if DamageMult > 1 then
-			local exists, coords = GetPedLastWeaponImpactCoord(PlayerPedId())
-			if exists then
-			
-				for k in EnumeratePeds() do
-					if coords == GetEntityCoords(k) then
-						local _,wep = GetCurrentPedWeapon(PlayerPedId())
-						ApplyDamageToPed(k, GetWeaponDamage(wep)*(DamageMult-1), 1)
-					end
-				end
-				
 			end
 		end
 
