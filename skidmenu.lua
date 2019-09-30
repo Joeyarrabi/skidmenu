@@ -1457,6 +1457,7 @@ Citizen.CreateThread(function()
 	local includeself = true
 	local Collision = true
 	local objVisible = true
+	local PlaceSelf = true
 
 	-- TABLES
 	SpawnedObjects = {}
@@ -1701,56 +1702,56 @@ Citizen.CreateThread(function()
 		-- MELEE WEAPON MENU
 		elseif WarMenu.IsMenuOpened('melee') then
 			for i=1, #meleeweapons do
-				if WarMenu.Button(meleeweapons[i]) then
+				if WarMenu.Button(string.sub(meleeweapons[i], 8)) then
 					GiveWeapon(selectedPlayer, meleeweapons[i])
 				end
 			end
 		-- PISTOL MENU
 		elseif WarMenu.IsMenuOpened('pistol') then
 			for i=1, #pistolweapons do
-				if WarMenu.Button(pistolweapons[i]) then
+				if WarMenu.Button(string.sub(pistolweapons[i], 8)) then
 					GiveWeapon(selectedPlayer, pistolweapons[i])
 				end
 			end
 		-- SMG MENU
 		elseif WarMenu.IsMenuOpened('smg') then
 			for i=1, #smgweapons do
-				if WarMenu.Button(smgweapons[i]) then
+				if WarMenu.Button(string.sub(smgweapons[i], 8)) then
 					GiveWeapon(selectedPlayer, smgweapons[i])
 				end
 			end
 		-- SHOTGUN MENU
 		elseif WarMenu.IsMenuOpened('shotgun') then
 			for i=1, #shotgunweapons do
-				if WarMenu.Button(shotgunweapons[i]) then
+				if WarMenu.Button(string.sub(shotgunweapons[i], 8)) then
 					GiveWeapon(selectedPlayer, shotgunweapons[i])
 				end
 			end
 		-- ASSAULT RIFLE MENU
 		elseif WarMenu.IsMenuOpened('assault') then
 			for i=1, #assaultweapons do
-				if WarMenu.Button(assaultweapons[i]) then
+				if WarMenu.Button(string.sub(assaultweapons[i], 8)) then
 					GiveWeapon(selectedPlayer, assaultweapons[i])
 				end
 			end
 		-- SNIPER MENU
 		elseif WarMenu.IsMenuOpened('sniper') then
 			for i=1, #sniperweapons do
-				if WarMenu.Button(sniperweapons[i]) then
+				if WarMenu.Button(string.sub(sniperweapons[i], 8)) then
 					GiveWeapon(selectedPlayer, sniperweapons[i])
 				end
 			end
 		-- THROWN WEAPON MENU
 		elseif WarMenu.IsMenuOpened('thrown') then
 			for i=1, #thrownweapons do
-				if WarMenu.Button(thrownweapons[i]) then
+				if WarMenu.Button(string.sub(thrownweapons[i], 8)) then
 					GiveWeapon(selectedPlayer, thrownweapons[i])
 				end
 			end
 		-- HEAVY WEAPON MENU
 		elseif WarMenu.IsMenuOpened('heavy') then
 			for i=1, #heavyweapons do
-				if WarMenu.Button(heavyweapons[i]) then
+				if WarMenu.Button(string.sub(heavyweapons[i], 8)) then
 					GiveWeapon(selectedPlayer, heavyweapons[i])
 				end
 			end
@@ -1763,8 +1764,15 @@ Citizen.CreateThread(function()
 				RequestModel(GetHashKey(model))
 				Wait(500)
 				if HasModelLoaded(GetHashKey(model)) then
-					CreateVehicle(GetHashKey(model), GetEntityCoords(PlayerPedId()), 0.0, 1, 1)
+					local coords = GetEntityCoords(PlayerPedId())
+					local xf = GetEntityForwardX(PlayerPedId())
+					local yf = GetEntityForwardY(PlayerPedId())
+					local heading = GetEntityHeading(PlayerPedId())
+					local veh = CreateVehicle(GetHashKey(model), coords.x+xf*5, coords.y+yf*5, coords.z, heading, 1, 1)
+					if PlaceSelf then SetPedIntoVehicle(PlayerPedId(), veh, -1) end
 				else ShowInfo("~r~Model not recognized") end
+			elseif WarMenu.CheckBox("Put Self Into Spawned Vehicle", PlaceSelf) then
+				PlaceSelf = not PlaceSelf
 			elseif WarMenu.CheckBox("Collision", Collision) then
 				Collision = not Collision
 			end
