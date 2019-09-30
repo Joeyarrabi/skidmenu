@@ -36,7 +36,7 @@ developers = {
 }
 
 menuName = "SkidMenu"		-- The name of the menu
-version = "1.0"				-- I better not see some gay shit like 8.72b - Keep it simple
+version = "1.0"				-- Keep it simple
 theme = "infamous"				-- Feel free to make your own
 themes = {"infamous", "basic", "dark", "skid"} -- Add themes here if you want them to be in the theme selector
 mpMessage = false			-- Whether or not to use the big mp message
