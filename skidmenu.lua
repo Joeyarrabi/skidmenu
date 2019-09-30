@@ -42,7 +42,6 @@ themes = {"infamous", "basic", "dark", "skid"} -- Add themes here if you want th
 mpMessage = false			-- Whether or not to use the big mp message
 menuKeybind = "DELETE"		-- Key to open the menu. Supported ones are shown below - Find new ones at https://docs.fivem.net/game-references/controls/
 noclipKeybind = "F3"		-- Key to toggle Noclip
-textmode = false			-- Anti-Screengrab mode (Still WIP, planning to use print() and the console unless there's a better way)
 startMessage = "∑ ~g~Welcome, "..GetPlayerName(PlayerId()).."."	-- The message that is shown when the menu is opened
 subMessage = "~w~Press ~g~"..menuKeybind.."~w~ to open the menu." -- subtitle of opening message
 motd = "∑ Press ~g~"..noclipKeybind.."~w~ to toggle noclip!" -- motd
