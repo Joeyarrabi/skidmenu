@@ -42,9 +42,9 @@ themes = {"infamous", "basic", "dark", "skid"} -- Add themes here if you want th
 mpMessage = false			-- Whether or not to use the big mp message
 menuKeybind = "DELETE"		-- Key to open the menu. Supported ones are shown below - Find new ones at https://docs.fivem.net/game-references/controls/
 noclipKeybind = "F3"		-- Key to toggle Noclip
-startMessage = "∑ ~g~Welcome, "..GetPlayerName(PlayerId()).."."	-- The message that is shown when the menu is opened
-subMessage = "~w~Press ~g~"..menuKeybind.."~w~ to open the menu." -- subtitle of opening message
-motd = "∑ Press ~g~"..noclipKeybind.."~w~ to toggle noclip!" -- motd
+startMessage = "∑ ~b~Welcome, "..GetPlayerName(PlayerId()).."."	-- The message that is shown when the menu is opened
+subMessage = "~w~Press ~b~"..menuKeybind.."~w~ to open the menu." -- subtitle of opening message
+motd = "∑ Press ~b~"..noclipKeybind.."~w~ to toggle noclip!" -- motd
 
 -- Add any new menus to this list (for theme changer/textures)
 menulist = {
@@ -1592,13 +1592,13 @@ Citizen.CreateThread(function()
 		-- SELF OPTIONS MENU
 		elseif WarMenu.IsMenuOpened('self') then
 			if WarMenu.MenuButton("Appearance "..themecolor.."   "..themearrow, 'appearance') then
-			elseif WarMenu.CheckBox("Infinite Stamina", InfStamina) then
-				InfStamina = not InfStamina
 			elseif WarMenu.CheckBox("Stealth Godmode", Godmode) then
 				Godmode = not Godmode
 				ToggleGodmode(Godmode)
 			elseif WarMenu.CheckBox("Demigod Mode", Demigod) then
 				Demigod = not Demigod
+			elseif WarMenu.CheckBox("Infinite Stamina", InfStamina) then
+				InfStamina = not InfStamina
 			elseif WarMenu.CheckBox("Invisibility", Invisibility) then
 				Invisibility = not Invisibility
 				SetEntityVisible(PlayerPedId(), not Invisibility)
@@ -1975,14 +1975,14 @@ Citizen.CreateThread(function()
 			local coords = GetEntityCoords(TrackedPlayer)
 			SetNewWaypoint(coords.x, coords.y)
 		end
-
+		
 		if InfStamina then
 		--[[if GetPlayerSprintStaminaRemaining(PlayerId()) < 0.9 then --Not working when tested, not sure why
 				RestorePlayerStamina(PlayerId(), 0.8)
 			end]]
 			RestorePlayerStamina(PlayerId(), GetPlayerSprintStaminaRemaining(PlayerId()))
 		end
-		
+
 		if Forcefield then
 			--ForcefieldPlayer(PlayerId(), ForcefieldRadius)
 			DoForceFieldTick(ForcefieldRadius)
