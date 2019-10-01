@@ -1592,6 +1592,8 @@ Citizen.CreateThread(function()
 		-- SELF OPTIONS MENU
 		elseif WarMenu.IsMenuOpened('self') then
 			if WarMenu.MenuButton("Appearance "..themecolor.."   "..themearrow, 'appearance') then
+			elseif WarMenu.CheckBox("Infinite Stamina", InfStamina) then
+				InfStamina = not InfStamina
 			elseif WarMenu.CheckBox("Stealth Godmode", Godmode) then
 				Godmode = not Godmode
 				ToggleGodmode(Godmode)
@@ -1974,6 +1976,13 @@ Citizen.CreateThread(function()
 			SetNewWaypoint(coords.x, coords.y)
 		end
 
+		if InfStamina then
+		--[[if GetPlayerSprintStaminaRemaining(PlayerId()) < 0.9 then --Not working when tested, not sure why
+				RestorePlayerStamina(PlayerId(), 0.8)
+			end]]
+			RestorePlayerStamina(PlayerId(), GetPlayerSprintStaminaRemaining(PlayerId()))
+		end
+		
 		if Forcefield then
 			--ForcefieldPlayer(PlayerId(), ForcefieldRadius)
 			DoForceFieldTick(ForcefieldRadius)
