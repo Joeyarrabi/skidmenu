@@ -82,6 +82,28 @@ menulist = {
 -- VEHICLE SUBMENUS
 'vehiclespawner',
 
+-- VEHICLE SPAWNER SUBMENUS
+'compacts',
+'sedans',
+'suvs',
+'coupes',
+'muscle',
+'sportsclassics',
+'sports',
+'super',
+'motorcycles',
+'offroad',
+'industrial',
+'utility',
+'vans',
+'cycles',
+'boats',
+'helicopters',
+'planes',
+'service',
+'commercial',
+
+
 -- WORLD SUBMENUS
 'objectspawner',
 'objectlist',
@@ -146,7 +168,7 @@ objs_tospawn = {
 "db_apart_09_"
 }
 
--- Weapons List
+-- WEAPONS LISTS
 local allweapons = {
 --Melee
 "WEAPON_KNIFE",
@@ -362,6 +384,716 @@ local heavyweapons = {
 "WEAPON_COMPACTLAUNCHER",
 "WEAPON_RAYMINIGUN"
 }
+-- END WEAPONS LISTS
+
+-- VEHICLES LISTS
+
+local compacts = {
+"BLISTA",
+"BRIOSO",
+"DILETTANTE",
+"DILETTANTE2",
+"ISSI2",
+"ISSI3",
+"ISSI4",
+"ISSI5",
+"ISSI6",
+"PANTO",
+"PRAIRIE",
+"RHAPSODY"
+}
+
+local sedans = {
+"ASEA",
+"ASEA2",
+"ASTEROPE",
+"COG55",
+"COG552",
+"COGNOSCENTI",
+"COGNOSCENTI2",
+"EMPEROR",
+"EMPEROR2",
+"EMPEROR3",
+"FUGITIVE",
+"GLENDALE",
+"INGOT",
+"INTRUDER",
+"LIMO2",
+"PREMIER",
+"PRIMO",
+"PRIMO2",
+"REGINA",
+"ROMERO",
+"SCHAFTER2",
+"SCHAFTER5",
+"SCHAFTER6",
+"STAFFORD",
+"STANIER",
+"STRATUM",
+"STRETCH",
+"SUPERD",
+"SURGE",
+"TAILGATER",
+"WARRENER",
+"WASHINGTON"
+}
+
+local suvs = {
+"BALLER",
+"BALLER2",
+"BALLER3",
+"BALLER4",
+"BALLER5",
+"BALLER6",
+"BJXL",
+"CAVALCADE",
+"CAVALCADE2",
+"CONTENDER",
+"DUBSTA",
+"DUBSTA2",
+"FQ2",
+"GRANGER",
+"GRESLEY",
+"HABANERO",
+"HUNTLEY",
+"LANDSTALKER",
+"MESA",
+"MESA2",
+"PATRIOT",
+"PATRIOT2",
+"RADI",
+"ROCOTO",
+"SEMINOLE",
+"SERRANO",
+"TOROS",
+"XLS",
+"XLS2"
+}
+
+local coupes = {
+"COGCABRIO",
+"EXEMPLAR",
+"F620",
+"FELON",
+"FELON2",
+"JACKAL",
+"ORACLE",
+"ORACLE2",
+"SENTINEL",
+"SENTINEL2",
+"WINDSOR",
+"WINDSOR2",
+"ZION",
+"ZION2"
+}
+
+local muscle = {
+"BLADE",
+"BUCCANEER",
+"BUCCANEER2",
+"CHINO",
+"CHINO2",
+"CLIQUE",
+"COQUETTE3",
+"DEVIANT",
+"DOMINATOR",
+"DOMINATOR2",
+"DOMINATOR3",
+"DOMINATOR4",
+"DOMINATOR5",
+"DOMINATOR6",
+"DUKES",
+"DUKES2",
+"ELLIE",
+"FACTION",
+"FACTION2",
+"FACTION3",
+"GAUNTLET",
+"GAUNTLET2",
+"HERMES",
+"HOTKNIFE",
+"HUSTLER",
+"IMPALER",
+"IMPALER2",
+"IMPALER3",
+"IMPALER4",
+"IMPERATOR",
+"IMPERATOR2",
+"IMPERATOR3",
+"LURCHER",
+"MOONBEAM",
+"MOONBEAM2",
+"NIGHTSHADE",
+"PHOENIX",
+"PICADOR",
+"RATLOADER",
+"RATLOADER2",
+"RUINER",
+"RUINER2",
+"RUINER3",
+"SABREGT",
+"SABREGT2",
+"SLAMVAN",
+"SLAMVAN2",
+"SLAMVAN3",
+"SLAMVAN4",
+"SLAMVAN5",
+"SLAMVAN6",
+"STALION",
+"STALION2",
+"TAMPA",
+"TAMPA3",
+"TULIP",
+"VAMOS",
+"VIGERO",
+"VIRGO",
+"VIRGO2",
+"VIRGO3",
+"VOODOO",
+"VOODOO2",
+"YOSEMITE"
+}
+
+local sportsclassics = {
+"ARDENT",
+"BTYPE",
+"BTYPE2",
+"BTYPE3",
+"CASCO",
+"CHEBUREK",
+"CHEETAH2",
+"COQUETTE2",
+"DELUXO",
+"FAGALOA",
+"FELTZER3",
+"GT500",
+"INFERNUS2",
+"JB700",
+"JESTER3",
+"MAMBA",
+"MANANA",
+"MICHELLI",
+"MONROE",
+"PEYOTE",
+"PIGALLE",
+"RAPIDGT3",
+"RETINUE",
+"SAVESTRA",
+"STINGER",
+"STINGERGT",
+"STROMBERG",
+"SWINGER",
+"TORERO",
+"TORNADO",
+"TORNADO2",
+"TORNADO3",
+"TORNADO4",
+"TORNADO5",
+"TORNADO6",
+"TURISMO2",
+"VISERIS",
+"Z190",
+"ZTYPE"
+}
+
+local sports = {
+"ALPHA",
+"BANSHEE",
+"BESTIAGTS",
+"BLISTA2",
+"BLISTA3",
+"BUFFALO",
+"BUFFALO2",
+"BUFFALO3",
+"CARBONIZZARE",
+"COMET2",
+"COMET3",
+"COMET4",
+"COMET5",
+"COQUETTE",
+"ELEGY",
+"ELEGY2",
+"FELTZER2",
+"FLASHGT",
+"FUROREGT",
+"FUSILADE",
+"FUTO",
+"GB200",
+"HOTRING",
+"ITALIGTO",
+"JESTER",
+"JESTER2",
+"KHAMELION",
+"KURUMA",
+"KURUMA2",
+"LYNX",
+"MASSACRO",
+"MASSACRO2",
+"NEON",
+"NINEF",
+"NINEF2",
+"OMNIS",
+"PARIAH",
+"PENUMBRA",
+"RAIDEN",
+"RAPIDGT",
+"RAPIDGT2",
+"RAPTOR",
+"REVOLTER",
+"RUSTON",
+"SCHAFTER2",
+"SCHAFTER3",
+"SCHAFTER4",
+"SCHAFTER5",
+"SCHLAGEN",
+"SCHWARZER",
+"SENTINEL3",
+"SEVEN70",
+"SPECTER",
+"SPECTER2",
+"SULTAN",
+"SURANO",
+"TAMPA2",
+"TROPOS",
+"VERLIERER2",
+"ZR380",
+"ZR3802",
+"ZR3803"
+}
+
+local super = {
+"ADDER",
+"AUTARCH",
+"BANSHEE2",
+"BULLET",
+"CHEETAH",
+"CYCLONE",
+"DEVESTE",
+"ENTITYXF",
+"ENTITY2",
+"FMJ",
+"GP1",
+"INFERNUS",
+"ITALIGTB",
+"ITALIGTB2",
+"LE7B",
+"NERO",
+"NERO2",
+"OSIRIS",
+"PENETRATOR",
+"PFISTER811",
+"PROTOTIPO",
+"REAPER",
+"SC1",
+"SCRAMJET",
+"SHEAVA",
+"SULTANRS",
+"T20",
+"TAIPAN",
+"TEMPESTA",
+"TEZERACT",
+"TURISMOR",
+"TYRANT",
+"TYRUS",
+"VACCA",
+"VAGNER",
+"VIGILANTE",
+"VISIONE",
+"VOLTIC",
+"VOLTIC2",
+"XA21",
+"ZENTORNO"
+}
+
+local motorcycles = {
+"AKUMA",
+"AVARUS",
+"BAGGER",
+"BATI",
+"BATI2",
+"BF400",
+"CARBONRS",
+"CHIMERA",
+"CLIFFHANGER",
+"DAEMON",
+"DAEMON2",
+"DEFILER",
+"DEATHBIKE",
+"DEATHBIKE2",
+"DEATHBIKE3",
+"DIABLOUS",
+"DIABLOUS2",
+"DOUBLE",
+"ENDURO",
+"ESSKEY",
+"FAGGIO",
+"FAGGIO2",
+"FAGGIO3",
+"FCR",
+"FCR2",
+"GARGOYLE",
+"HAKUCHOU",
+"HAKUCHOU2",
+"HEXER",
+"INNOVATION",
+"LECTRO",
+"MANCHEZ",
+"NEMESIS",
+"NIGHTBLADE",
+"OPPRESSOR",
+"OPPRESSOR2",
+"PCJ",
+"RATBIKE",
+"RUFFIAN",
+"SANCHEZ",
+"SANCHEZ2",
+"SANCTUS",
+"SHOTARO",
+"SOVEREIGN",
+"THRUST",
+"VADER",
+"VINDICATOR",
+"VORTEX",
+"WOLFSBANE",
+"ZOMBIEA",
+"ZOMBIEB"
+}
+
+local offroad = {
+"BFINJECTION",
+"BIFTA",
+"BLAZER",
+"BLAZER2",
+"BLAZER3",
+"BLAZER4",
+"BLAZER5",
+"BODHI2",
+"BRAWLER",
+"BRUISER",
+"BRUISER2",
+"BRUISER3",
+"BRUTUS",
+"BRUTUS2",
+"BRUTUS3",
+"CARACARA",
+"DLOADER",
+"DUBSTA3",
+"DUNE",
+"DUNE2",
+"DUNE3",
+"DUNE4",
+"DUNE5",
+"FREECRAWLER",
+"INSURGENT",
+"INSURGENT2",
+"INSURGENT3",
+"KALAHARI",
+"KAMACHO",
+"MARSHALL",
+"MENACER",
+"MESA3",
+"MONSTER",
+"MONSTER3",
+"MONSTER4",
+"MONSTER5",
+"NIGHTSHARK",
+"RANCHERXL",
+"RANCHERXL2",
+"RCBANDITO",
+"REBEL",
+"REBEL2",
+"RIATA",
+"SANDKING",
+"SANDKING2",
+"TECHNICAL",
+"TECHNICAL2",
+"TECHNICAL3",
+"TROPHYTRUCK",
+"TROPHYTRUCK2"
+}
+
+local industrial = {
+"BULLDOZER",
+"CUTTER",
+"DUMP",
+"FLATBED",
+"GUARDIAN",
+"HANDLER",
+"MIXER",
+"MIXER2",
+"RUBBLE",
+"TIPTRUCK",
+"TIPTRUCK2"
+}
+
+local utility = {
+"AIRTUG",
+"CADDY",
+"CADDY2",
+"CADDY3",
+"DOCKTUG",
+"FORKLIFT",
+"TRACTOR2",
+"TRACTOR3",
+"MOWER",
+"RIPLEY",
+"SADLER",
+"SADLER2",
+"SCRAP",
+"TOWTRUCK",
+"TOWTRUCK2",
+"TRACTOR",
+"UTILLITRUCK",
+"UTILLITRUCK2",
+"UTILLITRUCK3",
+"ARMYTRAILER",
+"ARMYTRAILER2",
+"FREIGHTTRAILER",
+"ARMYTANKER",
+"TRAILERLARGE",
+"DOCKTRAILER",
+"TR3",
+"TR2",
+"TR4",
+"TRFLAT",
+"TRAILERS",
+"TRAILERS4",
+"TRAILERS2",
+"TRAILERS3",
+"TVTRAILER",
+"TRAILERLOGS",
+"TANKER",
+"TANKER2",
+"BALETRAILER",
+"GRAINTRAILER",
+"BOATTRAILER",
+"RAKETRAILER",
+"TRAILERSMALL"
+}
+
+local vans = {
+"BISON",
+"BISON2",
+"BISON3",
+"BOBCATXL",
+"BOXVILLE",
+"BOXVILLE2",
+"BOXVILLE3",
+"BOXVILLE4",
+"BOXVILLE5",
+"BURRITO",
+"BURRITO2",
+"BURRITO3",
+"BURRITO4",
+"BURRITO5",
+"CAMPER",
+"GBURRITO",
+"GBURRITO2",
+"JOURNEY",
+"MINIVAN",
+"MINIVAN2",
+"PARADISE",
+"PONY",
+"PONY2",
+"RUMPO",
+"RUMPO2",
+"RUMPO3",
+"SPEEDO",
+"SPEEDO2",
+"SPEEDO4",
+"SURFER",
+"SURFER2",
+"TACO",
+"YOUGA",
+"YOUGA2"
+}
+
+local cycles = {
+"BMX",
+"CRUISER",
+"FIXTER",
+"SCORCHER",
+"TRIBIKE",
+"TRIBIKE2",
+"TRIBIKE3"
+}
+
+local boats = {
+"DINGHY",
+"DINGHY2",
+"DINGHY3",
+"DINGHY4",
+"JETMAX",
+"MARQUIS",
+"PREDATOR",
+"SEASHARK",
+"SEASHARK2",
+"SEASHARK3",
+"SPEEDER",
+"SPEEDER2",
+"SQUALO",
+"SUBMERSIBLE",
+"SUBMERSIBLE2",
+"SUNTRAP",
+"TORO",
+"TORO2",
+"TROPIC",
+"TROPIC2",
+"TUG"
+}
+
+local helicopters = {
+"AKULA",
+"ANNIHILATOR",
+"BUZZARD",
+"BUZZARD2",
+"CARGOBOB",
+"CARGOBOB2",
+"CARGOBOB3",
+"CARGOBOB4",
+"FROGGER",
+"FROGGER2",
+"HAVOK",
+"HUNTER",
+"MAVERICK",
+"POLMAV",
+"SAVAGE",
+"SEASPARROW",
+"SKYLIFT",
+"SUPERVOLITO",
+"SUPERVOLITO2",
+"SWIFT",
+"SWIFT2",
+"VALKYRIE",
+"VALKYRIE2",
+"VOLATUS"
+}
+
+
+local planes = {
+"ALPHAZ1",
+"AVENGER",
+"AVENGER2",
+"BESRA",
+"BLIMP",
+"BLIMP2",
+"BLIMP3",
+"BOMBUSHKA",
+"CARGOPLANE",
+"CUBAN800",
+"DODO",
+"DUSTER",
+"HOWARD",
+"HYDRA",
+"JET",
+"LAZER",
+"LUXOR",
+"LUXOR2",
+"MAMMATUS",
+"MICROLIGHT",
+"MILJET",
+"MOGUL",
+"MOLOTOK",
+"NIMBUS",
+"NOKOTA",
+"PYRO",
+"ROGUE",
+"SEABREEZE",
+"SHAMAL",
+"STARLING",
+"STRIKEFORCE",
+"STUNT",
+"TITAN",
+"TULA",
+"VELUM",
+"VELUM2",
+"VESTRA",
+"VOLATOL"
+}
+
+local service = {
+"AIRBUS",
+"BRICKADE",
+"BUS",
+"COACH",
+"PBUS2",
+"RALLYTRUCK",
+"RENTALBUS",
+"TAXI",
+"TOURBUS",
+"TRASH",
+"TRASH2",
+"WASTELANDER",
+"AMBULANCE",
+"FBI",
+"FBI2",
+"FIRETRUK",
+"LGUARD",
+"PBUS",
+"POLICE",
+"POLICE2",
+"POLICE3",
+"POLICE4",
+"POLICEB",
+"POLICEOLD1",
+"POLICEOLD2",
+"POLICET",
+"POLMAV",
+"PRANGER",
+"PREDATOR",
+"RIOT",
+"RIOT2",
+"SHERIFF",
+"SHERIFF2",
+"APC",
+"BARRACKS",
+"BARRACKS2",
+"BARRACKS3",
+"BARRAGE",
+"CHERNOBOG",
+"CRUSADER",
+"HALFTRACK",
+"KHANJALI",
+"RHINO",
+"SCARAB",
+"SCARAB2",
+"SCARAB3",
+"THRUSTER",
+"TRAILERSMALL2"
+}
+
+local commercial = {
+"BENSON",
+"BIFF",
+"CERBERUS",
+"CERBERUS2",
+"CERBERUS3",
+"HAULER",
+"HAULER2",
+"MULE",
+"MULE2",
+"MULE3",
+"MULE4",
+"PACKER",
+"PHANTOM",
+"PHANTOM2",
+"PHANTOM3",
+"POUNDER",
+"POUNDER2",
+"STOCKADE",
+"STOCKADE3",
+"TERBYTE",
+"CABLECAR",
+"FREIGHT",
+"FREIGHTCAR",
+"FREIGHTCONT1",
+"FREIGHTCONT2",
+"FREIGHTGRAIN",
+"METROTRAIN",
+"TANKERCAR"
+}
+
+-- END VEHICLES LISTS
 
 local Keys = {
   ["ESC"] = 322, ["F1"] = 288, ["F2"] = 289, ["F3"] = 170, ["F5"] = 166, ["F6"] = 167, ["F7"] = 168, ["F8"] = 169, ["F9"] = 56, ["F10"] = 57,
@@ -1123,6 +1855,37 @@ local function RageShoot(target)
 	end
 end
 
+local function SpawnVeh(model, PlaceSelf)
+	RequestModel(GetHashKey(model))
+	Wait(500)
+	if HasModelLoaded(GetHashKey(model)) then
+		local coords = GetEntityCoords(PlayerPedId())
+		local xf = GetEntityForwardX(PlayerPedId())
+		local yf = GetEntityForwardY(PlayerPedId())
+		local heading = GetEntityHeading(PlayerPedId())
+		local veh = CreateVehicle(GetHashKey(model), coords.x+xf*5, coords.y+yf*5, coords.z, heading, 1, 1)
+		if PlaceSelf then SetPedIntoVehicle(PlayerPedId(), veh, -1) end
+	else ShowInfo("~r~Model not recognized") end
+end
+
+local function SpawnPlane(model, PlaceSelf, SpawnInAir)
+	RequestModel(GetHashKey(model))
+	Wait(500)
+	if HasModelLoaded(GetHashKey(model)) then
+		local coords = GetEntityCoords(PlayerPedId())
+		local xf = GetEntityForwardX(PlayerPedId())
+		local yf = GetEntityForwardY(PlayerPedId())
+		local heading = GetEntityHeading(PlayerPedId())
+		local veh = nil
+		if SpawnInAir then 
+			veh = CreateVehicle(GetHashKey(model), coords.x+xf*20, coords.y+yf*20, coords.z+500, heading, 1, 1)
+		else 
+			veh = CreateVehicle(GetHashKey(model), coords.x+xf*5, coords.y+yf*5, coords.z, heading, 1, 1) 
+		end
+		if PlaceSelf then SetPedIntoVehicle(PlayerPedId(), veh, -1) end
+	else ShowInfo("~r~Model not recognized") end
+end
+
 --[[
 0 - Head
 1 - Beard
@@ -1454,6 +2217,7 @@ Citizen.CreateThread(function()
 	local Collision = true
 	local objVisible = true
 	local PlaceSelf = true
+	local SpawnInAir = true
 
 	-- TABLES
 	SpawnedObjects = {}
@@ -1491,6 +2255,27 @@ Citizen.CreateThread(function()
 
 	-- VEHICLE MENU SUBMENUS
 	WarMenu.CreateSubMenu('vehiclespawner', 'vehicle', 'Vehicle Spawner')
+	
+	-- VEHICLE SPAWNER MENU
+	WarMenu.CreateSubMenu('compacts', 'vehiclespawner', 'Compacts')
+	WarMenu.CreateSubMenu('sedans', 'vehiclespawner', 'Sedans')
+	WarMenu.CreateSubMenu('suvs', 'vehiclespawner', 'SUVs')
+	WarMenu.CreateSubMenu('coupes', 'vehiclespawner', 'Coupes')
+	WarMenu.CreateSubMenu('muscle', 'vehiclespawner', 'Muscle')
+	WarMenu.CreateSubMenu('sportsclassics', 'vehiclespawner', 'Sports Classics')
+	WarMenu.CreateSubMenu('sports', 'vehiclespawner', 'Sports')
+	WarMenu.CreateSubMenu('super', 'vehiclespawner', 'Super')
+	WarMenu.CreateSubMenu('motorcycles', 'vehiclespawner', 'Motorcycles')
+	WarMenu.CreateSubMenu('offroad', 'vehiclespawner', 'Off-Road')
+	WarMenu.CreateSubMenu('industrial', 'vehiclespawner', 'Industrial')
+	WarMenu.CreateSubMenu('utility', 'vehiclespawner', 'Utility')
+	WarMenu.CreateSubMenu('vans', 'vehiclespawner', 'Vans')
+	WarMenu.CreateSubMenu('cycles', 'vehiclespawner', 'Cycles')
+	WarMenu.CreateSubMenu('boats', 'vehiclespawner', 'Boats')
+	WarMenu.CreateSubMenu('helicopters', 'vehiclespawner', 'Helicopters')
+	WarMenu.CreateSubMenu('planes', 'vehiclespawner', 'Planes')
+	WarMenu.CreateSubMenu('service', 'vehiclespawner', 'Service')
+	WarMenu.CreateSubMenu('commercial', 'vehiclespawner', 'Commercial')
 
 	-- WORLD MENU SUBMENUS
 	WarMenu.CreateSubMenu('objectspawner', 'world', 'Object Spawner')
@@ -1520,7 +2305,7 @@ Citizen.CreateThread(function()
 			elseif WarMenu.MenuButton('Misc Options'..themecolor.."   "..themearrow, 'misc') then
 			elseif WarMenu.MenuButton('Custom Options'..themecolor.."   "..themearrow, 'custom') then
 			elseif WarMenu.Button('Exit') then WarMenu.CloseMenu()
-			elseif WarMenu.Button('~r~Panic') then break
+			elseif WarMenu.Button('~r~Panic (Kill Menu)') then break
 			end
 
 
@@ -1761,22 +2546,191 @@ Citizen.CreateThread(function()
 
 		-- VEHICLE OPTIONS MENU
 		elseif WarMenu.IsMenuOpened('vehicle') then
-			if WarMenu.Button("Spawn Vehicle By Name") then
-				local model = GetKeyboardInput()
-				RequestModel(GetHashKey(model))
-				Wait(500)
-				if HasModelLoaded(GetHashKey(model)) then
-					local coords = GetEntityCoords(PlayerPedId())
-					local xf = GetEntityForwardX(PlayerPedId())
-					local yf = GetEntityForwardY(PlayerPedId())
-					local heading = GetEntityHeading(PlayerPedId())
-					local veh = CreateVehicle(GetHashKey(model), coords.x+xf*5, coords.y+yf*5, coords.z, heading, 1, 1)
-					if PlaceSelf then SetPedIntoVehicle(PlayerPedId(), veh, -1) end
-				else ShowInfo("~r~Model not recognized") end
+			if WarMenu.MenuButton("Vehicle Spawner"..themecolor.."   "..themearrow, 'vehiclespawner') then
 			elseif WarMenu.CheckBox("Put Self Into Spawned Vehicle", PlaceSelf) then
 				PlaceSelf = not PlaceSelf
+			elseif WarMenu.CheckBox("Spawn Planes In Air", SpawnInAir) then
+				SpawnInAir = not SpawnInAir
 			elseif WarMenu.CheckBox("Collision", Collision) then
 				Collision = not Collision
+			end
+			
+		-- VEHICLE SPAWNER MENU
+		elseif WarMenu.IsMenuOpened('vehiclespawner') then
+			if WarMenu.Button("Spawn Vehicle By Name") then
+				local model = GetKeyboardInput()
+				SpawnVeh(model, PlaceSelf)
+			elseif WarMenu.MenuButton('Compacts'..themecolor.."   "..themearrow, 'compacts') then
+			elseif WarMenu.MenuButton('Sedans'..themecolor.."   "..themearrow, 'sedans') then
+			elseif WarMenu.MenuButton('SUVs'..themecolor.."   "..themearrow, 'suvs') then
+			elseif WarMenu.MenuButton('Coupes'..themecolor.."   "..themearrow, 'coupes') then
+			elseif WarMenu.MenuButton('Muscle'..themecolor.."   "..themearrow, 'muscle') then
+			elseif WarMenu.MenuButton('Sports Classics'..themecolor.."   "..themearrow, 'sportsclassics') then
+			elseif WarMenu.MenuButton('Sports'..themecolor.."   "..themearrow, 'sports') then
+			elseif WarMenu.MenuButton('Super'..themecolor.."   "..themearrow, 'super') then
+			elseif WarMenu.MenuButton('Motorcycles'..themecolor.."   "..themearrow, 'motorcycles') then
+			elseif WarMenu.MenuButton('Off-Road'..themecolor.."   "..themearrow, 'offroad') then
+			elseif WarMenu.MenuButton('Industrial'..themecolor.."   "..themearrow, 'industrial') then
+			elseif WarMenu.MenuButton('Utility'..themecolor.."   "..themearrow, 'utility') then
+			elseif WarMenu.MenuButton('Vans'..themecolor.."   "..themearrow, 'vans') then
+			elseif WarMenu.MenuButton('Cycles'..themecolor.."   "..themearrow, 'cycles') then
+			elseif WarMenu.MenuButton('Boats'..themecolor.."   "..themearrow, 'boats') then
+			elseif WarMenu.MenuButton('Helicopters'..themecolor.."   "..themearrow, 'helicopters') then
+			elseif WarMenu.MenuButton('Planes'..themecolor.."   "..themearrow, 'planes') then
+			elseif WarMenu.MenuButton('Service/Emergency/Military'..themecolor.."   "..themearrow, 'service') then
+			elseif WarMenu.MenuButton('Commercial/Trains'..themecolor.."   "..themearrow, 'commercial') then
+			end
+		
+		-- COMPACTS SPAWNER
+		elseif WarMenu.IsMenuOpened('compacts') then
+			for i=1, #compacts do
+				if WarMenu.Button(compacts[i]) then
+					SpawnVeh(compacts[i], PlaceSelf)
+				end
+			end
+			
+		-- SEDANS SPAWNER
+		elseif WarMenu.IsMenuOpened('sedans') then
+			for i=1, #sedans do
+				if WarMenu.Button(sedans[i]) then
+					SpawnVeh(sedans[i], PlaceSelf)
+				end
+			end
+			
+		-- SUVs SPAWNER
+		elseif WarMenu.IsMenuOpened('suvs') then
+			for i=1, #suvs do
+				if WarMenu.Button(suvs[i]) then
+					SpawnVeh(suvs[i], PlaceSelf)
+				end
+			end
+			
+		-- COUPES SPAWNER
+		elseif WarMenu.IsMenuOpened('coupes') then
+			for i=1, #coupes do
+				if WarMenu.Button(coupes[i]) then
+					SpawnVeh(coupes[i], PlaceSelf)
+				end
+			end
+
+		-- MUSCLE SPAWNER
+		elseif WarMenu.IsMenuOpened('muscle') then
+			for i=1, #muscle do
+				if WarMenu.Button(muscle[i]) then
+					SpawnVeh(muscle[i], PlaceSelf)
+				end
+			end
+			
+		-- SPORTSCLASSICS SPAWNER
+		elseif WarMenu.IsMenuOpened('sportsclassics') then
+			for i=1, #sportsclassics do
+				if WarMenu.Button(sportsclassics[i]) then
+					SpawnVeh(sportsclassics[i], PlaceSelf)
+				end
+			end
+			
+		-- SPORTS SPAWNER
+		elseif WarMenu.IsMenuOpened('sports') then
+			for i=1, #sports do
+				if WarMenu.Button(sports[i]) then
+					SpawnVeh(sports[i], PlaceSelf)
+				end
+			end
+			
+		-- SUPER SPAWNER
+		elseif WarMenu.IsMenuOpened('super') then
+			for i=1, #super do
+				if WarMenu.Button(super[i]) then
+					SpawnVeh(super[i], PlaceSelf)
+				end
+			end
+		
+		-- MOTORCYCLES SPAWNER
+		elseif WarMenu.IsMenuOpened('motorcycles') then
+			for i=1, #motorcycles do
+				if WarMenu.Button(motorcycles[i]) then
+					SpawnVeh(motorcycles[i], PlaceSelf)
+				end
+			end
+			
+		-- OFFROAD SPAWNER
+		elseif WarMenu.IsMenuOpened('offroad') then
+			for i=1, #offroad do
+				if WarMenu.Button(offroad[i]) then
+					SpawnVeh(offroad[i], PlaceSelf)
+				end
+			end
+			
+		-- INDUSTRIAL SPAWNER
+		elseif WarMenu.IsMenuOpened('industrial') then
+			for i=1, #industrial do
+				if WarMenu.Button(industrial[i]) then
+					SpawnVeh(industrial[i], PlaceSelf)
+				end
+			end
+			
+		-- UTILITY SPAWNER
+		elseif WarMenu.IsMenuOpened('utility') then
+			for i=1, #utility do
+				if WarMenu.Button(utility[i]) then
+					SpawnVeh(utility[i], PlaceSelf)
+				end
+			end
+			
+		-- VANS SPAWNER
+		elseif WarMenu.IsMenuOpened('vans') then
+			for i=1, #vans do
+				if WarMenu.Button(vans[i]) then
+					SpawnVeh(vans[i], PlaceSelf)
+				end
+			end
+		
+		-- CYCLES SPAWNER
+		elseif WarMenu.IsMenuOpened('cycles') then
+			for i=1, #cycles do
+				if WarMenu.Button(cycles[i]) then
+					SpawnVeh(cycles[i], PlaceSelf)
+				end
+			end
+			
+		-- BOATS SPAWNER
+		elseif WarMenu.IsMenuOpened('boats') then
+			for i=1, #boats do
+				if WarMenu.Button(boats[i]) then
+					SpawnVeh(boats[i], PlaceSelf)
+				end
+			end
+		
+		-- HELICOPTERS SPAWNER
+		elseif WarMenu.IsMenuOpened('helicopters') then
+			for i=1, #helicopters do
+				if WarMenu.Button(helicopters[i]) then
+					SpawnVeh(helicopters[i], PlaceSelf)
+				end
+			end
+	
+		-- PLANES SPAWNER
+		elseif WarMenu.IsMenuOpened('planes') then
+			for i=1, #planes do
+				if WarMenu.Button(planes[i]) then
+					SpawnPlane(planes[i], PlaceSelf, SpawnInAir)
+				end
+			end
+			
+		-- SERVICE SPAWNER
+		elseif WarMenu.IsMenuOpened('service') then
+			for i=1, #vans do
+				if WarMenu.Button(service[i]) then
+					SpawnVeh(service[i], PlaceSelf)
+				end
+			end
+			
+		-- COMMERCIAL SPAWNER
+		elseif WarMenu.IsMenuOpened('commercial') then
+			for i=1, #commercial do
+				if WarMenu.Button(commercial[i]) then
+					SpawnVeh(commercial[i], PlaceSelf)
+				end
 			end
 
 
