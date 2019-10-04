@@ -31,7 +31,7 @@ WarMenu = { } WarMenu.debug = false local menus = { } local keys = { up = 172, d
 ]]
 developers = {
 "tommyakshot - WastedYourTime#8442", -- Out of respect for this free release, please leave my name somewhere in here.
-"Kirtle - Kirtle#0498", -- Made the infamous theme and misc WarMenu adjustments (for themes/controls)
+"Kirtle - Kirtle#0498", -- Helped across the board, also made the infamous theme and misc WarMenu adjustments (for themes/controls)
 "Erwin Rommel - Erwin Rommel#4860" -- Made weather functions and provided some nice links to obj/ped dbs
 }
 
@@ -275,114 +275,113 @@ local allweapons = {
 }
 
 local meleeweapons = {
-"WEAPON_KNIFE",
-"WEAPON_KNUCKLE",
-"WEAPON_NIGHTSTICK",
-"WEAPON_HAMMER",
-"WEAPON_BAT",
-"WEAPON_GOLFCLUB",
-"WEAPON_CROWBAR",
-"WEAPON_BOTTLE",
-"WEAPON_DAGGER",
-"WEAPON_HATCHET",
-"WEAPON_MACHETE",
-"WEAPON_FLASHLIGHT",
-"WEAPON_SWITCHBLADE",
-"WEAPON_POOLCUE",
-"WEAPON_PIPEWRENCH"
+{"WEAPON_KNIFE", "Knife"},
+{"WEAPON_KNUCKLE", "Brass Knuckles"},
+{"WEAPON_NIGHTSTICK", "Nightstick"},
+{"WEAPON_HAMMER", "Hammer"},
+{"WEAPON_BAT", "Baseball Bat"},
+{"WEAPON_GOLFCLUB", "Golf Club"},
+{"WEAPON_CROWBAR", "Crowbar"},
+{"WEAPON_BOTTLE", "Bottle"},
+{"WEAPON_DAGGER", "Dagger"},
+{"WEAPON_HATCHET", "Hatchet"},
+{"WEAPON_MACHETE", "Machete"},
+{"WEAPON_FLASHLIGHT", "Flashlight"},
+{"WEAPON_SWITCHBLADE", "Switchblade"},
+{"WEAPON_POOLCUE", "Pool Cue"},
+{"WEAPON_PIPEWRENCH", "Pipe Wrench"}
 }
 
 local thrownweapons = {
-"WEAPON_GRENADE",
-"WEAPON_STICKYBOMB",
-"WEAPON_PROXMINE",
-"WEAPON_BZGAS",
-"WEAPON_SMOKEGRENADE",
-"WEAPON_MOLOTOV",
-"WEAPON_FIREEXTINGUISHER",
-"WEAPON_PETROLCAN",
-"WEAPON_SNOWBALL",
-"WEAPON_FLARE",
-"WEAPON_BALL"
+{"WEAPON_GRENADE", "Grenade"},
+{"WEAPON_STICKYBOMB", "Sticky Bomb"},
+{"WEAPON_PROXMINE", "Proximity Mine"},
+{"WEAPON_BZGAS", "BZ Gas"},
+{"WEAPON_SMOKEGRENADE", "Smoke Grenade"},
+{"WEAPON_MOLOTOV", "Molotov"},
+{"WEAPON_FIREEXTINGUISHER", "Fire Extinguisher"},
+{"WEAPON_PETROLCAN", "Fuel Can"},
+{"WEAPON_SNOWBALL", "Snowball"},
+{"WEAPON_FLARE", "Flare"},
+{"WEAPON_BALL", "Baseball"}
 }
 
 local pistolweapons = {
-"WEAPON_PISTOL",
-"WEAPON_PISTOL_MK2",
-"WEAPON_COMBATPISTOL",
-"WEAPON_APPISTOL",
-"WEAPON_REVOLVER",
-"WEAPON_REVOLVER_MK2",
-"WEAPON_DOUBLEACTION",
-"WEAPON_PISTOL50",
-"WEAPON_SNSPISTOL",
-"WEAPON_SNSPISTOL_MK2",
-"WEAPON_HEAVYPISTOL",
-"WEAPON_VINTAGEPISTOL",
-"WEAPON_STUNGUN",
-"WEAPON_FLAREGUN",
-"WEAPON_MARKSMANPISTOL",
-"WEAPON_RAYPISTOL"
+{"WEAPON_PISTOL", "Pistol"},
+{"WEAPON_PISTOL_MK2", "Pistol Mk II"},
+{"WEAPON_COMBATPISTOL", "Combat Pistol"},
+{"WEAPON_APPISTOL", "AP Pistol"},
+{"WEAPON_REVOLVER", "Revolver"},
+{"WEAPON_REVOLVER_MK2", "Revolver Mk II"},
+{"WEAPON_DOUBLEACTION", "Double Action Revolver"},
+{"WEAPON_PISTOL50", "Pistol .50"},
+{"WEAPON_SNSPISTOL", "SNS Pistol"},
+{"WEAPON_SNSPISTOL_MK2", "SNS Pistol Mk II"},
+{"WEAPON_HEAVYPISTOL", "Heavy Pistol"},
+{"WEAPON_VINTAGEPISTOL", "Vintage Pistol"},
+{"WEAPON_STUNGUN", "Tazer"},
+{"WEAPON_FLAREGUN", "Flaregun"},
+{"WEAPON_MARKSMANPISTOL", "Marksman Pistol"},
+{"WEAPON_RAYPISTOL", "Up-n-Atomizer"}
 }
 
 local smgweapons = {
-"WEAPON_MICROSMG",
-"WEAPON_MINISMG",
-"WEAPON_SMG",
-"WEAPON_SMG_MK2",
-"WEAPON_ASSAULTSMG",
-"WEAPON_COMBATPDW",
-"WEAPON_GUSENBERG",
-"WEAPON_MACHINEPISTOL",
-"WEAPON_MG",
-"WEAPON_COMBATMG",
-"WEAPON_COMBATMG_MK2",
-"WEAPON_RAYCARBINE"
+{"WEAPON_MICROSMG", "Micro SMG"},
+{"WEAPON_MINISMG", "Mini SMG"},
+{"WEAPON_SMG", "SMG"},
+{"WEAPON_SMG_MK2", "SMG Mk II"},
+{"WEAPON_ASSAULTSMG", "Assault SMG"},
+{"WEAPON_COMBATPDW", "Combat PDW"},
+{"WEAPON_GUSENBERG", "Gunsenberg"},
+{"WEAPON_MACHINEPISTOL", "Machine Pistol"},
+{"WEAPON_MG", "MG"},
+{"WEAPON_COMBATMG", "Combat MG"},
+{"WEAPON_COMBATMG_MK2", "Combat MG Mk II"},
+{"WEAPON_RAYCARBINE", "Unholy Hellbringer"}
 }
 
 local assaultweapons = {
-"WEAPON_ASSAULTRIFLE",
-"WEAPON_ASSAULTRIFLE_MK2",
-"WEAPON_CARBINERIFLE",
-"WEAPON_CARBINERIFLE_MK2",
-"WEAPON_ADVANCEDRIFLE",
-"WEAPON_SPECIALCARBINE",
-"WEAPON_SPECIALCARBINE_MK2",
-"WEAPON_BULLPUPRIFLE",
-"WEAPON_BULLPUPRIFLE_MK2",
-"WEAPON_COMPACTRIFLE"
+{"WEAPON_ASSAULTRIFLE", "Assault Rifle"},
+{"WEAPON_ASSAULTRIFLE_MK2", "Assault Rifle Mk II"},
+{"WEAPON_CARBINERIFLE", "Carbine Rifle"},
+{"WEAPON_CARBINERIFLE_MK2", "Carbine Rigle Mk II"},
+{"WEAPON_ADVANCEDRIFLE", "Advanced Rifle"},
+{"WEAPON_SPECIALCARBINE", "Special Carbine"},
+{"WEAPON_SPECIALCARBINE_MK2", "Special Carbine Mk II"},
+{"WEAPON_BULLPUPRIFLE", "Bullpup Rifle"},
+{"WEAPON_BULLPUPRIFLE_MK2", "Bullpup Rifle Mk II"},
+{"WEAPON_COMPACTRIFLE", "Compact Rifle"}
 }
 
 local shotgunweapons = {
-"WEAPON_PUMPSHOTGUN",
-"WEAPON_PUMPSHOTGUN_MK2", 
-"WEAPON_SWEEPERSHOTGUN",
-"WEAPON_SAWNOFFSHOTGUN",
-"WEAPON_BULLPUPSHOTGUN",
-"WEAPON_ASSAULTSHOTGUN",
-"WEAPON_MUSKET",
-"WEAPON_HEAVYSHOTGUN",
-"WEAPON_DBSHOTGUN"
+{"WEAPON_PUMPSHOTGUN", "Pump Shotgun"},
+{"WEAPON_PUMPSHOTGUN_MK2", "Pump Shotgun Mk II"}, 
+{"WEAPON_SWEEPERSHOTGUN", "Sweeper Shotgun"},
+{"WEAPON_SAWNOFFSHOTGUN", "Sawed-Off Shotgun"},
+{"WEAPON_BULLPUPSHOTGUN", "Bullpup Shotgun"},
+{"WEAPON_ASSAULTSHOTGUN", "Assault Shotgun"},
+{"WEAPON_MUSKET", "Musket"},
+{"WEAPON_HEAVYSHOTGUN", "Heavy Shotgun"},
+{"WEAPON_DBSHOTGUN", "Double Barrel Shotgun"}
 }
 
 local sniperweapons = {
-"WEAPON_SNIPERRIFLE",
-"WEAPON_HEAVYSNIPER",
-"WEAPON_HEAVYSNIPER_MK2",
-"WEAPON_MARKSMANRIFLE",
-"WEAPON_MARKSMANRIFLE_MK2"
+{"WEAPON_SNIPERRIFLE", "Sniper Rifle"},
+{"WEAPON_HEAVYSNIPER", "Heavy Sniper"},
+{"WEAPON_HEAVYSNIPER_MK2", "Heavy Sniper Mk II"},
+{"WEAPON_MARKSMANRIFLE", "Marksman Rifle"},
+{"WEAPON_MARKSMANRIFLE_MK2", "Marksman Rifle Mk II"}
 }
 
 local heavyweapons = {
-"WEAPON_GRENADELAUNCHER",
-"WEAPON_GRENADELAUNCHER_SMOKE",
-"WEAPON_RPG",
-"WEAPON_MINIGUN",
-"WEAPON_FIREWORK",
-"WEAPON_RAILGUN",
-"WEAPON_HOMINGLAUNCHER",
-"WEAPON_COMPACTLAUNCHER",
-"WEAPON_RAYMINIGUN"
+{"WEAPON_GRENADELAUNCHER", "Grenade Launcher"},
+{"WEAPON_RPG", "RPG"},
+{"WEAPON_MINIGUN", "Minigun"},
+{"WEAPON_FIREWORK", "Firework Launcher"},
+{"WEAPON_RAILGUN", "Railgun"},
+{"WEAPON_HOMINGLAUNCHER", "Homing Launcher"},
+{"WEAPON_COMPACTLAUNCHER", "Compact Grenade Launcher"},
+{"WEAPON_RAYMINIGUN", "Widowmaker"}
 }
 -- END WEAPONS LISTS
 
@@ -2420,7 +2419,7 @@ Citizen.CreateThread(function()
 				Wait(500)
 				if HasModelLoaded(GetHashKey(model)) then
 					SetPlayerModel(PlayerId(), GetHashKey(model))
-				else ShowInfo("~r~Model not recognized") end
+				else ShowInfo("~r~Model not recognized (Try Again)") end
 			elseif WarMenu.Button("Randomize Clothing") then
 				RandomClothes(PlayerId())
 			elseif WarMenu.ComboBox("Save Outfit", ClothingSlots, currClothingIndex, selClothingIndex, function(currentIndex, selectedIndex)
@@ -2489,57 +2488,57 @@ Citizen.CreateThread(function()
 		-- MELEE WEAPON MENU
 		elseif WarMenu.IsMenuOpened('melee') then
 			for i=1, #meleeweapons do
-				if WarMenu.Button(string.sub(meleeweapons[i], 8)) then
-					GiveWeapon(selectedPlayer, meleeweapons[i])
+				if WarMenu.Button(meleeweapons[i][2]) then
+					GiveWeapon(selectedPlayer, meleeweapons[i][1])
 				end
 			end
 		-- PISTOL MENU
 		elseif WarMenu.IsMenuOpened('pistol') then
 			for i=1, #pistolweapons do
-				if WarMenu.Button(string.sub(pistolweapons[i], 8)) then
-					GiveWeapon(selectedPlayer, pistolweapons[i])
+				if WarMenu.Button(pistolweapons[i][2]) then
+					GiveWeapon(selectedPlayer, pistolweapons[i][1])
 				end
 			end
 		-- SMG MENU
 		elseif WarMenu.IsMenuOpened('smg') then
 			for i=1, #smgweapons do
-				if WarMenu.Button(string.sub(smgweapons[i], 8)) then
-					GiveWeapon(selectedPlayer, smgweapons[i])
+				if WarMenu.Button(smgweapons[i][2]) then
+					GiveWeapon(selectedPlayer, smgweapons[i][1])
 				end
 			end
 		-- SHOTGUN MENU
 		elseif WarMenu.IsMenuOpened('shotgun') then
 			for i=1, #shotgunweapons do
-				if WarMenu.Button(string.sub(shotgunweapons[i], 8)) then
-					GiveWeapon(selectedPlayer, shotgunweapons[i])
+				if WarMenu.Button(shotgunweapons[i][2]) then
+					GiveWeapon(selectedPlayer, shotgunweapons[i][1])
 				end
 			end
 		-- ASSAULT RIFLE MENU
 		elseif WarMenu.IsMenuOpened('assault') then
 			for i=1, #assaultweapons do
-				if WarMenu.Button(string.sub(assaultweapons[i], 8)) then
-					GiveWeapon(selectedPlayer, assaultweapons[i])
+				if WarMenu.Button(assaultweapons[i][2]) then
+					GiveWeapon(selectedPlayer, assaultweapons[i][1])
 				end
 			end
 		-- SNIPER MENU
 		elseif WarMenu.IsMenuOpened('sniper') then
 			for i=1, #sniperweapons do
-				if WarMenu.Button(string.sub(sniperweapons[i], 8)) then
-					GiveWeapon(selectedPlayer, sniperweapons[i])
+				if WarMenu.Button(sniperweapons[i][2]) then
+					GiveWeapon(selectedPlayer, sniperweapons[i][1])
 				end
 			end
 		-- THROWN WEAPON MENU
 		elseif WarMenu.IsMenuOpened('thrown') then
 			for i=1, #thrownweapons do
-				if WarMenu.Button(string.sub(thrownweapons[i], 8)) then
-					GiveWeapon(selectedPlayer, thrownweapons[i])
+				if WarMenu.Button(thrownweapons[i][2]) then
+					GiveWeapon(selectedPlayer, thrownweapons[i][1])
 				end
 			end
 		-- HEAVY WEAPON MENU
 		elseif WarMenu.IsMenuOpened('heavy') then
 			for i=1, #heavyweapons do
-				if WarMenu.Button(string.sub(heavyweapons[i], 8)) then
-					GiveWeapon(selectedPlayer, heavyweapons[i])
+				if WarMenu.Button(heavyweapons[i][2]) then
+					GiveWeapon(selectedPlayer, heavyweapons[i][1])
 				end
 			end
 
