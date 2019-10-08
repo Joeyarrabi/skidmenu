@@ -1,6 +1,9 @@
 ## Skidmenu
 Skidmenu is a free, open-source lua menu for FiveM.
 
+> Note: Anyone is free to use this menu and modify it as they please. All I ask in return is that you do not try to monetize this release, I made this because I was tired of seeing people trying to sell the same old reused code and charging ridiculous amounts for it
+
+
 ##### Features:
 - Self Options
 - Player Options
@@ -75,3 +78,10 @@ Skidmenu is a free, open-source lua menu for FiveM.
 - ESX Options ( `WIP` )
 - VRP Options ( `WIP` )
 - Other ( `WIP` )
+
+> Credits:
+- tommyakshot `WastedYourTime#8442` Main Developer
+
+- Kirtle `Kirtle#0498` Helped across the board, also made the infamous theme and misc WarMenu adjustments (for themes/controls)
+
+- Erwin Rommel `Erwin Rommel#4860` Made weather functions and provided some nice links to obj/ped dbs
