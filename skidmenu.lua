@@ -30,7 +30,7 @@ WarMenu = { } WarMenu.debug = false local menus = { } local keys = { up = 172, d
 	Add your name or don't - I don't care.
 ]]
 developers = {
-"tommyakshot - WastedYourTime#8442", -- Out of respect for this free release, please leave my name somewhere in here.
+"tommyakshot - Joeyarrabi#7440", -- Out of respect for this free release, please leave my name somewhere in here.
 "Kirtle - Kirtle#0498", -- Helped across the board, also made the infamous theme and misc WarMenu adjustments (for themes/controls)
 "Erwin Rommel - Erwin Rommel#4860" -- Made weather functions and provided some nice links to obj/ped dbs
 }
