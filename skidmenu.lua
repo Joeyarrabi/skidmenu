@@ -1865,6 +1865,7 @@ local function SpawnVeh(model, PlaceSelf)
 		local heading = GetEntityHeading(PlayerPedId())
 		local veh = CreateVehicle(GetHashKey(model), coords.x+xf*5, coords.y+yf*5, coords.z, heading, 1, 1)
 		if PlaceSelf then SetPedIntoVehicle(PlayerPedId(), veh, -1) end
+		return veh
 	else ShowInfo("~r~Model not recognized") end
 end
 
@@ -2553,6 +2554,21 @@ Citizen.CreateThread(function()
 				SpawnInAir = not SpawnInAir
 			elseif WarMenu.CheckBox("Collision", Collision) then
 				Collision = not Collision
+			elseif WarMenu.CheckBox("Deadly Bulldozer", DeadlyBulldozer) then
+				DeadlyBulldozer = not DeadlyBulldozer
+				if DeadlyBulldozer then
+					local veh = SpawnVeh("BULLDOZER", 1)
+					SetVehicleCanBreak(veh, not DeadlyBulldozer)
+					SetVehicleCanBeVisiblyDamaged(veh, not DeadlyBulldozer)
+					SetVehicleEnginePowerMultiplier(veh, 2500.0)
+					SetVehicleEngineTorqueMultiplier(veh, 2500.0)
+					SetVehicleEngineOn(veh, 1, 1, 1)
+					SetVehicleGravityAmount(veh, 50.0)
+					SetVehicleColours(veh, 27, 27)
+					ShowInfo("~r~Go forth and devour thy enemies!\nPress ~w~E ~r~to launch a minion!")
+				elseif not DeadlyBulldozer and IsPedInModel(PlayerPedId(), GetHashKey("BULLDOZER")) then
+					DeleteVehicle(GetVehiclePedIsIn(PlayerPedId(), 0))
+				end
 			end
 			
 		-- VEHICLE SPAWNER MENU
@@ -3042,6 +3058,24 @@ Citizen.CreateThread(function()
 			end
 			for k in EnumeratePeds() do
 				SetEntityNoCollisionEntity(k, playerveh, true)
+			end
+		end
+		
+		if DeadlyBulldozer then
+			SetVehicleBulldozerArmPosition(GetVehiclePedIsIn(PlayerPedId(), 0), math.random()%1, 1)
+			SetVehicleEngineHealth(GetVehiclePedIsIn(PlayerPedId(), 0), 1000.0)
+			if not IsPedInAnyVehicle(PlayerPedId(), 0) then 
+				DeleteVehicle(GetVehiclePedIsIn(PlayerPedId(), 1))
+				DeadlyBulldozer = not DeadlyBulldozer
+			elseif IsControlJustPressed(0, Keys["E"]) then
+				local veh = GetVehiclePedIsIn(PlayerPedId(), 0)
+				local coords = GetEntityCoords(veh)
+				local forward = GetEntityForwardVector(veh)
+				local heading = GetEntityHeading(veh)
+				local veh = CreateVehicle(GetHashKey("BULLDOZER"), coords.x+forward.x*10, coords.y+forward.y*10, coords.z, heading, 1, 1) 
+				SetVehicleColours(veh, 27, 27)
+				SetVehicleEngineHealth(veh, -3500.0)
+				ApplyForce(veh, forward*500.0)
 			end
 		end
 
