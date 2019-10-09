@@ -80,7 +80,7 @@ Skidmenu is a free, open-source lua menu for FiveM.
 - Other ( `WIP` )
 
 > Credits:
-- tommyakshot `WastedYourTime#8442` Main Developer
+- tommyakshot `Joeyarrabi#7440` Main Developer
 
 - Kirtle `Kirtle#0498` Helped across the board, also made the infamous theme and misc WarMenu adjustments (for themes/controls)
 
