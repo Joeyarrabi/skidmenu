@@ -1996,7 +1996,7 @@ local function SpawnVeh(model, PlaceSelf, SpawnEngineOn)
 		if PlaceSelf then SetPedIntoVehicle(PlayerPedId(), veh, -1) end
 		if SpawnEngineOn then SetVehicleEngineOn(veh, 1, 1) end
 		return veh
-	else ShowInfo("~r~Model not recognized") end
+	else ShowInfo("~r~Model not recognized (Try Again)") end
 end
 
 local function SpawnPlane(model, PlaceSelf, SpawnInAir)
@@ -2014,7 +2014,7 @@ local function SpawnPlane(model, PlaceSelf, SpawnInAir)
 			veh = CreateVehicle(GetHashKey(model), coords.x+xf*5, coords.y+yf*5, coords.z, heading, 1, 1) 
 		end
 		if PlaceSelf then SetPedIntoVehicle(PlayerPedId(), veh, -1) end
-	else ShowInfo("~r~Model not recognized") end
+	else ShowInfo("~r~Model not recognized (Try Again)") end
 end
 
 --[[
@@ -2757,7 +2757,10 @@ Citizen.CreateThread(function()
 		-- COMPACTS SPAWNER
 		elseif WarMenu.IsMenuOpened('compacts') then
 			for i=1, #compacts do
-				if WarMenu.Button(compacts[i]) then
+				local vehname = GetLabelText(compacts[i])
+				if vehname == "NULL" then vehname = compacts[i] end -- Avoid getting NULL (for some reason GetLabelText returns null for some vehs)
+				local carButton = WarMenu.Button(vehname)
+				if carButton then
 					SpawnVeh(compacts[i], PlaceSelf, SpawnEngineOn)
 				end
 			end
@@ -2765,7 +2768,10 @@ Citizen.CreateThread(function()
 		-- SEDANS SPAWNER
 		elseif WarMenu.IsMenuOpened('sedans') then
 			for i=1, #sedans do
-				if WarMenu.Button(sedans[i]) then
+				local vehname = GetLabelText(sedans[i])
+				if vehname == "NULL" then vehname = sedans[i] end
+				local carButton = WarMenu.Button(vehname)
+				if carButton then
 					SpawnVeh(sedans[i], PlaceSelf, SpawnEngineOn)
 				end
 			end
@@ -2773,7 +2779,10 @@ Citizen.CreateThread(function()
 		-- SUVs SPAWNER
 		elseif WarMenu.IsMenuOpened('suvs') then
 			for i=1, #suvs do
-				if WarMenu.Button(suvs[i]) then
+				local vehname = GetLabelText(suvs[i])
+				if vehname == "NULL" then vehname = suvs[i] end
+				local carButton = WarMenu.Button(vehname)
+				if carButton then
 					SpawnVeh(suvs[i], PlaceSelf, SpawnEngineOn)
 				end
 			end
@@ -2781,7 +2790,10 @@ Citizen.CreateThread(function()
 		-- COUPES SPAWNER
 		elseif WarMenu.IsMenuOpened('coupes') then
 			for i=1, #coupes do
-				if WarMenu.Button(coupes[i]) then
+				local vehname = GetLabelText(coupes[i])
+				if vehname == "NULL" then vehname = coupes[i] end
+				local carButton = WarMenu.Button(vehname)
+				if carButton then
 					SpawnVeh(coupes[i], PlaceSelf, SpawnEngineOn)
 				end
 			end
@@ -2789,7 +2801,10 @@ Citizen.CreateThread(function()
 		-- MUSCLE SPAWNER
 		elseif WarMenu.IsMenuOpened('muscle') then
 			for i=1, #muscle do
-				if WarMenu.Button(muscle[i]) then
+				local vehname = GetLabelText(muscle[i])
+				if vehname == "NULL" then vehname = muscle[i] end
+				local carButton = WarMenu.Button(vehname)
+				if carButton then
 					SpawnVeh(muscle[i], PlaceSelf, SpawnEngineOn)
 				end
 			end
@@ -2797,7 +2812,10 @@ Citizen.CreateThread(function()
 		-- SPORTSCLASSICS SPAWNER
 		elseif WarMenu.IsMenuOpened('sportsclassics') then
 			for i=1, #sportsclassics do
-				if WarMenu.Button(sportsclassics[i]) then
+				local vehname = GetLabelText(sportsclassics[i])
+				if vehname == "NULL" then vehname = sportsclassics[i] end
+				local carButton = WarMenu.Button(vehname)
+				if carButton then
 					SpawnVeh(sportsclassics[i], PlaceSelf, SpawnEngineOn)
 				end
 			end
@@ -2805,7 +2823,10 @@ Citizen.CreateThread(function()
 		-- SPORTS SPAWNER
 		elseif WarMenu.IsMenuOpened('sports') then
 			for i=1, #sports do
-				if WarMenu.Button(sports[i]) then
+				local vehname = GetLabelText(sports[i])
+				if vehname == "NULL" then vehname = sports[i] end
+				local carButton = WarMenu.Button(vehname)
+				if carButton then
 					SpawnVeh(sports[i], PlaceSelf, SpawnEngineOn)
 				end
 			end
@@ -2813,7 +2834,10 @@ Citizen.CreateThread(function()
 		-- SUPER SPAWNER
 		elseif WarMenu.IsMenuOpened('super') then
 			for i=1, #super do
-				if WarMenu.Button(super[i]) then
+				local vehname = GetLabelText(super[i])
+				if vehname == "NULL" then vehname = super[i] end
+				local carButton = WarMenu.Button(vehname)
+				if carButton then
 					SpawnVeh(super[i], PlaceSelf, SpawnEngineOn)
 				end
 			end
@@ -2821,7 +2845,10 @@ Citizen.CreateThread(function()
 		-- MOTORCYCLES SPAWNER
 		elseif WarMenu.IsMenuOpened('motorcycles') then
 			for i=1, #motorcycles do
-				if WarMenu.Button(motorcycles[i]) then
+				local vehname = GetLabelText(motorcycles[i])
+				if vehname == "NULL" then vehname = motorcycles[i] end
+				local carButton = WarMenu.Button(vehname)
+				if carButton then
 					SpawnVeh(motorcycles[i], PlaceSelf, SpawnEngineOn)
 				end
 			end
@@ -2829,7 +2856,10 @@ Citizen.CreateThread(function()
 		-- OFFROAD SPAWNER
 		elseif WarMenu.IsMenuOpened('offroad') then
 			for i=1, #offroad do
-				if WarMenu.Button(offroad[i]) then
+				local vehname = GetLabelText(offroad[i])
+				if vehname == "NULL" then vehname = offroad[i] end
+				local carButton = WarMenu.Button(vehname)
+				if carButton then
 					SpawnVeh(offroad[i], PlaceSelf, SpawnEngineOn)
 				end
 			end
@@ -2837,7 +2867,10 @@ Citizen.CreateThread(function()
 		-- INDUSTRIAL SPAWNER
 		elseif WarMenu.IsMenuOpened('industrial') then
 			for i=1, #industrial do
-				if WarMenu.Button(industrial[i]) then
+				local vehname = GetLabelText(industrial[i])
+				if vehname == "NULL" then vehname = industrial[i] end
+				local carButton = WarMenu.Button(vehname)
+				if carButton then
 					SpawnVeh(industrial[i], PlaceSelf, SpawnEngineOn)
 				end
 			end
@@ -2845,7 +2878,10 @@ Citizen.CreateThread(function()
 		-- UTILITY SPAWNER
 		elseif WarMenu.IsMenuOpened('utility') then
 			for i=1, #utility do
-				if WarMenu.Button(utility[i]) then
+				local vehname = GetLabelText(utility[i])
+				if vehname == "NULL" then vehname = utility[i] end
+				local carButton = WarMenu.Button(vehname)
+				if carButton then
 					SpawnVeh(utility[i], PlaceSelf, SpawnEngineOn)
 				end
 			end
@@ -2853,7 +2889,10 @@ Citizen.CreateThread(function()
 		-- VANS SPAWNER
 		elseif WarMenu.IsMenuOpened('vans') then
 			for i=1, #vans do
-				if WarMenu.Button(vans[i]) then
+				local vehname = GetLabelText(vans[i])
+				if vehname == "NULL" then vehname = vans[i] end
+				local carButton = WarMenu.Button(vehname)
+				if carButton then
 					SpawnVeh(vans[i], PlaceSelf, SpawnEngineOn)
 				end
 			end
@@ -2861,7 +2900,10 @@ Citizen.CreateThread(function()
 		-- CYCLES SPAWNER
 		elseif WarMenu.IsMenuOpened('cycles') then
 			for i=1, #cycles do
-				if WarMenu.Button(cycles[i]) then
+				local vehname = GetLabelText(cycles[i])
+				if vehname == "NULL" then vehname = cycles[i] end
+				local carButton = WarMenu.Button(vehname)
+				if carButton then
 					SpawnVeh(cycles[i], PlaceSelf, SpawnEngineOn)
 				end
 			end
@@ -2869,7 +2911,10 @@ Citizen.CreateThread(function()
 		-- BOATS SPAWNER
 		elseif WarMenu.IsMenuOpened('boats') then
 			for i=1, #boats do
-				if WarMenu.Button(boats[i]) then
+				local vehname = GetLabelText(boats[i])
+				if vehname == "NULL" then vehname = boats[i] end
+				local carButton = WarMenu.Button(vehname)
+				if carButton then
 					SpawnVeh(boats[i], PlaceSelf, SpawnEngineOn)
 				end
 			end
@@ -2877,7 +2922,10 @@ Citizen.CreateThread(function()
 		-- HELICOPTERS SPAWNER
 		elseif WarMenu.IsMenuOpened('helicopters') then
 			for i=1, #helicopters do
-				if WarMenu.Button(helicopters[i]) then
+				local vehname = GetLabelText(helicopters[i])
+				if vehname == "NULL" then vehname = helicopters[i] end
+				local carButton = WarMenu.Button(vehname)
+				if carButton then
 					SpawnVeh(helicopters[i], PlaceSelf, SpawnEngineOn)
 				end
 			end
@@ -2885,15 +2933,21 @@ Citizen.CreateThread(function()
 		-- PLANES SPAWNER
 		elseif WarMenu.IsMenuOpened('planes') then
 			for i=1, #planes do
-				if WarMenu.Button(planes[i]) then
+				local vehname = GetLabelText(planes[i])
+				if vehname == "NULL" then vehname = planes[i] end
+				local carButton = WarMenu.Button(vehname)
+				if carButton then
 					SpawnPlane(planes[i], PlaceSelf, SpawnInAir)
 				end
 			end
 			
 		-- SERVICE SPAWNER
 		elseif WarMenu.IsMenuOpened('service') then
-			for i=1, #vans do
-				if WarMenu.Button(service[i]) then
+			for i=1, #service do
+				local vehname = GetLabelText(service[i])
+				if vehname == "NULL" then vehname = service[i] end
+				local carButton = WarMenu.Button(vehname)
+				if carButton then
 					SpawnVeh(service[i], PlaceSelf, SpawnEngineOn)
 				end
 			end
@@ -2901,7 +2955,10 @@ Citizen.CreateThread(function()
 		-- COMMERCIAL SPAWNER
 		elseif WarMenu.IsMenuOpened('commercial') then
 			for i=1, #commercial do
-				if WarMenu.Button(commercial[i]) then
+				local vehname = GetLabelText(commercial[i])
+				if vehname == "NULL" then vehname = commercial[i] end
+				local carButton = WarMenu.Button(vehname)
+				if carButton then
 					SpawnVeh(commercial[i], PlaceSelf, SpawnEngineOn)
 				end
 			end
