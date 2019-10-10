@@ -55,9 +55,17 @@ Skidmenu is a free, open-source lua menu for FiveM.
 
 > Vehicle Options:
 - Vehicle Spawner ( `With Categories` )
+- Vehicle Mods ( `WIP` )
+- Vehicle Godmode
+- Repair Vehicles
+- Clean Vehicle
+- 
 - Toggle put self into Spawned Vehicle
 - Spawn Planes in air
-- Toggle Collisio
+- Toggle Collision
+- Deadly Bulldozer
+- Toggle Vehicles with Engine ON/OFF
+- 
 
 > World Options:
 - Object Spawner
@@ -65,8 +73,10 @@ Skidmenu is a free, open-source lua menu for FiveM.
 - Time Changer ( `WIP` )
 - Disable Cars
 - Disable Guns
+- Clear Streets
 - Noisy Vehicles
 - Make all Vehicles Fly
+- Set All Nearby Vehicles Specific Plate
 - Set Gravity
 
 > Misc Options:
