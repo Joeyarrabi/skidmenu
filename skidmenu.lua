@@ -81,6 +81,16 @@ menulist = {
 
 -- VEHICLE SUBMENUS
 'vehiclespawner',
+'vehiclemods',
+'vehiclecolors',
+'vehiclecolors_primary',
+'vehiclecolors_secondary',
+'primary_classic',
+'primary_matte',
+'primary_metal',
+'secondary_classic',
+'secondary_matte',
+'secondary_metal',
 
 -- VEHICLE SPAWNER SUBMENUS
 'compacts',
@@ -1094,6 +1104,120 @@ local commercial = {
 
 -- END VEHICLES LISTS
 
+-- VEHICLE MODS LIST (this is going to take a while...)
+
+local classicColors = {
+{"Black", 0},
+{"Carbon Black", 147},
+{"Graphite", 1},
+{"Anhracite Black", 11},
+{"Black Steel", 2},
+{"Dark Steel", 3},
+{"Silver", 4},
+{"Bluish Silver", 5},
+{"Rolled Steel", 6},
+{"Shadow Silver", 7},
+{"Stone Silver", 8},
+{"Midnight Silver", 9},
+{"Cast Iron Silver", 10},
+{"Red", 27},
+{"Torino Red", 28},
+{"Formula Red", 29},
+{"Lava Red", 150},
+{"Blaze Red", 30},
+{"Grace Red", 31},
+{"Garnet Red", 32},
+{"Sunset Red", 33},
+{"Cabernet Red", 34},
+{"Wine Red", 143},
+{"Candy Red", 35},
+{"Hot Pink", 135},
+{"Pfsiter Pink", 137},
+{"Salmon Pink", 136},
+{"Sunrise Orange", 36},
+{"Orange", 38},
+{"Bright Orange", 138},
+{"Gold", 99},
+{"Bronze", 90},
+{"Yellow", 88},
+{"Race Yellow", 89},
+{"Dew Yellow", 91},
+{"Dark Green", 49},
+{"Racing Green", 50},
+{"Sea Green", 51},
+{"Olive Green", 52},
+{"Bright Green", 53},
+{"Gasoline Green", 54},
+{"Lime Green", 92},
+{"Midnight Blue", 141},
+{"Galaxy Blue", 61},
+{"Dark Blue", 62},
+{"Saxon Blue", 63},
+{"Blue", 64},
+{"Mariner Blue", 65},
+{"Harbor Blue", 66},
+{"Diamond Blue", 67},
+{"Surf Blue", 68},
+{"Nautical Blue", 69},
+{"Racing Blue", 73},
+{"Ultra Blue", 70},
+{"Light Blue", 74},
+{"Chocolate Brown", 96},
+{"Bison Brown", 101},
+{"Creeen Brown", 95},
+{"Feltzer Brown", 94},
+{"Maple Brown", 97},
+{"Beechwood Brown", 103},
+{"Sienna Brown", 104},
+{"Saddle Brown", 98},
+{"Moss Brown", 100},
+{"Woodbeech Brown", 102},
+{"Straw Brown", 99},
+{"Sandy Brown", 105},
+{"Bleached Brown", 106},
+{"Schafter Purple", 71},
+{"Spinnaker Purple", 72},
+{"Midnight Purple", 142},
+{"Bright Purple", 145},
+{"Cream", 107},
+{"Ice White", 111},
+{"Frost White", 112}
+}
+
+local matteColors = {
+{"Black", 12},
+{"Gray", 13},
+{"Light Gray", 14},
+{"Ice White", 131},
+{"Blue", 83},
+{"Dark Blue", 82},
+{"Midnight Blue", 84},
+{"Midnight Purple", 149},
+{"Schafter Purple", 148},
+{"Red", 39},
+{"Dark Red", 40},
+{"Orange", 41},
+{"Yellow", 42},
+{"Lime Green", 55},
+{"Green", 128},
+{"Forest Green", 151},
+{"Foliage Green", 155},
+{"Olive Darb", 152},
+{"Dark Earth", 153},
+{"Desert Tan", 154}
+}
+
+local metalColors = {
+{"Brushed Steel", 117},
+{"Brushed Black Steel", 118},
+{"Brushed Aluminum", 119},
+{"Chrome", 120},
+{"Pure Gold", 158},
+{"Brushed Gold", 159}
+}
+
+-- END VEHICLE MODS LIST
+
 local Keys = {
   ["ESC"] = 322, ["F1"] = 288, ["F2"] = 289, ["F3"] = 170, ["F5"] = 166, ["F6"] = 167, ["F7"] = 168, ["F8"] = 169, ["F9"] = 56, ["F10"] = 57,
   ["~"] = 243, ["1"] = 157, ["2"] = 158, ["3"] = 160, ["4"] = 164, ["5"] = 165, ["6"] = 159, ["7"] = 161, ["8"] = 162, ["9"] = 163, ["-"] = 84, ["="] = 83, ["BACKSPACE"] = 177,
@@ -1530,6 +1654,11 @@ local function SpectatePlayer(id)
 	end
 end
 
+local function FixVeh(veh)
+	SetVehicleEngineHealth(veh, 1000)
+	SetVehicleFixed(veh)
+end
+
 local function ExplodePlayer(target)
 	local ped = GetPlayerPed(target)
 	local coords = GetEntityCoords(ped)
@@ -1855,7 +1984,7 @@ local function RageShoot(target)
 	end
 end
 
-local function SpawnVeh(model, PlaceSelf)
+local function SpawnVeh(model, PlaceSelf, SpawnEngineOn)
 	RequestModel(GetHashKey(model))
 	Wait(500)
 	if HasModelLoaded(GetHashKey(model)) then
@@ -1865,6 +1994,7 @@ local function SpawnVeh(model, PlaceSelf)
 		local heading = GetEntityHeading(PlayerPedId())
 		local veh = CreateVehicle(GetHashKey(model), coords.x+xf*5, coords.y+yf*5, coords.z, heading, 1, 1)
 		if PlaceSelf then SetPedIntoVehicle(PlayerPedId(), veh, -1) end
+		if SpawnEngineOn then SetVehicleEngineOn(veh, 1, 1) end
 		return veh
 	else ShowInfo("~r~Model not recognized") end
 end
@@ -2219,6 +2349,7 @@ Citizen.CreateThread(function()
 	local objVisible = true
 	local PlaceSelf = true
 	local SpawnInAir = true
+	local SpawnEngineOn = true
 
 	-- TABLES
 	SpawnedObjects = {}
@@ -2256,6 +2387,7 @@ Citizen.CreateThread(function()
 
 	-- VEHICLE MENU SUBMENUS
 	WarMenu.CreateSubMenu('vehiclespawner', 'vehicle', 'Vehicle Spawner')
+	WarMenu.CreateSubMenu('vehiclemods', 'vehicle', 'Vehicle Mods')
 	
 	-- VEHICLE SPAWNER MENU
 	WarMenu.CreateSubMenu('compacts', 'vehiclespawner', 'Compacts')
@@ -2277,6 +2409,19 @@ Citizen.CreateThread(function()
 	WarMenu.CreateSubMenu('planes', 'vehiclespawner', 'Planes')
 	WarMenu.CreateSubMenu('service', 'vehiclespawner', 'Service')
 	WarMenu.CreateSubMenu('commercial', 'vehiclespawner', 'Commercial')
+	
+	-- VEHICLE MODS SUBMENUS
+	WarMenu.CreateSubMenu('vehiclecolors', 'vehiclemods', 'Vehicle Colors')
+	WarMenu.CreateSubMenu('vehiclecolors_primary', 'vehiclecolors', 'Primary Color')
+	WarMenu.CreateSubMenu('vehiclecolors_secondary', 'vehiclecolors', 'Secondary Color')
+	
+	WarMenu.CreateSubMenu('primary_classic', 'vehiclecolors_primary', 'Classic Colors')
+	WarMenu.CreateSubMenu('primary_matte', 'vehiclecolors_primary', 'Matte Colors')
+	WarMenu.CreateSubMenu('primary_metal', 'vehiclecolors_primary', 'Metals')
+	
+	WarMenu.CreateSubMenu('secondary_classic', 'vehiclecolors_secondary', 'Classic Colors')
+	WarMenu.CreateSubMenu('secondary_matte', 'vehiclecolors_secondary', 'Matte Colors')
+	WarMenu.CreateSubMenu('secondary_metal', 'vehiclecolors_secondary', 'Metals')
 
 	-- WORLD MENU SUBMENUS
 	WarMenu.CreateSubMenu('objectspawner', 'world', 'Object Spawner')
@@ -2457,7 +2602,7 @@ Citizen.CreateThread(function()
 				SuperDamage = not SuperDamage
 				if SuperDamage then
 					local _,wep = GetCurrentPedWeapon(PlayerPedId(), 1)
-					SetPlayerWeaponDamageModifier(PlayerId(), 9999.9)
+					SetPlayerWeaponDamageModifier(PlayerId(), 200.0)
 				else
 					local _,wep = GetCurrentPedWeapon(PlayerPedId(), 1)
 					SetPlayerWeaponDamageModifier(PlayerId(), 1.0)
@@ -2548,16 +2693,22 @@ Citizen.CreateThread(function()
 		-- VEHICLE OPTIONS MENU
 		elseif WarMenu.IsMenuOpened('vehicle') then
 			if WarMenu.MenuButton("Vehicle Spawner"..themecolor.."   "..themearrow, 'vehiclespawner') then
-			elseif WarMenu.CheckBox("Put Self Into Spawned Vehicle", PlaceSelf) then
-				PlaceSelf = not PlaceSelf
-			elseif WarMenu.CheckBox("Spawn Planes In Air", SpawnInAir) then
-				SpawnInAir = not SpawnInAir
+			elseif WarMenu.MenuButton("Vehicle Mods"..themecolor.."   "..themearrow, 'vehiclemods') then
+			elseif WarMenu.CheckBox("Vehicle Godmode", VehGodmode) then
+				VehGodmode	= not VehGodmode
+			elseif WarMenu.Button("Repair Vehicle") then
+				local veh = GetVehiclePedIsIn(PlayerPedId(), 0)
+				FixVeh(veh)
+				SetVehicleEngineOn(veh, 1, 1)
+			elseif WarMenu.Button("Clean Vehicle") then
+				local veh = GetVehiclePedIsIn(PlayerPedId(), 0)
+				SetVehicleDirtLevel(veh, 0)
 			elseif WarMenu.CheckBox("Collision", Collision) then
 				Collision = not Collision
 			elseif WarMenu.CheckBox("Deadly Bulldozer", DeadlyBulldozer) then
 				DeadlyBulldozer = not DeadlyBulldozer
 				if DeadlyBulldozer then
-					local veh = SpawnVeh("BULLDOZER", 1)
+					local veh = SpawnVeh("BULLDOZER", 1, SpawnEngineOn)
 					SetVehicleCanBreak(veh, not DeadlyBulldozer)
 					SetVehicleCanBeVisiblyDamaged(veh, not DeadlyBulldozer)
 					SetVehicleEnginePowerMultiplier(veh, 2500.0)
@@ -2575,7 +2726,13 @@ Citizen.CreateThread(function()
 		elseif WarMenu.IsMenuOpened('vehiclespawner') then
 			if WarMenu.Button("Spawn Vehicle By Name") then
 				local model = GetKeyboardInput()
-				SpawnVeh(model, PlaceSelf)
+				SpawnVeh(model, PlaceSelf, SpawnEngineOn)
+			elseif WarMenu.CheckBox("Put Self Into Spawned Vehicle", PlaceSelf) then
+				PlaceSelf = not PlaceSelf
+			elseif WarMenu.CheckBox("Spawn Planes In Air", SpawnInAir) then
+				SpawnInAir = not SpawnInAir
+			elseif WarMenu.CheckBox("Spawn Vehicle With Engine : ", SpawnEngineOn) then
+				SpawnEngineOn = not SpawnEngineOn
 			elseif WarMenu.MenuButton('Compacts'..themecolor.."   "..themearrow, 'compacts') then
 			elseif WarMenu.MenuButton('Sedans'..themecolor.."   "..themearrow, 'sedans') then
 			elseif WarMenu.MenuButton('SUVs'..themecolor.."   "..themearrow, 'suvs') then
@@ -2601,7 +2758,7 @@ Citizen.CreateThread(function()
 		elseif WarMenu.IsMenuOpened('compacts') then
 			for i=1, #compacts do
 				if WarMenu.Button(compacts[i]) then
-					SpawnVeh(compacts[i], PlaceSelf)
+					SpawnVeh(compacts[i], PlaceSelf, SpawnEngineOn)
 				end
 			end
 			
@@ -2609,7 +2766,7 @@ Citizen.CreateThread(function()
 		elseif WarMenu.IsMenuOpened('sedans') then
 			for i=1, #sedans do
 				if WarMenu.Button(sedans[i]) then
-					SpawnVeh(sedans[i], PlaceSelf)
+					SpawnVeh(sedans[i], PlaceSelf, SpawnEngineOn)
 				end
 			end
 			
@@ -2617,7 +2774,7 @@ Citizen.CreateThread(function()
 		elseif WarMenu.IsMenuOpened('suvs') then
 			for i=1, #suvs do
 				if WarMenu.Button(suvs[i]) then
-					SpawnVeh(suvs[i], PlaceSelf)
+					SpawnVeh(suvs[i], PlaceSelf, SpawnEngineOn)
 				end
 			end
 			
@@ -2625,7 +2782,7 @@ Citizen.CreateThread(function()
 		elseif WarMenu.IsMenuOpened('coupes') then
 			for i=1, #coupes do
 				if WarMenu.Button(coupes[i]) then
-					SpawnVeh(coupes[i], PlaceSelf)
+					SpawnVeh(coupes[i], PlaceSelf, SpawnEngineOn)
 				end
 			end
 
@@ -2633,7 +2790,7 @@ Citizen.CreateThread(function()
 		elseif WarMenu.IsMenuOpened('muscle') then
 			for i=1, #muscle do
 				if WarMenu.Button(muscle[i]) then
-					SpawnVeh(muscle[i], PlaceSelf)
+					SpawnVeh(muscle[i], PlaceSelf, SpawnEngineOn)
 				end
 			end
 			
@@ -2641,7 +2798,7 @@ Citizen.CreateThread(function()
 		elseif WarMenu.IsMenuOpened('sportsclassics') then
 			for i=1, #sportsclassics do
 				if WarMenu.Button(sportsclassics[i]) then
-					SpawnVeh(sportsclassics[i], PlaceSelf)
+					SpawnVeh(sportsclassics[i], PlaceSelf, SpawnEngineOn)
 				end
 			end
 			
@@ -2649,7 +2806,7 @@ Citizen.CreateThread(function()
 		elseif WarMenu.IsMenuOpened('sports') then
 			for i=1, #sports do
 				if WarMenu.Button(sports[i]) then
-					SpawnVeh(sports[i], PlaceSelf)
+					SpawnVeh(sports[i], PlaceSelf, SpawnEngineOn)
 				end
 			end
 			
@@ -2657,7 +2814,7 @@ Citizen.CreateThread(function()
 		elseif WarMenu.IsMenuOpened('super') then
 			for i=1, #super do
 				if WarMenu.Button(super[i]) then
-					SpawnVeh(super[i], PlaceSelf)
+					SpawnVeh(super[i], PlaceSelf, SpawnEngineOn)
 				end
 			end
 		
@@ -2665,7 +2822,7 @@ Citizen.CreateThread(function()
 		elseif WarMenu.IsMenuOpened('motorcycles') then
 			for i=1, #motorcycles do
 				if WarMenu.Button(motorcycles[i]) then
-					SpawnVeh(motorcycles[i], PlaceSelf)
+					SpawnVeh(motorcycles[i], PlaceSelf, SpawnEngineOn)
 				end
 			end
 			
@@ -2673,7 +2830,7 @@ Citizen.CreateThread(function()
 		elseif WarMenu.IsMenuOpened('offroad') then
 			for i=1, #offroad do
 				if WarMenu.Button(offroad[i]) then
-					SpawnVeh(offroad[i], PlaceSelf)
+					SpawnVeh(offroad[i], PlaceSelf, SpawnEngineOn)
 				end
 			end
 			
@@ -2681,7 +2838,7 @@ Citizen.CreateThread(function()
 		elseif WarMenu.IsMenuOpened('industrial') then
 			for i=1, #industrial do
 				if WarMenu.Button(industrial[i]) then
-					SpawnVeh(industrial[i], PlaceSelf)
+					SpawnVeh(industrial[i], PlaceSelf, SpawnEngineOn)
 				end
 			end
 			
@@ -2689,7 +2846,7 @@ Citizen.CreateThread(function()
 		elseif WarMenu.IsMenuOpened('utility') then
 			for i=1, #utility do
 				if WarMenu.Button(utility[i]) then
-					SpawnVeh(utility[i], PlaceSelf)
+					SpawnVeh(utility[i], PlaceSelf, SpawnEngineOn)
 				end
 			end
 			
@@ -2697,7 +2854,7 @@ Citizen.CreateThread(function()
 		elseif WarMenu.IsMenuOpened('vans') then
 			for i=1, #vans do
 				if WarMenu.Button(vans[i]) then
-					SpawnVeh(vans[i], PlaceSelf)
+					SpawnVeh(vans[i], PlaceSelf, SpawnEngineOn)
 				end
 			end
 		
@@ -2705,7 +2862,7 @@ Citizen.CreateThread(function()
 		elseif WarMenu.IsMenuOpened('cycles') then
 			for i=1, #cycles do
 				if WarMenu.Button(cycles[i]) then
-					SpawnVeh(cycles[i], PlaceSelf)
+					SpawnVeh(cycles[i], PlaceSelf, SpawnEngineOn)
 				end
 			end
 			
@@ -2713,7 +2870,7 @@ Citizen.CreateThread(function()
 		elseif WarMenu.IsMenuOpened('boats') then
 			for i=1, #boats do
 				if WarMenu.Button(boats[i]) then
-					SpawnVeh(boats[i], PlaceSelf)
+					SpawnVeh(boats[i], PlaceSelf, SpawnEngineOn)
 				end
 			end
 		
@@ -2721,7 +2878,7 @@ Citizen.CreateThread(function()
 		elseif WarMenu.IsMenuOpened('helicopters') then
 			for i=1, #helicopters do
 				if WarMenu.Button(helicopters[i]) then
-					SpawnVeh(helicopters[i], PlaceSelf)
+					SpawnVeh(helicopters[i], PlaceSelf, SpawnEngineOn)
 				end
 			end
 	
@@ -2737,7 +2894,7 @@ Citizen.CreateThread(function()
 		elseif WarMenu.IsMenuOpened('service') then
 			for i=1, #vans do
 				if WarMenu.Button(service[i]) then
-					SpawnVeh(service[i], PlaceSelf)
+					SpawnVeh(service[i], PlaceSelf, SpawnEngineOn)
 				end
 			end
 			
@@ -2745,20 +2902,114 @@ Citizen.CreateThread(function()
 		elseif WarMenu.IsMenuOpened('commercial') then
 			for i=1, #commercial do
 				if WarMenu.Button(commercial[i]) then
-					SpawnVeh(commercial[i], PlaceSelf)
+					SpawnVeh(commercial[i], PlaceSelf, SpawnEngineOn)
 				end
 			end
+			
+		-- VEHICLE MODS MENU
+		elseif WarMenu.IsMenuOpened('vehiclemods') then
+			if WarMenu.MenuButton("Vehicle Colors"..themecolor.."   "..themearrow, 'vehiclecolors') then
+			elseif WarMenu.Button("Set Plate Text (8 Characters)") then
+				local plateInput = GetKeyboardInput()
+				SetVehicleNumberPlateText(GetVehiclePedIsIn(PlayerPedId(), 0), plateInput)
+				
+			end
+		
+		-- VEHICLE COLORS MENU
+		elseif WarMenu.IsMenuOpened('vehiclecolors') then
+			if WarMenu.MenuButton("Primary Color"..themecolor.."   "..themearrow, 'vehiclecolors_primary') then
+			elseif WarMenu.MenuButton("Secondary Color"..themecolor.."   "..themearrow, 'vehiclecolors_secondary') then
+			
+			end
 
+		elseif WarMenu.IsMenuOpened('vehiclecolors_primary') then
+			if WarMenu.MenuButton("Classic Colors"..themecolor.."   "..themearrow, 'primary_classic') then
+			elseif WarMenu.MenuButton("Matte Colors"..themecolor.."   "..themearrow, 'primary_matte') then
+			elseif WarMenu.MenuButton("Metals"..themecolor.."   "..themearrow, 'primary_metal')  then
+			end
+		
+		elseif WarMenu.IsMenuOpened('vehiclecolors_secondary') then
+			if WarMenu.MenuButton("Classic Colors"..themecolor.."   "..themearrow, 'secondary_classic') then
+			elseif WarMenu.MenuButton("Matte Colors"..themecolor.."   "..themearrow, 'secondary_matte') then
+			elseif WarMenu.MenuButton("Metals"..themecolor.."   "..themearrow, 'secondary_metal')  then
+			end
+				
+		-- PRIMARY CLASSIC
+		elseif WarMenu.IsMenuOpened('primary_classic') then
+			for i=1, #classicColors do
+				if WarMenu.Button(classicColors[i][1]) then 
+					local veh = GetVehiclePedIsIn(PlayerPedId(), 0)
+					local prim, sec = GetVehicleColours(veh)
+					SetVehicleColours(veh, classicColors[i][2], sec)
+				end
+			end
+		
+		-- PRIMARY MATTE
+		elseif WarMenu.IsMenuOpened('primary_matte') then
+			for i=1, #matteColors do
+				if WarMenu.Button(matteColors[i][1]) then 
+					local veh = GetVehiclePedIsIn(PlayerPedId(), 0)
+					local prim, sec = GetVehicleColours(veh)
+					SetVehicleColours(veh, matteColors[i][2], sec)
+				end
+			end
+			
+		-- PRIMARY METAL
+		elseif WarMenu.IsMenuOpened('primary_metal') then
+			for i=1, #metalColors do
+				if WarMenu.Button(metalColors[i][1]) then 
+					local veh = GetVehiclePedIsIn(PlayerPedId(), 0)
+					local prim, sec = GetVehicleColours(veh)
+					SetVehicleColours(veh, metalColors[i][2], sec)
+				end
+			end
+			
+		-- SECONDARY CLASSIC
+		elseif WarMenu.IsMenuOpened('secondary_classic') then
+			for i=1, #classicColors do
+				if WarMenu.Button(classicColors[i][1]) then 
+					local veh = GetVehiclePedIsIn(PlayerPedId(), 0)
+					local prim, sec = GetVehicleColours(veh)
+					SetVehicleColours(veh, prim, classicColors[i][2])
+				end
+			end
+			
+		-- SECONDARY MATTE
+		elseif WarMenu.IsMenuOpened('secondary_matte') then
+			for i=1, #matteColors do
+				if WarMenu.Button(matteColors[i][1]) then 
+					local veh = GetVehiclePedIsIn(PlayerPedId(), 0)
+					local prim, sec = GetVehicleColours(veh)
+					SetVehicleColours(veh, prim, matteColors[i][2])
+				end
+			end
+			
+		-- SECONDARY METAL
+		elseif WarMenu.IsMenuOpened('secondary_metal') then
+			for i=1, #metalColors do
+				if WarMenu.Button(metalColors[i][1]) then 
+					local veh = GetVehiclePedIsIn(PlayerPedId(), 0)
+					local prim, sec = GetVehicleColours(veh)
+					SetVehicleColours(veh, prim, metalColors[i][2])
+				end
+			end
 
 		-- WORLD OPTIONS MENU
 		elseif WarMenu.IsMenuOpened('world') then
 			if WarMenu.MenuButton("Object Spawner"..themecolor.."   "..themearrow, 'objectspawner') then
 			elseif WarMenu.MenuButton("Weather Changer ~r~(CLIENT SIDE)"..themecolor.."   "..themearrow, 'weather') then
 			elseif WarMenu.MenuButton("Time Changer"..themecolor.."   "..themearrow, 'time') then
+			elseif WarMenu.Button("Set All Nearby Vehicles Plate Text") then
+				local plateInput = GetKeyboardInput()
+				for k in EnumerateVehicles() do
+					SetVehicleNumberPlateText(k, plateInput)
+				end
 			elseif WarMenu.CheckBox("Disable Cars", CarsDisabled) then
 				CarsDisabled = not CarsDisabled
 			elseif WarMenu.CheckBox("Disable Guns", GunsDisabled) then
 				GunsDisabled = not GunsDisabled
+			elseif WarMenu.CheckBox("Clear Streets", ClearStreets) then
+				ClearStreets = not ClearStreets
 			elseif WarMenu.CheckBox("Noisy Cars", NoisyCars) then
 				NoisyCars = not NoisyCars
 				if not NoisyCars then
@@ -2994,6 +3245,14 @@ Citizen.CreateThread(function()
 				RequestControlOnce(k)
 				SetVehicleGravityAmount(k, GravAmount)
 			end
+		end
+		
+		if ClearStreets then
+			SetVehicleDensityMultiplierThisFrame(0.0)
+			SetRandomVehicleDensityMultiplierThisFrame(0.0)
+			SetParkedVehicleDensityMultiplierThisFrame(0.0)
+			SetAmbientVehicleRangeMultiplierThisFrame(0.0)
+			SetPedDensityMultiplierThisFrame(0.0)
 		end
 
 		if RapidFire then
