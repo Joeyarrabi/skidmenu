@@ -50,6 +50,7 @@ Skidmenu is a free, open-source lua menu for FiveM.
 - Give Max Ammo
 - Infinite Ammo
 - Explosive Ammo
+- Force Gun
 - Super Damage
 - Rapid Fire
 - Aimbot ( `with Draw Fov` )
@@ -82,6 +83,11 @@ Skidmenu is a free, open-source lua menu for FiveM.
 
 > Misc Options:
 - Theme Changer
+- Blips
+- Nametags
+- ESP Distance
+- ESP
+- Lines
 - Teleport to Waypoint
 - Force Map ( `Display Radar` )
 - Toggle Crosshair
