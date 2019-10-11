@@ -1,0 +1,11 @@
+Last modified: 10/11/2019
+
+Skidmenu Changelogs:
+
+# 10/11/2019:
+- Added a lot, don't remember everything but the major additions are:
+- Blips (Still unpolished, but they work fine.  Need to add player names to blips)
+- Nametags that show when a player it talking/driving a vehicle
+- ESP with distance modifier from 50.0 to 10000.0
+- Lines
+- Some code cleanup and comment removal
