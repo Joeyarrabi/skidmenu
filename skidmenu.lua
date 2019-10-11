@@ -184,6 +184,7 @@ objs_tospawn = {
 
 -- WEAPONS LISTS
 local allweapons = {
+"WEAPON_UNARMED",
 --Melee
 "WEAPON_KNIFE",
 "WEAPON_KNUCKLE",
@@ -1679,6 +1680,14 @@ local function SpectatePlayer(id)
 	end
 end
 
+function GetWeaponNameFromHash(hash)
+	for i=1, #allweapons do
+		if GetHashKey(allweapons[i]) == hash then
+			return string.sub(allweapons[i], 8)
+		end
+	end
+end
+
 local function FixVeh(veh)
 	SetVehicleEngineHealth(veh, 1000)
 	SetVehicleFixed(veh)
@@ -2683,6 +2692,8 @@ Citizen.CreateThread(function()
 				SetPedInfiniteAmmoClip(PlayerPedId(), InfAmmo)
 			elseif WarMenu.CheckBox("Explosive Ammo", ExplosiveAmmo) then
 				ExplosiveAmmo = not ExplosiveAmmo
+			elseif WarMenu.CheckBox("Force Gun", ForceGun) then
+				ForceGun = not ForceGun
 			elseif WarMenu.CheckBox("Super Damage", SuperDamage) then
 				SuperDamage = not SuperDamage
 				if SuperDamage then
@@ -3456,6 +3467,28 @@ Citizen.CreateThread(function()
 				AddExplosion(pos.x, pos.y, pos.z, 1, 1.0, 1, 0, 0.1)
 			end
 		end
+		
+		if ForceGun then
+			local ret, pos = GetPedLastWeaponImpactCoord(PlayerPedId())
+			if ret then
+				for k in EnumeratePeds() do
+					local coords = GetEntityCoords(k)
+					if k ~= PlayerPedId() and GetDistanceBetweenCoords(pos, coords) <= 1.0 then
+						local forward = GetEntityForwardVector(PlayerPedId())
+						ApplyForce(k, forward*500)
+					end
+				end
+				
+				for k in EnumerateVehicles() do
+					local coords = GetEntityCoords(k)
+					if k ~= GetVehiclePedIsIn(PlayerPedId(), 0 ) and GetDistanceBetweenCoords(pos, coords) <= 3.0 then
+						local forward = GetEntityForwardVector(PlayerPedId())
+						ApplyForce(k, forward*500)
+					end
+				end
+				
+			end
+		end
 
 		if Triggerbot then
 			local hasTarget, target = GetEntityPlayerIsFreeAimingAt(PlayerId())
@@ -3527,13 +3560,14 @@ Citizen.CreateThread(function()
 				local targetCoords = GetEntityCoords(GetPlayerPed(plist[i]))
 				local _,x,y = GetScreenCoordFromWorldCoord(targetCoords.x, targetCoords.y, targetCoords.z)
 				local distance = GetDistanceBetweenCoords(GetEntityCoords(PlayerPedId()), targetCoords)
+				local _,wephash = GetCurrentPedWeapon(GetPlayerPed(plist[i]), 1)
+				local wepname = GetWeaponNameFromHash(wephash)
 				if distance <= EspDistance then
 				DrawRect(x, y, 0.008, 0.01, 0, 0, 255, 255)
 				DrawRect(x, y, 0.003, 0.005, 255, 0, 0, 255)
-				DrawTxt(
-				"~y~ID: ~w~"..GetPlayerServerId(plist[i]).."~w~  |  ~y~".."Name: ~w~"..GetPlayerName(plist[i]).."  |  ~y~Distance: ~w~"..math.floor(distance), 
-				x-0.03, y-0.03, 0.0, 0.2
-				)
+				local espstring = "~b~ID: ~w~"..GetPlayerServerId(plist[i]).."~w~  |  ~b~Name: ~w~"..GetPlayerName(plist[i])..
+				"  |  ~b~Distance: ~w~"..math.floor(distance).."\n~b~Weapon: ~w~"..wepname
+				DrawTxt(espstring, x-0.05, y-0.04, 0.0, 0.2)
 				end
 			end
 		end
