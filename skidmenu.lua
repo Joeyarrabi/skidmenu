@@ -155,6 +155,10 @@ GravityOps = {0.0, 5.0, 50.0, 100.0, 200.0, 500.0, 1000.0, 9999.9}
 -- Default
 GravAmount = 50.0
 
+-- ESP Distance Options
+ESPDistanceOps = {50.0, 100.0, 500.0, 1000.0, 2000.0, 5000.0, 10000.0}
+EspDistance = 500.0
+
 -- Clothing Slots
 ClothingSlots = {1, 2, 3, 4, 5}
 
@@ -1525,6 +1529,19 @@ function ShowInfo(text)
   DrawNotification(true, false)
 end
 
+function DrawTxt(text, x, y, height, width)
+    SetTextFont(0)
+    SetTextProportional(1)
+    SetTextScale(height, width)
+    SetTextDropshadow(1, 0, 0, 0, 255)
+    SetTextEdge(1, 0, 0, 0, 255)
+    SetTextDropShadow()
+    SetTextOutline()
+    SetTextEntry("STRING")
+    AddTextComponentString(text)
+    DrawText(x, y)
+end
+
 function DrawText3D(x,y,z, text)
     local onScreen,_x,_y=GetScreenCoordFromWorldCoord(x,y,z)
     local px,py,pz=table.unpack(GetGameplayCamCoords())
@@ -1609,6 +1626,14 @@ function table.contains(table, element)
     end
   end
   return false
+end
+
+function table.removekey(array, element)
+	for i=1, #array do
+		if array[i] == element then
+			table.remove(array, i)
+		end
+	end
 end
 
 function AddVectors(vect1, vect2)
@@ -1697,62 +1722,6 @@ local function PedAttack(target, attackType)
 		end
 	end
 end
-
--- Rocket functions unused
---[[
-local function RocketPlayer(target, force)
-	ClearPedTasksImmediately(GetPlayerPed(target))
-	RequestControlOnce(GetPlayerPed(target))
-	ApplyForceToEntity(GetPlayerPed(target), 3, 0, 0, force, 0, 0, 0, 0, false, true, true, false, true)
-end
-
-local function RocketAllPlayers(self)
-	local plist = GetActivePlayers()
-	for i=0, #plist do
-		if not self and i == PlayerId() then i=i+1 end
-		RequestControlOnce(GetPlayerPed(plist[i]))
-		ApplyForceToEntity(GetPlayerPed(plist[i]), 3, 0, 0, 15.0, 0, 0, 0, 0, false, true, true, false, true)
-	end
-end
-]]
-
---[[ OLD FORCEFIELD (Might still be useful at some point?)
-local function ForcefieldPlayer(target, radius)
-	local player = GetPlayerPed(target)
-	local coords = GetEntityCoords(player)
-	DrawMarker(28, coords.x, coords.y, coords.z, 0.0, 0.0, 0.0, 0.0, 180.0, 0.0, radius, radius, radius, 180, 0, 0, 35, false, true, 2, nil, nil, false)
-
-	for ped in EnumeratePeds() do
-		if GetDistanceBetweenCoords(coords, GetEntityCoords(ped)) <= radius*1.2 and ped ~= PlayerPedId() then
-			--ApplyForceToEntity(ped, 3, 5.0, 5.0, 10.0, 0, 0, 0, 0, false, true, true, false, true)
-			AddExplosion(GetEntityCoords(ped), 5, 1.0, false, true, 0.0)
-		end
-	end
-
-	for obj in EnumerateObjects() do
-		if GetDistanceBetweenCoords(coords, GetEntityCoords(obj)) <= radius*1.2 then
-			--ApplyForceToEntity(obj, 3, 5.0, 5.0, 10.0, 0, 0, 0, 0, false, true, true, false, true)
-			AddExplosion(GetEntityCoords(obj), 5, 1.0, false, true, 0.0)
-		end
-	end
-
-	for veh in EnumerateVehicles() do
-		if GetDistanceBetweenCoords(coords, GetEntityCoords(veh)) <= radius*1.2 then
-			--ApplyForceToEntity(veh, 3, 5.0, 5.0, 10.0, 0, 0, 0, 0, false, true, true, false, true)
-			AddExplosion(GetEntityCoords(veh), 5, 1.0, false, true, 0.0)
-		end
-	end
-
-	for pickup in EnumeratePickups() do
-		if GetDistanceBetweenCoords(coords, GetEntityCoords(pickup)) <= radius*1.2 then
-			--ApplyForceToEntity(pickup, 3, 5.0, 5.0, 10.0, 0, 0, 0, 0, false, true, true, false, true)
-			AddExplosion(GetEntityCoords(pickup), 5, 1.0, false, true, 0.0)
-		end
-	end
-
-end
-]]
-
 
 -- Adapted from Shockwave by scmorio - https://www.gta5-mods.com/scripts/shockwave
 function ApplyShockwave(entity)
@@ -1949,6 +1918,120 @@ local function ToggleNoclip()
 	Noclipping = not Noclipping
 	if Noclipping then SetEntityVisible(PlayerPedId(), false, false) else
 	ClearPedTasksImmediately(PlayerPedId()) SetEntityVisible(PlayerPedId(), true, false) end
+end
+
+function ToggleBlips()
+	BlipsEnabled = not BlipsEnabled
+	if not BlipsEnabled then
+		for i=1, #pblips do
+			RemoveBlip(pblips[i])
+		end
+	else
+	pblips = {}
+	blips_plist = GetActivePlayers()
+	
+	for i=1, #blips_plist do
+		local ped = GetPlayerPed(blips_plist[i])
+		if IsPedInAnyVehicle(ped) and GetSeatPedIsIn(ped) == 0 then
+			pblips[i] = AddBlipForCoord(GetVehiclePedIsIn(ped, 0))
+		else
+			pblips[i] = AddBlipForEntity(ped)
+		end
+		SetBlipCategory(pblips[i], 2)
+		SetBlipDisplay(pblips[i], 2)
+		SetBlipScale(pblips[i], 0.9)
+
+		Citizen.InvokeNative(0x127DE7B20C60A6A3, pblips[i], blips_plist[i])
+		
+	end
+	end
+	
+	Citizen.CreateThread(function()
+		while BlipsEnabled do
+			blips_plist = GetActivePlayers()
+			Wait(1000)
+		end
+	end)
+		
+	Citizen.CreateThread(function()
+		while BlipsEnabled do
+			
+			for i=1, #blips_plist do
+				local target = GetPlayerPed(blips_plist[i])
+				
+				
+				-- If ped is driving a vehicle of no special type
+				if IsPedInAnyVehicle(target) and not IsPedInAnyBoat(target) and not IsPedInAnyHeli(target) and not IsPedInAnyPlane(target) and not IsPedInAnyPoliceVehicle(target) and GetSeatPedIsIn(target) == 0 then
+					
+					SetBlipNameToPlayerName(pblips[i], NetworkGetPlayerIndexFromPed(target))
+					local targetVeh = GetVehiclePedIsIn(target, 0)
+					local passengers = GetVehicleNumberOfPassengers(targetVeh)
+					SetBlipCoords(pblips[i], GetEntityCoords(targetVeh))
+					SetBlipSprite(pblips[i], 225)
+					if passengers > 0 then ShowNumberOnBlip(pblips[i], passengers+1) end
+					
+				elseif IsPedInAnyBoat(target) and GetSeatPedIsIn(target) == 0 then -- if ped is driving a boat
+					
+					SetBlipNameToPlayerName(pblips[i], NetworkGetPlayerIndexFromPed(target))
+					local targetVeh = GetVehiclePedIsIn(target, 0)
+					local passengers = GetVehicleNumberOfPassengers(targetVeh)
+					SetBlipCoords(pblips[i], GetEntityCoords(targetVeh))
+					SetBlipSprite(pblips[i], 427)
+					if passengers > 0 then ShowNumberOnBlip(pblips[i], passengers+1) end
+					
+				elseif IsPedInAnyHeli(target) and GetSeatPedIsIn(target) == 0 then -- if ped is flying a heli
+					
+					SetBlipNameToPlayerName(pblips[i], NetworkGetPlayerIndexFromPed(target))
+					local targetVeh = GetVehiclePedIsIn(target, 0)
+					local passengers = GetVehicleNumberOfPassengers(targetVeh)
+					SetBlipCoords(pblips[i], GetEntityCoords(targetVeh))
+					SetBlipSprite(pblips[i], 422)
+					if passengers > 0 then ShowNumberOnBlip(pblips[i], passengers+1) end
+					
+				elseif IsPedInAnyPlane(target) and GetSeatPedIsIn(target) == 0 then -- if ped is flying a plane
+					
+					SetBlipNameToPlayerName(pblips[i], NetworkGetPlayerIndexFromPed(target))
+					local targetVeh = GetVehiclePedIsIn(target, 0)
+					local passengers = GetVehicleNumberOfPassengers(targetVeh)
+					SetBlipCoords(pblips[i], GetEntityCoords(targetVeh))
+					SetBlipSprite(pblips[i], 423)
+					if passengers > 0 then ShowNumberOnBlip(pblips[i], passengers+1) end
+					
+				elseif IsPedInAnyPoliceVehicle(target) and GetSeatPedIsIn(target) == 0 then -- If ped is driving a cop car
+					
+					SetBlipNameToPlayerName(pblips[i], NetworkGetPlayerIndexFromPed(target))
+					local targetVeh = GetVehiclePedIsIn(target, 0)
+					local passengers = GetVehicleNumberOfPassengers(targetVeh)
+					SetBlipCoords(pblips[i], GetEntityCoords(targetVeh))
+					SetBlipSprite(pblips[i], 56)
+					if passengers > 0 then ShowNumberOnBlip(pblips[i], passengers+1) end
+					
+				elseif IsPedOnAnyBike(target) and GetSeatPedIsIn(target) == 0 then -- If ped is riding a motorcycle/bicycle
+					
+					SetBlipNameToPlayerName(pblips[i], NetworkGetPlayerIndexFromPed(target))
+					local targetVeh = GetVehiclePedIsIn(target, 0)
+					local passengers = GetVehicleNumberOfPassengers(targetVeh)
+					SetBlipCoords(pblips[i], GetEntityCoords(targetVeh))
+					SetBlipSprite(pblips[i], 348)
+					if passengers > 0 then ShowNumberOnBlip(pblips[i], passengers+1) end
+					
+				elseif not IsPedInAnyVehicle(target) then
+					
+					local targetHeight = GetEntityCoords(target).z
+					local pHeight = GetEntityCoords(PlayerPedId()).z
+					SetBlipCoords(pblips[i], GetEntityCoords(target))
+					SetBlipSprite(pblips[i], 1)
+					
+				end
+				
+				
+			end
+			
+			Wait(0)
+		end
+	end)
+	
+	
 end
 
 local function ShootAt(target, bone)
@@ -2305,7 +2388,6 @@ for i=0, #Resources do
 end
 print("\n________________\nEND OF RESOURCES\n")
 
-
 -- MAIN
 Citizen.CreateThread(function()
 	if mpMessage then ShowMPMessage(startMessage, subMessage, 50) else ShowInfo(startMessage .." ".. subMessage) end
@@ -2339,6 +2421,9 @@ Citizen.CreateThread(function()
 	
 	local currAttackTypeIndex = 1
 	local selAttackTypeIndex = 1
+	
+	local currESPDistance = 3
+	local selESPDistance = 3
 
 	-- GLOBALS
 	local TrackedPlayer = nil
@@ -3172,6 +3257,32 @@ Citizen.CreateThread(function()
 					currThemeIndex = currentIndex
 					selThemeIndex = selectedIndex
 				end) then theme = themes[selThemeIndex] WarMenu.InitializeTheme()
+			elseif WarMenu.CheckBox("Blips", BlipsEnabled) then
+				ToggleBlips()
+			elseif WarMenu.CheckBox("Nametags", NametagsEnabled) then
+				NametagsEnabled = not NametagsEnabled
+				tags_plist = GetActivePlayers()
+				ptags = {}
+				for i=1, #tags_plist do
+					ptags[i] = CreateFakeMpGamerTag(GetPlayerPed(tags_plist[i]), GetPlayerName(tags_plist[i]), 0, 0, "", 0)
+					SetMpGamerTagVisibility(ptags[i], 0, NametagsEnabled)
+					SetMpGamerTagVisibility(ptags[i], 2, NametagsEnabled)
+				end
+				if not NametagsEnabled then
+					for i=1, #ptags do
+						SetMpGamerTagVisibility(ptags[i], 4, 0)
+						SetMpGamerTagVisibility(ptags[i], 8, 0)
+					end
+				end
+			elseif WarMenu.ComboBox("ESP Distance", ESPDistanceOps, currESPDistance, selESPDistance, function(currentIndex, selectedIndex)
+					currESPDistance = currentIndex
+					selESPDistance = currentIndex
+					EspDistance = ESPDistanceOps[currESPDistance]
+				end) then
+			elseif WarMenu.CheckBox("ESP", ESPEnabled) then
+				ESPEnabled = not ESPEnabled
+			elseif WarMenu.CheckBox("Lines", LinesEnabled) then
+				LinesEnabled = not LinesEnabled
 			elseif WarMenu.Button('Teleport To Waypoint') then
 				TeleportToWaypoint()
 			elseif WarMenu.CheckBox('Force Map', ForceMap) then
@@ -3255,14 +3366,10 @@ Citizen.CreateThread(function()
 		end
 		
 		if InfStamina then
-		--[[if GetPlayerSprintStaminaRemaining(PlayerId()) < 0.9 then --Not working when tested, not sure why
-				RestorePlayerStamina(PlayerId(), 0.8)
-			end]]
 			RestorePlayerStamina(PlayerId(), GetPlayerSprintStaminaRemaining(PlayerId()))
 		end
 
 		if Forcefield then
-			--ForcefieldPlayer(PlayerId(), ForcefieldRadius)
 			DoForceFieldTick(ForcefieldRadius)
 		end
 
@@ -3326,12 +3433,6 @@ Citizen.CreateThread(function()
 				DrawRect(0.5, 0.75, 0.49, 0.015, 255, 80, 80, 100)
 			end
 
-			--[[
-			for k in EnumeratePeds() do
-				ShootAimbot(k)
-			end
-			]]
-
 			local plist = GetActivePlayers()
 			for i=1, #plist do
 				ShootAimbot(GetPlayerPed(plist[i]))
@@ -3350,7 +3451,6 @@ Citizen.CreateThread(function()
 		end
 
 		if ExplosiveAmmo then
-			--SetExplosiveAmmoThisFrame(PlayerId())
 			local ret, pos = GetPedLastWeaponImpactCoord(PlayerPedId())
 			if ret then
 				AddExplosion(pos.x, pos.y, pos.z, 1, 1.0, 1, 0, 0.1)
@@ -3402,10 +3502,56 @@ Citizen.CreateThread(function()
 			end
 		end
 		
+		if NametagsEnabled then
+			tags_plist = GetActivePlayers()
+			for i=1, #tags_plist do
+				if NetworkIsPlayerTalking(tags_plist[i]) then
+					SetMpGamerTagVisibility(ptags[i], 4, 1)
+				else
+					SetMpGamerTagVisibility(ptags[i], 4, 0)
+				end
+				
+				if IsPedInAnyVehicle(GetPlayerPed(tags_plist[i])) and GetSeatPedIsIn(GetPlayerPed(tags_plist[i])) == 0 then
+					SetMpGamerTagVisibility(ptags[i], 8, 1)
+				else
+					SetMpGamerTagVisibility(ptags[i], 8, 0)
+				end
+				
+			end
+		end
+		
+		if ESPEnabled then
+			local plist = GetActivePlayers()
+			table.removekey(plist, PlayerId())
+			for i=1, #plist do
+				local targetCoords = GetEntityCoords(GetPlayerPed(plist[i]))
+				local _,x,y = GetScreenCoordFromWorldCoord(targetCoords.x, targetCoords.y, targetCoords.z)
+				local distance = GetDistanceBetweenCoords(GetEntityCoords(PlayerPedId()), targetCoords)
+				if distance <= EspDistance then
+				DrawRect(x, y, 0.008, 0.01, 0, 0, 255, 255)
+				DrawRect(x, y, 0.003, 0.005, 255, 0, 0, 255)
+				DrawTxt(
+				"~y~ID: ~w~"..GetPlayerServerId(plist[i]).."~w~  |  ~y~".."Name: ~w~"..GetPlayerName(plist[i]).."  |  ~y~Distance: ~w~"..math.floor(distance), 
+				x-0.03, y-0.03, 0.0, 0.2
+				)
+				end
+			end
+		end
+		
+		if LinesEnabled then
+			local plist = GetActivePlayers()
+			local playerCoords = GetEntityCoords(PlayerPedId())
+			for i=1, #plist do
+				if i == PlayerId() then i=i+1 end
+				local targetCoords = GetEntityCoords(GetPlayerPed(plist[i]))
+				DrawLine(playerCoords, targetCoords, 0, 0, 255, 255)
+			end
+		end
+		
 		if ForceMap then
 			DisplayRadar(true)
 		end
-
+		
 		Wait(0)
 	end
 end)
