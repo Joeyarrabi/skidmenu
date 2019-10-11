@@ -6,6 +6,7 @@ Skidmenu is a free, open-source lua menu for FiveM.
 > Note: Anyone is free to use this menu and modify it as they please. All I ask in return is that you do not try to monetize this release, I made this because I was tired of seeing people trying to sell the same old reused code and charging ridiculous amounts for it
 
 > If you have suggestions: [Click Here](https://github.com/Joeyarrabi/skidmenu/issues)
+> Changelogs: [Click Here](https://raw.githubusercontent.com/Joeyarrabi/skidmenu/master/changelogs.txt)
 
 ##### Features:
 - Self Options
