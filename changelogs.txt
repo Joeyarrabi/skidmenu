@@ -1,6 +1,10 @@
-Last modified: 10/11/2019
+Last modified: 10/12/2019
 
 Skidmenu Changelogs:
+
+# 10/12/2019:
+- Fixed a Crash with ESP
+- Changed how the ESP loop works so I can add a separate timer for it later
 
 # 10/11/2019:
 - Added Force Gun
