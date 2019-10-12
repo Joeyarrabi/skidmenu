@@ -3,6 +3,10 @@ Last modified: 10/11/2019
 Skidmenu Changelogs:
 
 # 10/11/2019:
+- Added Force Gun
+- Improved ESP (Now shows the weapon player has equipped)
+
+# 10/11/2019:
 - Added a lot, don't remember everything but the major additions are:
 - Blips (Still unpolished, but they work fine.  Need to add player names to blips)
 - Nametags that show when a player it talking/driving a vehicle
