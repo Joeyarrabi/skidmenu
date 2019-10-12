@@ -1929,6 +1929,33 @@ local function ToggleNoclip()
 	ClearPedTasksImmediately(PlayerPedId()) SetEntityVisible(PlayerPedId(), true, false) end
 end
 
+local function ToggleESP()
+	ESPEnabled = not ESPEnabled
+	Citizen.CreateThread(function()
+	while ESPEnabled do
+		local plist = GetActivePlayers()
+		table.removekey(plist, PlayerId())
+		for i=1, #plist do
+			local targetCoords = GetEntityCoords(GetPlayerPed(plist[i]))
+			local _,x,y = GetScreenCoordFromWorldCoord(targetCoords.x, targetCoords.y, targetCoords.z)
+			local distance = GetDistanceBetweenCoords(GetEntityCoords(PlayerPedId()), targetCoords)
+			if distance <= EspDistance then
+				local _,wephash = GetCurrentPedWeapon(GetPlayerPed(plist[i]), 1)
+				local wepname = GetWeaponNameFromHash(wephash)
+				if wepname == nil then wepname = "Unknown" end
+				DrawRect(x, y, 0.008, 0.01, 0, 0, 255, 255)
+				DrawRect(x, y, 0.003, 0.005, 255, 0, 0, 255)
+				local espstring1 = "~b~ID: ~w~"..GetPlayerServerId(plist[i]).."~w~  |  ~b~Name: ~w~"..GetPlayerName(plist[i]).."  |  ~b~Distance: ~w~"..math.floor(distance)
+				local espstring2 = "~b~Weapon: ~w~"..wepname
+				DrawTxt(espstring1, x-0.05, y-0.04, 0.0, 0.2)
+				DrawTxt(espstring2, x-0.05, y-0.03, 0.0, 0.2)
+			end
+		end
+		Wait(0)
+	end
+	end)
+end
+
 function ToggleBlips()
 	BlipsEnabled = not BlipsEnabled
 	if not BlipsEnabled then
@@ -3291,7 +3318,7 @@ Citizen.CreateThread(function()
 					EspDistance = ESPDistanceOps[currESPDistance]
 				end) then
 			elseif WarMenu.CheckBox("ESP", ESPEnabled) then
-				ESPEnabled = not ESPEnabled
+				ToggleESP()
 			elseif WarMenu.CheckBox("Lines", LinesEnabled) then
 				LinesEnabled = not LinesEnabled
 			elseif WarMenu.Button('Teleport To Waypoint') then
@@ -3550,25 +3577,6 @@ Citizen.CreateThread(function()
 					SetMpGamerTagVisibility(ptags[i], 8, 0)
 				end
 				
-			end
-		end
-		
-		if ESPEnabled then
-			local plist = GetActivePlayers()
-			table.removekey(plist, PlayerId())
-			for i=1, #plist do
-				local targetCoords = GetEntityCoords(GetPlayerPed(plist[i]))
-				local _,x,y = GetScreenCoordFromWorldCoord(targetCoords.x, targetCoords.y, targetCoords.z)
-				local distance = GetDistanceBetweenCoords(GetEntityCoords(PlayerPedId()), targetCoords)
-				local _,wephash = GetCurrentPedWeapon(GetPlayerPed(plist[i]), 1)
-				local wepname = GetWeaponNameFromHash(wephash)
-				if distance <= EspDistance then
-				DrawRect(x, y, 0.008, 0.01, 0, 0, 255, 255)
-				DrawRect(x, y, 0.003, 0.005, 255, 0, 0, 255)
-				local espstring = "~b~ID: ~w~"..GetPlayerServerId(plist[i]).."~w~  |  ~b~Name: ~w~"..GetPlayerName(plist[i])..
-				"  |  ~b~Distance: ~w~"..math.floor(distance).."\n~b~Weapon: ~w~"..wepname
-				DrawTxt(espstring, x-0.05, y-0.04, 0.0, 0.2)
-				end
 			end
 		end
 		
