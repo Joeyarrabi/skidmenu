@@ -1,6 +1,14 @@
-Last modified: 10/12/2019
+Last modified: 10/13/2019
 
 Skidmenu Changelogs:
+
+# 10/13/2019:
+- Added a warning for possess vehicles because the fake spectating will show your nametag
+
+# 10/13/2019:
+- Added Possess Vehicle in the player options menu.  Lets you take control of another player's vehicle and move it in any direction.
+- Replaced my blips with Scammer's blips and modified them to be toggle-able
+- Added vehicle names to ESP
 
 # 10/12/2019:
 - Fixed a Crash with ESP
