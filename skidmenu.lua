@@ -2699,7 +2699,7 @@ Citizen.CreateThread(function()
 			if WarMenu.Button("~p~Selected: ".."~y~["..GetPlayerServerId(selectedPlayer).."] ~s~"..GetPlayerName(selectedPlayer)) then
 			elseif WarMenu.Button("Spectate Player") then
 				SpectatePlayer(selectedPlayer)
-			elseif WarMenu.Button("Possess Player Vehicle") then
+			elseif WarMenu.Button("Possess Player Vehicle ~r~(Do not use on servers with nametags)") then
 					PossessVehicle(selectedPlayer)
 			elseif WarMenu.Button("Teleport To Player") then
 				TeleportToPlayer(selectedPlayer)
