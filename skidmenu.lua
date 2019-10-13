@@ -82,6 +82,7 @@ menulist = {
 -- VEHICLE SUBMENUS
 'vehiclespawner',
 'vehiclemods',
+
 'vehiclecolors',
 'vehiclecolors_primary',
 'vehiclecolors_secondary',
@@ -91,6 +92,8 @@ menulist = {
 'secondary_classic',
 'secondary_matte',
 'secondary_metal',
+
+'vehicletuning',
 
 -- VEHICLE SPAWNER SUBMENUS
 'compacts',
@@ -1668,7 +1671,7 @@ end
 
 -- MENU FUNCTIONS
 
-local function SpectatePlayer(id)
+function SpectatePlayer(id)
 	spectating = not spectating
 	local player = GetPlayerPed(id)
 	if spectating then
@@ -1677,6 +1680,81 @@ local function SpectatePlayer(id)
 	else
 		RequestCollisionAtCoord(GetEntityCoords(player))
 		NetworkSetInSpectatorMode(false, player)
+	end
+end
+
+local function PossessVehicle(target)
+	PossessingVeh = not PossessingVeh
+	
+	if not PossessingVeh then				
+		SetEntityVisible(PlayerPedId(), true, 0)
+		SetEntityCoords(PlayerPedId(), oldPlayerPos)
+		SetEntityCollision(PlayerPedId(), true, 1)
+	else
+		SpectatePlayer(selectedPlayer)
+		ShowInfo("~b~Checking Player...")
+		Wait(3000)
+		if IsPedInAnyVehicle(GetPlayerPed(selectedPlayer), 0) then
+			SpectatePlayer(selectedPlayer)
+			oldPlayerPos = GetEntityCoords(PlayerPedId())
+			SetEntityVisible(PlayerPedId(), false, 0)
+			SetEntityCollision(PlayerPedId(), false, 0)
+		else
+			SpectatePlayer(selectedPlayer)
+			PossessingVeh = false
+			ShowInfo("~r~Player not in a vehicle!  (Try again?)")
+		end
+		
+		
+		local Markerloc = nil
+		
+		-- Main loop for posessing veh
+		Citizen.CreateThread(function()		
+			local ped = GetPlayerPed(target)
+			local veh = GetVehiclePedIsIn(ped, 0)
+			
+			while PossessingVeh and GetEntityHealth(PlayerPedId()) > 0 and GetEntityHealth(veh)  do
+			
+			DrawTxt("~b~Controls:\n~b~W/S: ~w~Forward/Back\n~b~SPACEBAR: ~w~Up\n~b~CTRL: ~w~Down\n~b~X: ~w~Cancel", 0.2, 0.2, 0.0, 0.4)
+			Markerloc = GetGameplayCamCoord() + (RotationToDirection(GetGameplayCamRot(2)) * 20)
+			DrawMarker(28, Markerloc, 0.0, 0.0, 0.0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 0, 0, 180, 35, false, true, 2, nil, nil, false)
+			
+			local forward = SubVectors(Markerloc, GetEntityCoords(veh))
+			local vpos = GetEntityCoords(veh)
+			local vf = GetEntityForwardVector(veh)
+			local vrel = SubVectors(vpos, vf)
+			
+			SetEntityCoords(PlayerPedId(), vrel.x-2.0, vrel.y-2.0, vpos.z+1.3)
+			SetEntityNoCollisionEntity(PlayerPedId(), veh, 1)
+			
+			RequestControlOnce(veh)
+			
+			if IsControlPressed(0, Keys["W"]) then
+				ApplyForce(veh, forward*0.1)
+			end
+			
+			if IsControlPressed(0, Keys["S"]) then
+				ApplyForce(veh, -(forward*0.1))
+			end
+			
+			if IsControlPressed(0, Keys["SPACE"]) then
+				ApplyForceToEntity(veh, 3, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0, 0, 1, 1, 0, 1)
+			end
+			
+			if IsControlPressed(0, Keys["LEFTCTRL"]) then
+				ApplyForceToEntity(veh, 3, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0, 0, 1, 1, 0, 1)
+			end
+			
+			if IsControlPressed(0, Keys["X"]) then
+				PossessingVeh = false
+				SetEntityVisible(PlayerPedId(), true, 0)
+				SetEntityCoords(PlayerPedId(), oldPlayerPos)
+				SetEntityCollision(PlayerPedId(), true, 1)
+			end
+				
+				Wait(0)
+			end
+		end)
 	end
 end
 
@@ -1942,11 +2020,15 @@ local function ToggleESP()
 			if distance <= EspDistance then
 				local _,wephash = GetCurrentPedWeapon(GetPlayerPed(plist[i]), 1)
 				local wepname = GetWeaponNameFromHash(wephash)
+				local vehname = "On Foot"
+				if IsPedInAnyVehicle(GetPlayerPed(plist[i]), 0) then
+					 vehname = GetLabelText(GetDisplayNameFromVehicleModel(GetEntityModel(GetVehiclePedIsUsing(GetPlayerPed(plist[i])))))
+				end
 				if wepname == nil then wepname = "Unknown" end
 				DrawRect(x, y, 0.008, 0.01, 0, 0, 255, 255)
 				DrawRect(x, y, 0.003, 0.005, 255, 0, 0, 255)
 				local espstring1 = "~b~ID: ~w~"..GetPlayerServerId(plist[i]).."~w~  |  ~b~Name: ~w~"..GetPlayerName(plist[i]).."  |  ~b~Distance: ~w~"..math.floor(distance)
-				local espstring2 = "~b~Weapon: ~w~"..wepname
+				local espstring2 = "~b~Weapon: ~w~"..wepname.."  |  ~b~Vehicle: ~w~"..vehname
 				DrawTxt(espstring1, x-0.05, y-0.04, 0.0, 0.2)
 				DrawTxt(espstring2, x-0.05, y-0.03, 0.0, 0.2)
 			end
@@ -1956,118 +2038,121 @@ local function ToggleESP()
 	end)
 end
 
+-- Blips from Scammer's Script Collection (https://forum.fivem.net/t/release-scammers-script-collection-09-03-17/3313)
+-- Slightly modified to allow blip toggling
 function ToggleBlips()
 	BlipsEnabled = not BlipsEnabled
+	
 	if not BlipsEnabled then
 		for i=1, #pblips do
 			RemoveBlip(pblips[i])
 		end
 	else
+	
+	Citizen.CreateThread(function()
 	pblips = {}
-	blips_plist = GetActivePlayers()
-	
-	for i=1, #blips_plist do
-		local ped = GetPlayerPed(blips_plist[i])
-		if IsPedInAnyVehicle(ped) and GetSeatPedIsIn(ped) == 0 then
-			pblips[i] = AddBlipForCoord(GetVehiclePedIsIn(ped, 0))
-		else
-			pblips[i] = AddBlipForEntity(ped)
-		end
-		SetBlipCategory(pblips[i], 2)
-		SetBlipDisplay(pblips[i], 2)
-		SetBlipScale(pblips[i], 0.9)
+	while BlipsEnabled do
+	local plist = GetActivePlayers()
+	for i=1, #plist do
+		if NetworkIsPlayerActive( plist[i] ) then --and GetPlayerPed( id ) ~= GetPlayerPed( -1 ) then
+				ped = GetPlayerPed( plist[i] )
+				pblips[i] = GetBlipFromEntity( ped )
+				if not DoesBlipExist( pblips[i] ) then
+					pblips[i] = AddBlipForEntity( ped )
+					SetBlipSprite( pblips[i], 1 )
+					Citizen.InvokeNative( 0x5FBCA48327B914DF, pblips[i], true ) -- Player Blip indicator
+				else
+					veh = GetVehiclePedIsIn( ped, false )
+					blipSprite = GetBlipSprite( pblips[i] )
+					if not GetEntityHealth( ped ) then -- dead
+						if blipSprite ~= 274 then
+							SetBlipSprite( pblips[i], 274 )
+							Citizen.InvokeNative( 0x5FBCA48327B914DF, pblips[i], false ) -- Player Blip indicator
+						end
+					elseif veh then
+						vehClass = GetVehicleClass( veh )
+						vehModel = GetEntityModel( veh )
+						if vehClass == 15 then -- jet
+							if blipSprite ~= 422 then
+								SetBlipSprite( pblips[i], 422 )
+								Citizen.InvokeNative( 0x5FBCA48327B914DF, pblips[i], false ) -- Player Blip indicator
+							end
+						elseif vehClass == 16 then -- plane
+							if vehModel == GetHashKey( "besra" ) or vehModel == GetHashKey( "hydra" )
+								or vehModel == GetHashKey( "lazer" ) then -- jet
+								if blipSprite ~= 424 then
+									SetBlipSprite( pblips[i], 424 )
+									Citizen.InvokeNative( 0x5FBCA48327B914DF, pblips[i], false ) -- Player Blip indicator
+								end
+							elseif blipSprite ~= 423 then
+								SetBlipSprite( pblips[i], 423 )
+								Citizen.InvokeNative (0x5FBCA48327B914DF, pblips[i], false ) -- Player Blip indicator
+							end
+						elseif vehClass == 14 then -- boat
+							if blipSprite ~= 427 then
+								SetBlipSprite( pblips[i], 427 )
+								Citizen.InvokeNative( 0x5FBCA48327B914DF, pblips[i], false ) -- Player Blip indicator
+							end
+						elseif vehModel == GetHashKey( "insurgent" ) or vehModel == GetHashKey( "insurgent2" )
+						or vehModel == GetHashKey( "limo2" ) then -- insurgent (+ turreted limo cuz limo pblips[i] wont work)
+							if blipSprite ~= 426 then
+								SetBlipSprite( pblips[i], 426 )
+								Citizen.InvokeNative( 0x5FBCA48327B914DF, pblips[i], false ) -- Player Blip indicator
+							end
+						elseif vehModel == GetHashKey( "rhino" ) then -- tank
+							if blipSprite ~= 421 then
+								SetBlipSprite( pblips[i], 421 )
+								Citizen.InvokeNative( 0x5FBCA48327B914DF, pblips[i], false ) -- Player Blip indicator
+							end
+						elseif blipSprite ~= 1 then -- default pblips[i]
+							SetBlipSprite( pblips[i], 1 )
+							Citizen.InvokeNative( 0x5FBCA48327B914DF, pblips[i], true ) -- Player Blip indicator
+						end
 
-		Citizen.InvokeNative(0x127DE7B20C60A6A3, pblips[i], blips_plist[i])
-		
-	end
-	end
-	
-	Citizen.CreateThread(function()
-		while BlipsEnabled do
-			blips_plist = GetActivePlayers()
-			Wait(1000)
-		end
-	end)
-		
-	Citizen.CreateThread(function()
-		while BlipsEnabled do
-			
-			for i=1, #blips_plist do
-				local target = GetPlayerPed(blips_plist[i])
-				
-				
-				-- If ped is driving a vehicle of no special type
-				if IsPedInAnyVehicle(target) and not IsPedInAnyBoat(target) and not IsPedInAnyHeli(target) and not IsPedInAnyPlane(target) and not IsPedInAnyPoliceVehicle(target) and GetSeatPedIsIn(target) == 0 then
-					
-					SetBlipNameToPlayerName(pblips[i], NetworkGetPlayerIndexFromPed(target))
-					local targetVeh = GetVehiclePedIsIn(target, 0)
-					local passengers = GetVehicleNumberOfPassengers(targetVeh)
-					SetBlipCoords(pblips[i], GetEntityCoords(targetVeh))
-					SetBlipSprite(pblips[i], 225)
-					if passengers > 0 then ShowNumberOnBlip(pblips[i], passengers+1) end
-					
-				elseif IsPedInAnyBoat(target) and GetSeatPedIsIn(target) == 0 then -- if ped is driving a boat
-					
-					SetBlipNameToPlayerName(pblips[i], NetworkGetPlayerIndexFromPed(target))
-					local targetVeh = GetVehiclePedIsIn(target, 0)
-					local passengers = GetVehicleNumberOfPassengers(targetVeh)
-					SetBlipCoords(pblips[i], GetEntityCoords(targetVeh))
-					SetBlipSprite(pblips[i], 427)
-					if passengers > 0 then ShowNumberOnBlip(pblips[i], passengers+1) end
-					
-				elseif IsPedInAnyHeli(target) and GetSeatPedIsIn(target) == 0 then -- if ped is flying a heli
-					
-					SetBlipNameToPlayerName(pblips[i], NetworkGetPlayerIndexFromPed(target))
-					local targetVeh = GetVehiclePedIsIn(target, 0)
-					local passengers = GetVehicleNumberOfPassengers(targetVeh)
-					SetBlipCoords(pblips[i], GetEntityCoords(targetVeh))
-					SetBlipSprite(pblips[i], 422)
-					if passengers > 0 then ShowNumberOnBlip(pblips[i], passengers+1) end
-					
-				elseif IsPedInAnyPlane(target) and GetSeatPedIsIn(target) == 0 then -- if ped is flying a plane
-					
-					SetBlipNameToPlayerName(pblips[i], NetworkGetPlayerIndexFromPed(target))
-					local targetVeh = GetVehiclePedIsIn(target, 0)
-					local passengers = GetVehicleNumberOfPassengers(targetVeh)
-					SetBlipCoords(pblips[i], GetEntityCoords(targetVeh))
-					SetBlipSprite(pblips[i], 423)
-					if passengers > 0 then ShowNumberOnBlip(pblips[i], passengers+1) end
-					
-				elseif IsPedInAnyPoliceVehicle(target) and GetSeatPedIsIn(target) == 0 then -- If ped is driving a cop car
-					
-					SetBlipNameToPlayerName(pblips[i], NetworkGetPlayerIndexFromPed(target))
-					local targetVeh = GetVehiclePedIsIn(target, 0)
-					local passengers = GetVehicleNumberOfPassengers(targetVeh)
-					SetBlipCoords(pblips[i], GetEntityCoords(targetVeh))
-					SetBlipSprite(pblips[i], 56)
-					if passengers > 0 then ShowNumberOnBlip(pblips[i], passengers+1) end
-					
-				elseif IsPedOnAnyBike(target) and GetSeatPedIsIn(target) == 0 then -- If ped is riding a motorcycle/bicycle
-					
-					SetBlipNameToPlayerName(pblips[i], NetworkGetPlayerIndexFromPed(target))
-					local targetVeh = GetVehiclePedIsIn(target, 0)
-					local passengers = GetVehicleNumberOfPassengers(targetVeh)
-					SetBlipCoords(pblips[i], GetEntityCoords(targetVeh))
-					SetBlipSprite(pblips[i], 348)
-					if passengers > 0 then ShowNumberOnBlip(pblips[i], passengers+1) end
-					
-				elseif not IsPedInAnyVehicle(target) then
-					
-					local targetHeight = GetEntityCoords(target).z
-					local pHeight = GetEntityCoords(PlayerPedId()).z
-					SetBlipCoords(pblips[i], GetEntityCoords(target))
-					SetBlipSprite(pblips[i], 1)
-					
+						-- Show number in case of passangers
+						passengers = GetVehicleNumberOfPassengers( veh )
+						if passengers then
+							if not IsVehicleSeatFree( veh, -1 ) then
+								passengers = passengers + 1
+							end
+							ShowNumberOnBlip( pblips[i], passengers )
+						else
+							HideNumberOnBlip( pblips[i] )
+						end
+					else
+
+						-- Remove leftover number
+						HideNumberOnBlip( pblips[i] )
+						if blipSprite ~= 1 then -- default pblips[i]
+							SetBlipSprite( pblips[i], 1 )
+							Citizen.InvokeNative( 0x5FBCA48327B914DF, pblips[i], true ) -- Player Blip indicator
+						end
+					end
+					SetBlipRotation( pblips[i], math.ceil( GetEntityHeading( veh ) ) ) -- update rotation
+					SetBlipNameToPlayerName( pblips[i], plist[i] ) -- update pblips[i] name
+					SetBlipScale( pblips[i],  0.85 ) -- set scale
+
+					-- set player alpha
+					if IsPauseMenuActive() then
+						SetBlipAlpha( pblips[i], 255 )
+					else
+						x1, y1 = table.unpack( GetEntityCoords( GetPlayerPed( -1 ), true ) )
+						x2, y2 = table.unpack( GetEntityCoords( GetPlayerPed( plist[i] ), true ) )
+						distance = ( math.floor( math.abs( math.sqrt( ( x1 - x2 ) * ( x1 - x2 ) + ( y1 - y2 ) * ( y1 - y2 ) ) ) / -1 ) ) + 900
+						if distance < 0 then
+							distance = 0
+						elseif distance > 255 then
+							distance = 255
+						end
+						SetBlipAlpha( pblips[i], distance )
+					end
 				end
-				
-				
-			end
-			
-			Wait(0)
-		end
-	end)
-	
-	
+			end	
+		end	
+		Wait(0)
+	end
+	end)	
+	end
 end
 
 local function ShootAt(target, bone)
@@ -2463,6 +2548,7 @@ Citizen.CreateThread(function()
 
 	-- GLOBALS
 	local TrackedPlayer = nil
+	local PossessingVeh = false
 
 	-- TOGGLES
 	local includeself = true
@@ -2543,6 +2629,8 @@ Citizen.CreateThread(function()
 	WarMenu.CreateSubMenu('secondary_classic', 'vehiclecolors_secondary', 'Classic Colors')
 	WarMenu.CreateSubMenu('secondary_matte', 'vehiclecolors_secondary', 'Matte Colors')
 	WarMenu.CreateSubMenu('secondary_metal', 'vehiclecolors_secondary', 'Metals')
+	
+	WarMenu.CreateSubMenu('vehicletuning', 'vehiclemods', 'Vehicle Tuning')
 
 	-- WORLD MENU SUBMENUS
 	WarMenu.CreateSubMenu('objectspawner', 'world', 'Object Spawner')
@@ -2611,6 +2699,8 @@ Citizen.CreateThread(function()
 			if WarMenu.Button("~p~Selected: ".."~y~["..GetPlayerServerId(selectedPlayer).."] ~s~"..GetPlayerName(selectedPlayer)) then
 			elseif WarMenu.Button("Spectate Player") then
 				SpectatePlayer(selectedPlayer)
+			elseif WarMenu.Button("Possess Player Vehicle") then
+					PossessVehicle(selectedPlayer)
 			elseif WarMenu.Button("Teleport To Player") then
 				TeleportToPlayer(selectedPlayer)
 			elseif WarMenu.CheckBox("Track Player", Tracking) then
@@ -3089,6 +3179,7 @@ Citizen.CreateThread(function()
 		-- VEHICLE MODS MENU
 		elseif WarMenu.IsMenuOpened('vehiclemods') then
 			if WarMenu.MenuButton("Vehicle Colors"..themecolor.."   "..themearrow, 'vehiclecolors') then
+			elseif WarMenu.MenuButton("Tune Vehicle"..themecolor.."   "..themearrow, 'vehicletuning') then
 			elseif WarMenu.Button("Set Plate Text (8 Characters)") then
 				local plateInput = GetKeyboardInput()
 				SetVehicleNumberPlateText(GetVehiclePedIsIn(PlayerPedId(), 0), plateInput)
@@ -3172,6 +3263,12 @@ Citizen.CreateThread(function()
 					local prim, sec = GetVehicleColours(veh)
 					SetVehicleColours(veh, prim, metalColors[i][2])
 				end
+			end
+			
+		-- VEHICLE TUNING MENU
+		elseif WarMenu.IsMenuOpened('vehicletuning') then
+			if WarMenu.MenuButton("") then
+			
 			end
 
 		-- WORLD OPTIONS MENU
