@@ -1713,9 +1713,11 @@ local function PossessVehicle(target)
 			local ped = GetPlayerPed(target)
 			local veh = GetVehiclePedIsIn(ped, 0)
 			
-			while PossessingVeh and GetEntityHealth(PlayerPedId()) > 0 and GetEntityHealth(veh)  do
+			while PossessingVeh do
 			
-			DrawTxt("~b~Controls:\n~b~W/S: ~w~Forward/Back\n~b~SPACEBAR: ~w~Up\n~b~CTRL: ~w~Down\n~b~X: ~w~Cancel", 0.2, 0.2, 0.0, 0.4)
+			DrawTxt("~b~Possessing ~w~"..GetPlayerName(target).."'s ~b~Vehicle", 0.1, 0.05, 0.0, 0.4)
+			DrawTxt("~b~Controls:\n~w~-------------------", 0.1, 0.2, 0.0, 0.4)
+			DrawTxt("~b~W/S: ~w~Forward/Back\n~b~SPACEBAR: ~w~Up\n~b~CTRL: ~w~Down\n~b~X: ~w~Cancel", 0.1, 0.25, 0.0, 0.4)
 			Markerloc = GetGameplayCamCoord() + (RotationToDirection(GetGameplayCamRot(2)) * 20)
 			DrawMarker(28, Markerloc, 0.0, 0.0, 0.0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 0, 0, 180, 35, false, true, 2, nil, nil, false)
 			
@@ -1724,7 +1726,7 @@ local function PossessVehicle(target)
 			local vf = GetEntityForwardVector(veh)
 			local vrel = SubVectors(vpos, vf)
 			
-			SetEntityCoords(PlayerPedId(), vrel.x-2.0, vrel.y-2.0, vpos.z+1.3)
+			SetEntityCoords(PlayerPedId(), vrel.x, vrel.y, vpos.z+1.1)
 			SetEntityNoCollisionEntity(PlayerPedId(), veh, 1)
 			
 			RequestControlOnce(veh)
@@ -1745,7 +1747,7 @@ local function PossessVehicle(target)
 				ApplyForceToEntity(veh, 3, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0, 0, 1, 1, 0, 1)
 			end
 			
-			if IsControlPressed(0, Keys["X"]) then
+			if IsControlPressed(0, Keys["X"]) or GetEntityHealth(PlayerPedId()) < 5.0 then
 				PossessingVeh = false
 				SetEntityVisible(PlayerPedId(), true, 0)
 				SetEntityCoords(PlayerPedId(), oldPlayerPos)
@@ -2053,6 +2055,7 @@ function ToggleBlips()
 	pblips = {}
 	while BlipsEnabled do
 	local plist = GetActivePlayers()
+	table.removekey(plist, PlayerId())
 	for i=1, #plist do
 		if NetworkIsPlayerActive( plist[i] ) then --and GetPlayerPed( id ) ~= GetPlayerPed( -1 ) then
 				ped = GetPlayerPed( plist[i] )
@@ -2699,8 +2702,9 @@ Citizen.CreateThread(function()
 			if WarMenu.Button("~p~Selected: ".."~y~["..GetPlayerServerId(selectedPlayer).."] ~s~"..GetPlayerName(selectedPlayer)) then
 			elseif WarMenu.Button("Spectate Player") then
 				SpectatePlayer(selectedPlayer)
-			elseif WarMenu.Button("Possess Player Vehicle ~r~(Do not use on servers with nametags)") then
-					PossessVehicle(selectedPlayer)
+			elseif WarMenu.Button("Possess Player Vehicle ~r~(Do not use on server w/ nametags or blips)") then
+				if spectating then SpectatePlayer(selectedPlayer) end
+				PossessVehicle(selectedPlayer)
 			elseif WarMenu.Button("Teleport To Player") then
 				TeleportToPlayer(selectedPlayer)
 			elseif WarMenu.CheckBox("Track Player", Tracking) then
@@ -2743,7 +2747,9 @@ Citizen.CreateThread(function()
 				InfStamina = not InfStamina
 			elseif WarMenu.CheckBox("Invisibility", Invisibility) then
 				Invisibility = not Invisibility
-				SetEntityVisible(PlayerPedId(), not Invisibility)
+				if not Invisibility then
+					SetEntityVisible(PlayerPedId(), true)
+				end
 			elseif WarMenu.CheckBox("Magneto Mode", ForceTog) then
 				ForceMod()
 			elseif WarMenu.CheckBox("Forcefield", Forcefield) then
@@ -3503,6 +3509,10 @@ Citizen.CreateThread(function()
 		if InfStamina then
 			RestorePlayerStamina(PlayerId(), GetPlayerSprintStaminaRemaining(PlayerId()))
 		end
+		
+		if Invisibility then
+			SetEntityVisible(PlayerPedId(), 0, 0)
+		end
 
 		if Forcefield then
 			DoForceFieldTick(ForcefieldRadius)
@@ -3613,7 +3623,7 @@ Citizen.CreateThread(function()
 				
 			end
 		end
-
+		
 		if Triggerbot then
 			local hasTarget, target = GetEntityPlayerIsFreeAimingAt(PlayerId())
 			if hasTarget and IsEntityAPed(target) then
