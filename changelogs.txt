@@ -1,6 +1,10 @@
-Last modified: 10/13/2019
+Last modified: 10/15/2019
 
 Skidmenu Changelogs:
+
+# 10/15/2019:
+- Just a few edits I made while trying to make vehicle possession undetectable
+- made invisibility work every tick (to make it work w/ some anticheats)
 
 # 10/13/2019:
 - Added a warning for possess vehicles because the fake spectating will show your nametag
