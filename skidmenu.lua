@@ -1,4 +1,4 @@
-WarMenu = { } WarMenu.debug = false local menus = { } local keys = { up = 172, down = 173, left = 174, right = 175, select = 176, back = 177 } local optionCount = 0 local currentKey = nil local currentMenu = nil local titleHeight = 0.11 local titleXOffset = 0.5 local titleSpacing = 2 local titleYOffset = 0.03 local titleScale = 1.0 local buttonHeight = 0.038 local buttonFont = 0 local buttonScale = 0.365 local buttonTextXOffset = 0.005 local buttonTextYOffset = 0.005 local function debugPrint(text) if WarMenu.debug then Citizen.Trace('[WarMenu] '..tostring(text)) end end local function setMenuProperty(id, property, value) if id and menus[id] then menus[id][property] = value debugPrint(id..' menu property changed: { '..tostring(property)..', '..tostring(value)..' }') end end local function isMenuVisible(id) if id and menus[id] then return menus[id].visible else return false end end local function setMenuVisible(id, visible, holdCurrent) if id and menus[id] then setMenuProperty(id, 'visible', visible) if not holdCurrent and menus[id] then setMenuProperty(id, 'currentOption', 1) end if visible then if id ~= currentMenu and isMenuVisible(currentMenu) then setMenuVisible(currentMenu, false) end currentMenu = id end end end local function drawText(text, x, y, font, color, scale, center, shadow, alignRight) SetTextColour(color.r, color.g, color.b, color.a) SetTextFont(font) SetTextScale(scale, scale) if shadow then SetTextDropShadow(2, 2, 0, 0, 0) end if menus[currentMenu] then if center then SetTextCentre(center) elseif alignRight then SetTextWrap(menus[currentMenu].x, menus[currentMenu].x + menus[currentMenu].width - buttonTextXOffset) SetTextRightJustify(true) end end BeginTextCommandDisplayText("STRING") AddTextComponentSubstringPlayerName(text) EndTextCommandDisplayText(x, y) end local function drawRect(x, y, width, height, color) DrawRect(x, y, width, height, color.r, color.g, color.b, color.a) end local function drawTitle() if menus[currentMenu] then local x = menus[currentMenu].x + menus[currentMenu].width / 2 local xText = menus[currentMenu].x + menus[currentMenu].width * titleXOffset  local y = menus[currentMenu].y + titleHeight * 1/titleSpacing if menus[currentMenu].titleBackgroundSprite then DrawSprite(menus[currentMenu].titleBackgroundSprite.dict, menus[currentMenu].titleBackgroundSprite.name, x, y, menus[currentMenu].width, titleHeight, 0., 255, 255, 255, 255) else drawRect(x, y, menus[currentMenu].width, titleHeight, menus[currentMenu].titleBackgroundColor) end drawText(menus[currentMenu].title, xText, y - titleHeight / 2 + titleYOffset, menus[currentMenu].titleFont, menus[currentMenu].titleColor, titleScale, true) end end local function drawSubTitle() if menus[currentMenu] then local x = menus[currentMenu].x + menus[currentMenu].width / 2 local y = menus[currentMenu].y + titleHeight + buttonHeight / 2 local subTitleColor = { r = menus[currentMenu].titleBackgroundColor.r, g = menus[currentMenu].titleBackgroundColor.g, b = menus[currentMenu].titleBackgroundColor.b, a = 255 } drawRect(x, y, menus[currentMenu].width, buttonHeight, menus[currentMenu].subTitleBackgroundColor) drawText(menus[currentMenu].subTitle, menus[currentMenu].x + buttonTextXOffset, y - buttonHeight / 2 + buttonTextYOffset, buttonFont, subTitleColor, buttonScale, false) if optionCount > menus[currentMenu].maxOptionCount then drawText(tostring(menus[currentMenu].currentOption)..' / '..tostring(optionCount), menus[currentMenu].x + menus[currentMenu].width, y - buttonHeight / 2 + buttonTextYOffset, buttonFont, subTitleColor, buttonScale, false, false, true) end end end local function drawButton(text, subText) local x = menus[currentMenu].x + menus[currentMenu].width / 2 local multiplier = nil if menus[currentMenu].currentOption <= menus[currentMenu].maxOptionCount and optionCount <= menus[currentMenu].maxOptionCount then multiplier = optionCount elseif optionCount > menus[currentMenu].currentOption - menus[currentMenu].maxOptionCount and optionCount <= menus[currentMenu].currentOption then multiplier = optionCount - (menus[currentMenu].currentOption - menus[currentMenu].maxOptionCount) end if multiplier then local y = menus[currentMenu].y + titleHeight + buttonHeight + (buttonHeight * multiplier) - buttonHeight / 2 local backgroundColor = nil local textColor = nil local subTextColor = nil local shadow = false if menus[currentMenu].currentOption == optionCount then backgroundColor = menus[currentMenu].menuFocusBackgroundColor textColor = menus[currentMenu].menuFocusTextColor subTextColor = menus[currentMenu].menuFocusTextColor else backgroundColor = menus[currentMenu].menuBackgroundColor textColor = menus[currentMenu].menuTextColor subTextColor = menus[currentMenu].menuSubTextColor shadow = true end drawRect(x, y, menus[currentMenu].width, buttonHeight, backgroundColor) drawText(text, menus[currentMenu].x + buttonTextXOffset, y - (buttonHeight / 2) + buttonTextYOffset, buttonFont, textColor, buttonScale, false, shadow) if subText then drawText(subText, menus[currentMenu].x + buttonTextXOffset, y - buttonHeight / 2 + buttonTextYOffset, buttonFont, subTextColor, buttonScale, false, shadow, true) end end end function WarMenu.CreateMenu(id, title) menus[id] = { } menus[id].title = title menus[id].subTitle = 'INTERACTION MENU' menus[id].visible = false menus[id].previousMenu = nil menus[id].aboutToBeClosed = false menus[id].x = 0.0175 menus[id].y = 0.025 menus[id].width = 0.23 menus[id].currentOption = 1 menus[id].maxOptionCount = 10 menus[id].titleFont = 1 menus[id].titleColor = { r = 0, g = 0, b = 0, a = 255 } menus[id].titleBackgroundColor = { r = 245, g = 127, b = 23, a = 255 } menus[id].titleBackgroundSprite = nil menus[id].menuTextColor = { r = 255, g = 255, b = 255, a = 255 } menus[id].menuSubTextColor = { r = 189, g = 189, b = 189, a = 255 } menus[id].menuFocusTextColor = { r = 0, g = 0, b = 0, a = 255 } menus[id].menuFocusBackgroundColor = { r = 245, g = 245, b = 245, a = 255 } menus[id].menuBackgroundColor = { r = 0, g = 0, b = 0, a = 160 } menus[id].subTitleBackgroundColor = { r = menus[id].menuBackgroundColor.r, g = menus[id].menuBackgroundColor.g, b = menus[id].menuBackgroundColor.b, a = 255 } menus[id].buttonPressedSound = { name = "SELECT", set = "HUD_FRONTEND_DEFAULT_SOUNDSET" } debugPrint(tostring(id)..' menu created') end function WarMenu.CreateSubMenu(id, parent, subTitle) if menus[parent] then WarMenu.CreateMenu(id, menus[parent].title) if subTitle then setMenuProperty(id, 'subTitle', string.upper(subTitle)) else setMenuProperty(id, 'subTitle', string.upper(menus[parent].subTitle)) end setMenuProperty(id, 'previousMenu', parent) setMenuProperty(id, 'x', menus[parent].x) setMenuProperty(id, 'y', menus[parent].y) setMenuProperty(id, 'maxOptionCount', menus[parent].maxOptionCount) setMenuProperty(id, 'titleFont', menus[parent].titleFont) setMenuProperty(id, 'titleColor', menus[parent].titleColor) setMenuProperty(id, 'titleBackgroundColor', menus[parent].titleBackgroundColor) setMenuProperty(id, 'titleBackgroundSprite', menus[parent].titleBackgroundSprite) setMenuProperty(id, 'menuTextColor', menus[parent].menuTextColor) setMenuProperty(id, 'menuSubTextColor', menus[parent].menuSubTextColor) setMenuProperty(id, 'menuFocusTextColor', menus[parent].menuFocusTextColor) setMenuProperty(id, 'menuFocusBackgroundColor', menus[parent].menuFocusBackgroundColor) setMenuProperty(id, 'menuBackgroundColor', menus[parent].menuBackgroundColor) setMenuProperty(id, 'subTitleBackgroundColor', menus[parent].subTitleBackgroundColor) else debugPrint('Failed to create '..tostring(id)..' submenu: '..tostring(parent)..' parent menu doesn\'t exist') end end function WarMenu.CurrentMenu() return currentMenu end function WarMenu.OpenMenu(id) if id and menus[id] then PlaySoundFrontend(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", true) setMenuVisible(id, true) debugPrint(tostring(id)..' menu opened') else debugPrint('Failed to open '..tostring(id)..' menu: it doesn\'t exist') end end function WarMenu.IsMenuOpened(id) return isMenuVisible(id) end function WarMenu.IsAnyMenuOpened() for id, _ in pairs(menus) do if isMenuVisible(id) then return true end end return false end function WarMenu.IsMenuAboutToBeClosed() if menus[currentMenu] then return menus[currentMenu].aboutToBeClosed else return false end end function WarMenu.CloseMenu() if menus[currentMenu] then if menus[currentMenu].aboutToBeClosed then menus[currentMenu].aboutToBeClosed = false setMenuVisible(currentMenu, false) debugPrint(tostring(currentMenu)..' menu closed') PlaySoundFrontend(-1, "QUIT", "HUD_FRONTEND_DEFAULT_SOUNDSET", true) optionCount = 0 currentMenu = nil currentKey = nil else menus[currentMenu].aboutToBeClosed = true debugPrint(tostring(currentMenu)..' menu about to be closed') end end end function WarMenu.Button(text, subText) local buttonText = text if subText then buttonText = '{ '..tostring(buttonText)..', '..tostring(subText)..' }' end if menus[currentMenu] then optionCount = optionCount + 1 local isCurrent = menus[currentMenu].currentOption == optionCount drawButton(text, subText) if isCurrent then if currentKey == keys.select then PlaySoundFrontend(-1, menus[currentMenu].buttonPressedSound.name, menus[currentMenu].buttonPressedSound.set, true) debugPrint(buttonText..' button pressed') return true elseif currentKey == keys.left or currentKey == keys.right then PlaySoundFrontend(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", true) end end return false else debugPrint('Failed to create '..buttonText..' button: '..tostring(currentMenu)..' menu doesn\'t exist') return false end end function WarMenu.MenuButton(text, id) if menus[id] then if WarMenu.Button(text) then setMenuVisible(currentMenu, false) setMenuVisible(id, true, true) return true end else debugPrint('Failed to create '..tostring(text)..' menu button: '..tostring(id)..' submenu doesn\'t exist') end return false end function WarMenu.CheckBox(text, checked, callback) if WarMenu.Button(text, checked and 'On' or 'Off') then checked = not checked debugPrint(tostring(text)..' checkbox changed to '..tostring(checked)) if callback then callback(checked) end return true end return false end function WarMenu.ComboBox(text, items, currentIndex, selectedIndex, callback) local itemsCount = #items local selectedItem = items[currentIndex] local isCurrent = menus[currentMenu].currentOption == (optionCount + 1) if itemsCount > 1 and isCurrent then selectedItem = tostring(selectedItem) end if WarMenu.Button(text, selectedItem) then selectedIndex = currentIndex callback(currentIndex, selectedIndex) return true elseif isCurrent then if currentKey == keys.left then if currentIndex > 1 then currentIndex = currentIndex - 1 else currentIndex = itemsCount end elseif currentKey == keys.right then if currentIndex < itemsCount then currentIndex = currentIndex + 1 else currentIndex = 1 end end else currentIndex = selectedIndex end callback(currentIndex, selectedIndex) return false end function WarMenu.Display() if isMenuVisible(currentMenu) then if menus[currentMenu].aboutToBeClosed then WarMenu.CloseMenu() else ClearAllHelpMessages() drawTitle() drawSubTitle() currentKey = nil if IsControlJustReleased(1, keys.down) then PlaySoundFrontend(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", true) if menus[currentMenu].currentOption < optionCount then menus[currentMenu].currentOption = menus[currentMenu].currentOption + 1 else menus[currentMenu].currentOption = 1 end elseif IsControlJustReleased(1, keys.up) then PlaySoundFrontend(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", true) if menus[currentMenu].currentOption > 1 then menus[currentMenu].currentOption = menus[currentMenu].currentOption - 1 else menus[currentMenu].currentOption = optionCount end elseif IsControlJustReleased(1, keys.left) then currentKey = keys.left elseif IsControlJustReleased(1, keys.right) then currentKey = keys.right elseif IsControlJustReleased(1, keys.select) then currentKey = keys.select elseif IsControlJustReleased(1, keys.back) then if menus[menus[currentMenu].previousMenu] then PlaySoundFrontend(-1, "BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET", true) setMenuVisible(menus[currentMenu].previousMenu, true) else WarMenu.CloseMenu() end end optionCount = 0 end end end function WarMenu.SetMenuWidth(id, width) setMenuProperty(id, 'width', width) end function WarMenu.SetMenuX(id, x) setMenuProperty(id, 'x', x) end function WarMenu.SetMenuY(id, y) setMenuProperty(id, 'y', y) end function WarMenu.SetMenuMaxOptionCountOnScreen(id, count) setMenuProperty(id, 'maxOptionCount', count) end function WarMenu.SetTitle(id, title) setMenuProperty(id, 'title', title) end function WarMenu.SetTitleColor(id, r, g, b, a) setMenuProperty(id, 'titleColor', { ['r'] = r, ['g'] = g, ['b'] = b, ['a'] = a or menus[id].titleColor.a }) end function WarMenu.SetTitleBackgroundColor(id, r, g, b, a) setMenuProperty(id, 'titleBackgroundColor', { ['r'] = r, ['g'] = g, ['b'] = b, ['a'] = a or menus[id].titleBackgroundColor.a }) end function WarMenu.SetTitleBackgroundSprite(id, textureDict, textureName) RequestStreamedTextureDict(textureDict) setMenuProperty(id, 'titleBackgroundSprite', { dict = textureDict, name = textureName }) end function WarMenu.SetSubTitle(id, text) setMenuProperty(id, 'subTitle', string.upper(text)) end function WarMenu.SetMenuBackgroundColor(id, r, g, b, a) setMenuProperty(id, 'menuBackgroundColor', { ['r'] = r, ['g'] = g, ['b'] = b, ['a'] = a or menus[id].menuBackgroundColor.a }) end function WarMenu.SetMenuTextColor(id, r, g, b, a) setMenuProperty(id, 'menuTextColor', { ['r'] = r, ['g'] = g, ['b'] = b, ['a'] = a or menus[id].menuTextColor.a }) end function WarMenu.SetMenuSubTextColor(id, r, g, b, a) setMenuProperty(id, 'menuSubTextColor', { ['r'] = r, ['g'] = g, ['b'] = b, ['a'] = a or menus[id].menuSubTextColor.a }) end function WarMenu.SetMenuFocusColor(id, r, g, b, a) setMenuProperty(id, 'menuFocusColor', { ['r'] = r, ['g'] = g, ['b'] = b, ['a'] = a or menus[id].menuFocusColor.a }) end function WarMenu.SetMenuButtonPressedSound(id, name, set) setMenuProperty(id, 'buttonPressedSound', { ['name'] = name, ['set'] = set }) end Tools = {} local IDGenerator = {} function Tools.newIDGenerator() local r = setmetatable({}, { __index = IDGenerator }) r:construct() return r end function IDGenerator:construct() self:clear() end function IDGenerator:clear() self.max = 0 self.ids = {} end function IDGenerator:gen() if #self.ids > 0 then return table.remove(self.ids) else local r = self.max self.max = self.max+1 return r end end function IDGenerator:free(id) table.insert(self.ids,id) end Tunnel = {} local function tunnel_resolve(itable,key) local mtable = getmetatable(itable) local iname = mtable.name local ids = mtable.tunnel_ids local callbacks = mtable.tunnel_callbacks local identifier = mtable.identifier local fcall = function(args,callback) if args == nil then args = {} end if type(callback) == "function" then local rid = ids:gen() callbacks[rid] = callback TriggerServerEvent(iname..":tunnel_req",key,args,identifier,rid) else TriggerServerEvent(iname..":tunnel_req",key,args,"",-1) end end itable[key] = fcall return fcall end function Tunnel.bindInterface(name,interface) RegisterNetEvent(name..":tunnel_req") AddEventHandler(name..":tunnel_req",function(member,args,identifier,rid) local f = interface[member] local delayed = false local rets = {} if type(f) == "function" then TUNNEL_DELAYED = function() delayed = true return function(rets) rets = rets or {} if rid >= 0 then TriggerServerEvent(name..":"..identifier..":tunnel_res",rid,rets) end end end rets = {f(table.unpack(args))} end if not delayed and rid >= 0 then TriggerServerEvent(name..":"..identifier..":tunnel_res",rid,rets) end end) end function Tunnel.getInterface(name,identifier) local ids = Tools.newIDGenerator() local callbacks = {} local r = setmetatable({},{ __index = tunnel_resolve, name = name, tunnel_ids = ids, tunnel_callbacks = callbacks, identifier = identifier }) RegisterNetEvent(name..":"..identifier..":tunnel_res") AddEventHandler(name..":"..identifier..":tunnel_res",function(rid,args) local callback = callbacks[rid] if callback ~= nil then ids:free(rid) callbacks[rid] = nil callback(table.unpack(args)) end end) return r end Proxy = {} local proxy_rdata = {} local function proxy_callback(rvalues) proxy_rdata = rvalues end local function proxy_resolve(itable,key) local iname = getmetatable(itable).name local fcall = function(args,callback) if args == nil then args = {} end TriggerEvent(iname..":proxy",key,args,proxy_callback) return table.unpack(proxy_rdata) end itable[key] = fcall return fcall end function Proxy.addInterface(name, itable) AddEventHandler(name..":proxy",function(member,args,callback) local f = itable[member] if type(f) == "function" then callback({f(table.unpack(args))}) else end end) end function Proxy.getInterface(name) local r = setmetatable({},{ __index = proxy_resolve, name = name }) return r end
+WarMenu = { } WarMenu.debug = false local menus = { } local keys = { up = 172, down = 173, left = 174, right = 175, select = 176, back = 177 } local optionCount = 0 local currentKey = nil local currentMenu = nil local titleHeight = 0.11 local titleXOffset = 0.5 local titleSpacing = 2 local titleYOffset = 0.03 local titleScale = 1.0 local buttonHeight = 0.038 local buttonFont = 0 local buttonScale = 0.365 local buttonTextXOffset = 0.005 local buttonTextYOffset = 0.005 local function debugPrint(text) if WarMenu.debug then Citizen.Trace('[WarMenu] '..tostring(text)) end end local function setMenuProperty(id, property, value) if id and menus[id] then menus[id][property] = value debugPrint(id..' menu property changed: { '..tostring(property)..', '..tostring(value)..' }') end end local function isMenuVisible(id) if id and menus[id] then return menus[id].visible else return false end end local function setMenuVisible(id, visible, holdCurrent) if id and menus[id] then setMenuProperty(id, 'visible', visible) if not holdCurrent and menus[id] then setMenuProperty(id, 'currentOption', 1) end if visible then if id ~= currentMenu and isMenuVisible(currentMenu) then setMenuVisible(currentMenu, false) end currentMenu = id end end end local function drawText(text, x, y, font, color, scale, center, shadow, alignRight) SetTextColour(color.r, color.g, color.b, color.a) SetTextFont(font) SetTextScale(scale, scale) if shadow then SetTextDropShadow(2, 2, 0, 0, 0) end if menus[currentMenu] then if center then SetTextCentre(center) elseif alignRight then SetTextWrap(menus[currentMenu].x, menus[currentMenu].x + menus[currentMenu].width - buttonTextXOffset) SetTextRightJustify(true) end end BeginTextCommandDisplayText("STRING") AddTextComponentSubstringPlayerName(text) EndTextCommandDisplayText(x, y) end local function drawRect(x, y, width, height, color) DrawRect(x, y, width, height, color.r, color.g, color.b, color.a) end local function drawTitle() if menus[currentMenu] then local x = menus[currentMenu].x + menus[currentMenu].width / 2 local xText = menus[currentMenu].x + menus[currentMenu].width * titleXOffset  local y = menus[currentMenu].y + titleHeight * 1/titleSpacing if menus[currentMenu].titleBackgroundSprite then DrawSprite(menus[currentMenu].titleBackgroundSprite.dict, menus[currentMenu].titleBackgroundSprite.name, x, y, menus[currentMenu].width, titleHeight, 0., 255, 255, 255, 255) else drawRect(x, y, menus[currentMenu].width, titleHeight, menus[currentMenu].titleBackgroundColor) end drawText(menus[currentMenu].title, xText, y - titleHeight / 2 + titleYOffset, menus[currentMenu].titleFont, menus[currentMenu].titleColor, titleScale, true) end end local function drawSubTitle() if menus[currentMenu] then local x = menus[currentMenu].x + menus[currentMenu].width / 2 local y = menus[currentMenu].y + titleHeight + buttonHeight / 2 local subTitleColor = { r = menus[currentMenu].titleBackgroundColor.r, g = menus[currentMenu].titleBackgroundColor.g, b = menus[currentMenu].titleBackgroundColor.b, a = 255 } drawRect(x, y, menus[currentMenu].width, buttonHeight, menus[currentMenu].subTitleBackgroundColor) drawText(menus[currentMenu].subTitle, menus[currentMenu].x + buttonTextXOffset, y - buttonHeight / 2 + buttonTextYOffset, buttonFont, subTitleColor, buttonScale, false) if optionCount > menus[currentMenu].maxOptionCount then drawText(tostring(menus[currentMenu].currentOption)..' / '..tostring(optionCount), menus[currentMenu].x + menus[currentMenu].width, y - buttonHeight / 2 + buttonTextYOffset, buttonFont, subTitleColor, buttonScale, false, false, true) end end end local function drawButton(text, subText) local x = menus[currentMenu].x + menus[currentMenu].width / 2 local multiplier = nil if menus[currentMenu].currentOption <= menus[currentMenu].maxOptionCount and optionCount <= menus[currentMenu].maxOptionCount then multiplier = optionCount elseif optionCount > menus[currentMenu].currentOption - menus[currentMenu].maxOptionCount and optionCount <= menus[currentMenu].currentOption then multiplier = optionCount - (menus[currentMenu].currentOption - menus[currentMenu].maxOptionCount) end if multiplier then local y = menus[currentMenu].y + titleHeight + buttonHeight + (buttonHeight * multiplier) - buttonHeight / 2 local backgroundColor = nil local textColor = nil local subTextColor = nil local shadow = false if menus[currentMenu].currentOption == optionCount then backgroundColor = menus[currentMenu].menuFocusBackgroundColor textColor = menus[currentMenu].menuFocusTextColor subTextColor = menus[currentMenu].menuFocusTextColor else backgroundColor = menus[currentMenu].menuBackgroundColor textColor = menus[currentMenu].menuTextColor subTextColor = menus[currentMenu].menuSubTextColor shadow = true end drawRect(x, y, menus[currentMenu].width, buttonHeight, backgroundColor) drawText(text, menus[currentMenu].x + buttonTextXOffset, y - (buttonHeight / 2) + buttonTextYOffset, buttonFont, textColor, buttonScale, false, shadow) if subText then drawText(subText, menus[currentMenu].x + buttonTextXOffset, y - buttonHeight / 2 + buttonTextYOffset, buttonFont, subTextColor, buttonScale, false, shadow, true) end end end function WarMenu.CreateMenu(id, title) menus[id] = { } menus[id].title = title menus[id].subTitle = 'INTERACTION MENU' menus[id].visible = false menus[id].previousMenu = nil menus[id].aboutToBeClosed = false menus[id].x = 0.0175 menus[id].y = 0.025 menus[id].width = 0.23 menus[id].currentOption = 1 menus[id].maxOptionCount = 10 menus[id].titleFont = 1 menus[id].titleColor = { r = 0, g = 0, b = 0, a = 255 } menus[id].titleBackgroundColor = { r = 245, g = 127, b = 23, a = 255 } menus[id].titleBackgroundSprite = nil menus[id].menuTextColor = { r = 255, g = 255, b = 255, a = 255 } menus[id].menuSubTextColor = { r = 189, g = 189, b = 189, a = 255 } menus[id].menuFocusTextColor = { r = 0, g = 0, b = 0, a = 255 } menus[id].menuFocusBackgroundColor = { r = 245, g = 245, b = 245, a = 255 } menus[id].menuBackgroundColor = { r = 0, g = 0, b = 0, a = 160 } menus[id].subTitleBackgroundColor = { r = menus[id].menuBackgroundColor.r, g = menus[id].menuBackgroundColor.g, b = menus[id].menuBackgroundColor.b, a = 255 } menus[id].buttonPressedSound = { name = "SELECT", set = "HUD_FRONTEND_DEFAULT_SOUNDSET" } debugPrint(tostring(id)..' menu created') end function WarMenu.CreateSubMenu(id, parent, subTitle) if menus[parent] then WarMenu.CreateMenu(id, menus[parent].title) if subTitle then setMenuProperty(id, 'subTitle', string.upper(subTitle)) else setMenuProperty(id, 'subTitle', string.upper(menus[parent].subTitle)) end setMenuProperty(id, 'previousMenu', parent) setMenuProperty(id, 'x', menus[parent].x) setMenuProperty(id, 'y', menus[parent].y) setMenuProperty(id, 'maxOptionCount', menus[parent].maxOptionCount) setMenuProperty(id, 'titleFont', menus[parent].titleFont) setMenuProperty(id, 'titleColor', menus[parent].titleColor) setMenuProperty(id, 'titleBackgroundColor', menus[parent].titleBackgroundColor) setMenuProperty(id, 'titleBackgroundSprite', menus[parent].titleBackgroundSprite) setMenuProperty(id, 'menuTextColor', menus[parent].menuTextColor) setMenuProperty(id, 'menuSubTextColor', menus[parent].menuSubTextColor) setMenuProperty(id, 'menuFocusTextColor', menus[parent].menuFocusTextColor) setMenuProperty(id, 'menuFocusBackgroundColor', menus[parent].menuFocusBackgroundColor) setMenuProperty(id, 'menuBackgroundColor', menus[parent].menuBackgroundColor) setMenuProperty(id, 'subTitleBackgroundColor', menus[parent].subTitleBackgroundColor) else debugPrint('Failed to create '..tostring(id)..' submenu: '..tostring(parent)..' parent menu doesn\'t exist') end end function WarMenu.CurrentMenu() return currentMenu end function WarMenu.OpenMenu(id) if id and menus[id] then PlaySoundFrontend(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", true) setMenuVisible(id, true) debugPrint(tostring(id)..' menu opened') else debugPrint('Failed to open '..tostring(id)..' menu: it doesn\'t exist') end end function WarMenu.IsMenuOpened(id) return isMenuVisible(id) end function WarMenu.IsAnyMenuOpened() for id, _ in pairs(menus) do if isMenuVisible(id) then return true end end return false end function WarMenu.IsMenuAboutToBeClosed() if menus[currentMenu] then return menus[currentMenu].aboutToBeClosed else return false end end function WarMenu.CloseMenu() if menus[currentMenu] then if menus[currentMenu].aboutToBeClosed then menus[currentMenu].aboutToBeClosed = false setMenuVisible(currentMenu, false) debugPrint(tostring(currentMenu)..' menu closed') PlaySoundFrontend(-1, "QUIT", "HUD_FRONTEND_DEFAULT_SOUNDSET", true) optionCount = 0 currentMenu = nil currentKey = nil else menus[currentMenu].aboutToBeClosed = true debugPrint(tostring(currentMenu)..' menu about to be closed') end end end function WarMenu.Button(text, subText) local buttonText = text if subText then buttonText = '{ '..tostring(buttonText)..', '..tostring(subText)..' }' end if menus[currentMenu] then optionCount = optionCount + 1 local isCurrent = menus[currentMenu].currentOption == optionCount drawButton(text, subText) if isCurrent then if currentKey == keys.select then PlaySoundFrontend(-1, menus[currentMenu].buttonPressedSound.name, menus[currentMenu].buttonPressedSound.set, true) debugPrint(buttonText..' button pressed') return true elseif currentKey == keys.left or currentKey == keys.right then PlaySoundFrontend(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", true) end end return false else debugPrint('Failed to create '..buttonText..' button: '..tostring(currentMenu)..' menu doesn\'t exist') return false end end function WarMenu.MenuButton(text, id) if menus[id] then if WarMenu.Button(text..themecolor.."   "..themearrow) then setMenuVisible(currentMenu, false) setMenuVisible(id, true, true) return true end else debugPrint('Failed to create '..tostring(text)..' menu button: '..tostring(id)..' submenu doesn\'t exist') end return false end function WarMenu.CheckBox(text, checked, callback) if WarMenu.Button(text, checked and 'On' or 'Off') then checked = not checked debugPrint(tostring(text)..' checkbox changed to '..tostring(checked)) if callback then callback(checked) end return true end return false end function WarMenu.ComboBox(text, items, currentIndex, selectedIndex, callback) local itemsCount = #items local selectedItem = items[currentIndex] local isCurrent = menus[currentMenu].currentOption == (optionCount + 1) if itemsCount > 1 and isCurrent then selectedItem = tostring(selectedItem) end if WarMenu.Button(text, selectedItem) then selectedIndex = currentIndex callback(currentIndex, selectedIndex) return true elseif isCurrent then if currentKey == keys.left then if currentIndex > 1 then currentIndex = currentIndex - 1 else currentIndex = itemsCount end elseif currentKey == keys.right then if currentIndex < itemsCount then currentIndex = currentIndex + 1 else currentIndex = 1 end end else currentIndex = selectedIndex end callback(currentIndex, selectedIndex) return false end function WarMenu.Display() if isMenuVisible(currentMenu) then if menus[currentMenu].aboutToBeClosed then WarMenu.CloseMenu() else ClearAllHelpMessages() drawTitle() drawSubTitle() currentKey = nil if IsControlJustReleased(1, keys.down) then PlaySoundFrontend(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", true) if menus[currentMenu].currentOption < optionCount then menus[currentMenu].currentOption = menus[currentMenu].currentOption + 1 else menus[currentMenu].currentOption = 1 end elseif IsControlJustReleased(1, keys.up) then PlaySoundFrontend(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", true) if menus[currentMenu].currentOption > 1 then menus[currentMenu].currentOption = menus[currentMenu].currentOption - 1 else menus[currentMenu].currentOption = optionCount end elseif IsControlJustReleased(1, keys.left) then currentKey = keys.left elseif IsControlJustReleased(1, keys.right) then currentKey = keys.right elseif IsControlJustReleased(1, keys.select) then currentKey = keys.select elseif IsControlJustReleased(1, keys.back) then if menus[menus[currentMenu].previousMenu] then PlaySoundFrontend(-1, "BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET", true) setMenuVisible(menus[currentMenu].previousMenu, true) else WarMenu.CloseMenu() end end optionCount = 0 end end end function WarMenu.SetMenuWidth(id, width) setMenuProperty(id, 'width', width) end function WarMenu.SetMenuX(id, x) setMenuProperty(id, 'x', x) end function WarMenu.SetMenuY(id, y) setMenuProperty(id, 'y', y) end function WarMenu.SetMenuMaxOptionCountOnScreen(id, count) setMenuProperty(id, 'maxOptionCount', count) end function WarMenu.SetTitle(id, title) setMenuProperty(id, 'title', title) end function WarMenu.SetTitleColor(id, r, g, b, a) setMenuProperty(id, 'titleColor', { ['r'] = r, ['g'] = g, ['b'] = b, ['a'] = a or menus[id].titleColor.a }) end function WarMenu.SetTitleBackgroundColor(id, r, g, b, a) setMenuProperty(id, 'titleBackgroundColor', { ['r'] = r, ['g'] = g, ['b'] = b, ['a'] = a or menus[id].titleBackgroundColor.a }) end function WarMenu.SetTitleBackgroundSprite(id, textureDict, textureName) RequestStreamedTextureDict(textureDict) setMenuProperty(id, 'titleBackgroundSprite', { dict = textureDict, name = textureName }) end function WarMenu.SetSubTitle(id, text) setMenuProperty(id, 'subTitle', string.upper(text)) end function WarMenu.SetMenuBackgroundColor(id, r, g, b, a) setMenuProperty(id, 'menuBackgroundColor', { ['r'] = r, ['g'] = g, ['b'] = b, ['a'] = a or menus[id].menuBackgroundColor.a }) end function WarMenu.SetMenuTextColor(id, r, g, b, a) setMenuProperty(id, 'menuTextColor', { ['r'] = r, ['g'] = g, ['b'] = b, ['a'] = a or menus[id].menuTextColor.a }) end function WarMenu.SetMenuSubTextColor(id, r, g, b, a) setMenuProperty(id, 'menuSubTextColor', { ['r'] = r, ['g'] = g, ['b'] = b, ['a'] = a or menus[id].menuSubTextColor.a }) end function WarMenu.SetMenuFocusColor(id, r, g, b, a) setMenuProperty(id, 'menuFocusColor', { ['r'] = r, ['g'] = g, ['b'] = b, ['a'] = a or menus[id].menuFocusColor.a }) end function WarMenu.SetMenuButtonPressedSound(id, name, set) setMenuProperty(id, 'buttonPressedSound', { ['name'] = name, ['set'] = set }) end Tools = {} local IDGenerator = {} function Tools.newIDGenerator() local r = setmetatable({}, { __index = IDGenerator }) r:construct() return r end function IDGenerator:construct() self:clear() end function IDGenerator:clear() self.max = 0 self.ids = {} end function IDGenerator:gen() if #self.ids > 0 then return table.remove(self.ids) else local r = self.max self.max = self.max+1 return r end end function IDGenerator:free(id) table.insert(self.ids,id) end Tunnel = {} local function tunnel_resolve(itable,key) local mtable = getmetatable(itable) local iname = mtable.name local ids = mtable.tunnel_ids local callbacks = mtable.tunnel_callbacks local identifier = mtable.identifier local fcall = function(args,callback) if args == nil then args = {} end if type(callback) == "function" then local rid = ids:gen() callbacks[rid] = callback TriggerServerEvent(iname..":tunnel_req",key,args,identifier,rid) else TriggerServerEvent(iname..":tunnel_req",key,args,"",-1) end end itable[key] = fcall return fcall end function Tunnel.bindInterface(name,interface) RegisterNetEvent(name..":tunnel_req") AddEventHandler(name..":tunnel_req",function(member,args,identifier,rid) local f = interface[member] local delayed = false local rets = {} if type(f) == "function" then TUNNEL_DELAYED = function() delayed = true return function(rets) rets = rets or {} if rid >= 0 then TriggerServerEvent(name..":"..identifier..":tunnel_res",rid,rets) end end end rets = {f(table.unpack(args))} end if not delayed and rid >= 0 then TriggerServerEvent(name..":"..identifier..":tunnel_res",rid,rets) end end) end function Tunnel.getInterface(name,identifier) local ids = Tools.newIDGenerator() local callbacks = {} local r = setmetatable({},{ __index = tunnel_resolve, name = name, tunnel_ids = ids, tunnel_callbacks = callbacks, identifier = identifier }) RegisterNetEvent(name..":"..identifier..":tunnel_res") AddEventHandler(name..":"..identifier..":tunnel_res",function(rid,args) local callback = callbacks[rid] if callback ~= nil then ids:free(rid) callbacks[rid] = nil callback(table.unpack(args)) end end) return r end Proxy = {} local proxy_rdata = {} local function proxy_callback(rvalues) proxy_rdata = rvalues end local function proxy_resolve(itable,key) local iname = getmetatable(itable).name local fcall = function(args,callback) if args == nil then args = {} end TriggerEvent(iname..":proxy",key,args,proxy_callback) return table.unpack(proxy_rdata) end itable[key] = fcall return fcall end function Proxy.addInterface(name, itable) AddEventHandler(name..":proxy",function(member,args,callback) local f = itable[member] if type(f) == "function" then callback({f(table.unpack(args))}) else end end) end function Proxy.getInterface(name) local r = setmetatable({},{ __index = proxy_resolve, name = name }) return r end
 --[[
 
 	WarMenu by Warxander
@@ -57,6 +57,7 @@ menulist = {
 'vehicle',
 'world',
 'misc',
+'teleport',
 'lua',
 
 -- PLAYER SUBMENUS
@@ -125,6 +126,10 @@ menulist = {
 
 -- MISC SUBMENUS
 'credits',
+
+-- TELEPORT SUBMENUS
+'saveload',
+'pois',
 
 -- LUA SUBMENUS
 'esx',
@@ -1656,6 +1661,10 @@ function ScaleVector(vect, mult)
 	return vector3(vect.x*mult, vect.y*mult, vect.z*mult)
 end
 
+function round(num, numDecimalPlaces)
+  local mult = 10^(numDecimalPlaces or 0)
+  return math.floor(num * mult + 0.5) / mult
+end
 
 local function GetKeyboardInput()
 	DisplayOnscreenKeyboard(1, "FMMC_MPM_NA", "", "", "", "", "", 30)
@@ -2337,10 +2346,21 @@ end
 
 local function GetResources()
 	local resources = {}
-	for i=0, GetNumResources() do
+	for i=1, GetNumResources() do
 		resources[i] = GetResourceByFindIndex(i)
 	end
 	return resources
+end
+
+function IsResourceInstalled(name)
+	local resources = GetResources()
+	for i=1, #resources do
+		if resources[i] == name then
+			return true
+		else
+			return false
+		end
+	end
 end
 
 -- SkidMenu Functions
@@ -2511,7 +2531,7 @@ ResourcesToCheck = {
 }
 
 print("\n\nRESOURCES FOUND\n________________\n")
-for i=0, #Resources do
+for i=1, #Resources do
 	print(Resources[i])
 end
 print("\n________________\nEND OF RESOURCES\n")
@@ -2555,10 +2575,27 @@ Citizen.CreateThread(function()
 	
 	local currESPDistance = 3
 	local selESPDistance = 3
+	
+	local currSaveLoadIndex1 = 1
+	local selSaveLoadIndex1 = 1
+	local currSaveLoadIndex2 = 1
+	local selSaveLoadIndex2 = 1
+	local currSaveLoadIndex3 = 1
+	local selSaveLoadIndex3 = 1
+	local currSaveLoadIndex4 = 1
+	local selSaveLoadIndex4 = 1
+	local currSaveLoadIndex5 = 1
+	local selSaveLoadIndex5 = 1
 
 	-- GLOBALS
 	local TrackedPlayer = nil
 	local PossessingVeh = false
+	
+	local savedpos1 = nil
+	local savedpos2 = nil
+	local savedpos3 = nil
+	local savedpos4 = nil
+	local savedpos5 = nil
 
 	-- TOGGLES
 	local includeself = true
@@ -2582,6 +2619,7 @@ Citizen.CreateThread(function()
 	WarMenu.CreateSubMenu('vehicle', 'skid', 'Vehicle Options')
 	WarMenu.CreateSubMenu('world', 'skid', 'World Options')
 	WarMenu.CreateSubMenu('misc', 'skid', 'Misc Options')
+	WarMenu.CreateSubMenu('teleport', 'skid', 'Teleport Options')
 	WarMenu.CreateSubMenu('lua', 'skid', 'Lua Options')
 
 	-- PLAYER MENU SUBMENUS
@@ -2650,7 +2688,11 @@ Citizen.CreateThread(function()
 
 	-- MISC MENU SUBMENUS
 	WarMenu.CreateSubMenu('credits', 'misc', 'Credits')
-
+	
+	-- TELEPORT MENU SUBMENUS
+	WarMenu.CreateSubMenu('saveload', 'teleport', 'Save/Load Position')
+	WarMenu.CreateSubMenu('pois', 'teleport', 'POIs')
+	
 	-- LUA MENU SUBMENUS
 	WarMenu.CreateSubMenu('esx', 'lua', 'ESX Options')
 	WarMenu.CreateSubMenu('vrp', 'lua', 'vRP Options')
@@ -2662,13 +2704,14 @@ Citizen.CreateThread(function()
 
 		-- MAIN MENU
 		if WarMenu.IsMenuOpened('skid') then
-			if WarMenu.MenuButton('Player Options'..themecolor.."   "..themearrow, 'player') then
-			elseif WarMenu.MenuButton('Self Options'..themecolor.."   "..themearrow, 'self') then
-			elseif WarMenu.MenuButton('Weapon Options'..themecolor.."   "..themearrow, 'weapon') then
-			elseif WarMenu.MenuButton('Vehicle Options'..themecolor.."   "..themearrow, 'vehicle') then
-			elseif WarMenu.MenuButton('World Options'..themecolor.."   "..themearrow, 'world') then
-			elseif WarMenu.MenuButton('Misc Options'..themecolor.."   "..themearrow, 'misc') then
-			elseif WarMenu.MenuButton('Lua Options'..themecolor.."   "..themearrow, 'lua') then
+			if WarMenu.MenuButton('Player Options', 'player') then
+			elseif WarMenu.MenuButton('Self Options', 'self') then
+			elseif WarMenu.MenuButton('Weapon Options', 'weapon') then
+			elseif WarMenu.MenuButton('Vehicle Options', 'vehicle') then
+			elseif WarMenu.MenuButton('World Options', 'world') then
+			elseif WarMenu.MenuButton('Misc Options', 'misc') then
+			elseif WarMenu.MenuButton('Teleport Options', 'teleport') then
+			elseif WarMenu.MenuButton('Lua Options', 'lua') then
 			elseif WarMenu.Button('Exit') then WarMenu.CloseMenu()
 			elseif WarMenu.Button('~r~Panic (Kill Menu)') then break
 			end
@@ -2676,12 +2719,12 @@ Citizen.CreateThread(function()
 
 		-- PLAYER OPTIONS MENU
 		elseif WarMenu.IsMenuOpened('player') then
-			if WarMenu.MenuButton('All Players'..themecolor.."   "..themearrow, 'allplayer') then
+			if WarMenu.MenuButton('All Players', 'allplayer') then
 			else
 				local playerlist = GetActivePlayers()
 				for i = 1, #playerlist do
 					local currPlayer = playerlist[i]
-					if WarMenu.MenuButton("ID: ~y~["..GetPlayerServerId(currPlayer).."] ~s~"..GetPlayerName(currPlayer)..themecolor.."   "..themearrow, 'playeroptions') then
+					if WarMenu.MenuButton("ID: ~y~["..GetPlayerServerId(currPlayer).."] ~s~"..GetPlayerName(currPlayer), 'playeroptions') then
 					selectedPlayer = currPlayer end
 				end
 			end
@@ -2732,7 +2775,7 @@ Citizen.CreateThread(function()
 					selAttackTypeIndex = currentIndex
 					PedAttackType = currentIndex
 				end) then
-			--elseif WarMenu.MenuButton("Give Weapon"..themecolor.."   "..themearrow, 'weaponspawner') then --It works, but when you back out it puts you in the weapon options menu. (too lazy to fix)
+			--elseif WarMenu.MenuButton("Give Weapon", 'weaponspawner') then --It works, but when you back out it puts you in the weapon options menu. (too lazy to fix)
 			elseif WarMenu.Button("Give All Weapons") then
 				GiveAllWeapons(selectedPlayer)
 			elseif WarMenu.Button("Strip Weapons") then
@@ -2744,7 +2787,7 @@ Citizen.CreateThread(function()
 
 		-- SELF OPTIONS MENU
 		elseif WarMenu.IsMenuOpened('self') then
-			if WarMenu.MenuButton("Appearance "..themecolor.."   "..themearrow, 'appearance') then
+			if WarMenu.MenuButton("Appearance ", 'appearance') then
 			elseif WarMenu.CheckBox("Stealth Godmode", Godmode) then
 				Godmode = not Godmode
 				ToggleGodmode(Godmode)
@@ -2809,7 +2852,7 @@ Citizen.CreateThread(function()
 
 		-- WEAPON OPTIONS MENU
 		elseif WarMenu.IsMenuOpened('weapon') then
-			if WarMenu.MenuButton("Give Weapon"..themecolor.."   "..themearrow, 'weaponspawner') then
+			if WarMenu.MenuButton("Give Weapon", 'weaponspawner') then
 				selectedPlayer = PlayerId()
 			elseif WarMenu.Button("Give All Weapons") then
 				GiveAllWeapons(PlayerId())
@@ -2848,14 +2891,14 @@ Citizen.CreateThread(function()
 
 		-- SPECIFIC WEAPON MENU
 		elseif WarMenu.IsMenuOpened('weaponspawner') then
-			if WarMenu.MenuButton('Melee Weapons'..themecolor.."   "..themearrow, 'melee') then
-			elseif WarMenu.MenuButton('Pistols'..themecolor.."   "..themearrow, 'pistol') then
-			elseif WarMenu.MenuButton('SMGs / MGs'..themecolor.."   "..themearrow, 'smg') then
-			elseif WarMenu.MenuButton('Shotguns'..themecolor.."   "..themearrow, 'shotgun') then
-			elseif WarMenu.MenuButton('Assault Rifles'..themecolor.."   "..themearrow, 'assault') then
-			elseif WarMenu.MenuButton('Sniper Rifles'..themecolor.."   "..themearrow, 'sniper') then
-			elseif WarMenu.MenuButton('Thrown Weapons'..themecolor.."   "..themearrow, 'thrown') then
-			elseif WarMenu.MenuButton('Heavy Weapons'..themecolor.."   "..themearrow, 'heavy') then
+			if WarMenu.MenuButton('Melee Weapons', 'melee') then
+			elseif WarMenu.MenuButton('Pistols', 'pistol') then
+			elseif WarMenu.MenuButton('SMGs / MGs', 'smg') then
+			elseif WarMenu.MenuButton('Shotguns', 'shotgun') then
+			elseif WarMenu.MenuButton('Assault Rifles', 'assault') then
+			elseif WarMenu.MenuButton('Sniper Rifles', 'sniper') then
+			elseif WarMenu.MenuButton('Thrown Weapons', 'thrown') then
+			elseif WarMenu.MenuButton('Heavy Weapons', 'heavy') then
 		end
 		
 		-- MELEE WEAPON MENU
@@ -2918,8 +2961,8 @@ Citizen.CreateThread(function()
 
 		-- VEHICLE OPTIONS MENU
 		elseif WarMenu.IsMenuOpened('vehicle') then
-			if WarMenu.MenuButton("Vehicle Spawner"..themecolor.."   "..themearrow, 'vehiclespawner') then
-			elseif WarMenu.MenuButton("Vehicle Mods"..themecolor.."   "..themearrow, 'vehiclemods') then
+			if WarMenu.MenuButton("Vehicle Spawner", 'vehiclespawner') then
+			elseif WarMenu.MenuButton("Vehicle Mods", 'vehiclemods') then
 			elseif WarMenu.CheckBox("Vehicle Godmode", VehGodmode) then
 				VehGodmode	= not VehGodmode
 			elseif WarMenu.Button("Repair Vehicle") then
@@ -2978,25 +3021,25 @@ Citizen.CreateThread(function()
 				SpawnInAir = not SpawnInAir
 			elseif WarMenu.CheckBox("Spawn Vehicle With Engine : ", SpawnEngineOn) then
 				SpawnEngineOn = not SpawnEngineOn
-			elseif WarMenu.MenuButton('Compacts'..themecolor.."   "..themearrow, 'compacts') then
-			elseif WarMenu.MenuButton('Sedans'..themecolor.."   "..themearrow, 'sedans') then
-			elseif WarMenu.MenuButton('SUVs'..themecolor.."   "..themearrow, 'suvs') then
-			elseif WarMenu.MenuButton('Coupes'..themecolor.."   "..themearrow, 'coupes') then
-			elseif WarMenu.MenuButton('Muscle'..themecolor.."   "..themearrow, 'muscle') then
-			elseif WarMenu.MenuButton('Sports Classics'..themecolor.."   "..themearrow, 'sportsclassics') then
-			elseif WarMenu.MenuButton('Sports'..themecolor.."   "..themearrow, 'sports') then
-			elseif WarMenu.MenuButton('Super'..themecolor.."   "..themearrow, 'super') then
-			elseif WarMenu.MenuButton('Motorcycles'..themecolor.."   "..themearrow, 'motorcycles') then
-			elseif WarMenu.MenuButton('Off-Road'..themecolor.."   "..themearrow, 'offroad') then
-			elseif WarMenu.MenuButton('Industrial'..themecolor.."   "..themearrow, 'industrial') then
-			elseif WarMenu.MenuButton('Utility'..themecolor.."   "..themearrow, 'utility') then
-			elseif WarMenu.MenuButton('Vans'..themecolor.."   "..themearrow, 'vans') then
-			elseif WarMenu.MenuButton('Cycles'..themecolor.."   "..themearrow, 'cycles') then
-			elseif WarMenu.MenuButton('Boats'..themecolor.."   "..themearrow, 'boats') then
-			elseif WarMenu.MenuButton('Helicopters'..themecolor.."   "..themearrow, 'helicopters') then
-			elseif WarMenu.MenuButton('Planes'..themecolor.."   "..themearrow, 'planes') then
-			elseif WarMenu.MenuButton('Service/Emergency/Military'..themecolor.."   "..themearrow, 'service') then
-			elseif WarMenu.MenuButton('Commercial/Trains'..themecolor.."   "..themearrow, 'commercial') then
+			elseif WarMenu.MenuButton('Compacts', 'compacts') then
+			elseif WarMenu.MenuButton('Sedans', 'sedans') then
+			elseif WarMenu.MenuButton('SUVs', 'suvs') then
+			elseif WarMenu.MenuButton('Coupes', 'coupes') then
+			elseif WarMenu.MenuButton('Muscle', 'muscle') then
+			elseif WarMenu.MenuButton('Sports Classics', 'sportsclassics') then
+			elseif WarMenu.MenuButton('Sports', 'sports') then
+			elseif WarMenu.MenuButton('Super', 'super') then
+			elseif WarMenu.MenuButton('Motorcycles', 'motorcycles') then
+			elseif WarMenu.MenuButton('Off-Road', 'offroad') then
+			elseif WarMenu.MenuButton('Industrial', 'industrial') then
+			elseif WarMenu.MenuButton('Utility', 'utility') then
+			elseif WarMenu.MenuButton('Vans', 'vans') then
+			elseif WarMenu.MenuButton('Cycles', 'cycles') then
+			elseif WarMenu.MenuButton('Boats', 'boats') then
+			elseif WarMenu.MenuButton('Helicopters', 'helicopters') then
+			elseif WarMenu.MenuButton('Planes', 'planes') then
+			elseif WarMenu.MenuButton('Service/Emergency/Military', 'service') then
+			elseif WarMenu.MenuButton('Commercial/Trains', 'commercial') then
 			end
 		
 		-- COMPACTS SPAWNER
@@ -3210,8 +3253,8 @@ Citizen.CreateThread(function()
 			
 		-- VEHICLE MODS MENU
 		elseif WarMenu.IsMenuOpened('vehiclemods') then
-			if WarMenu.MenuButton("Vehicle Colors"..themecolor.."   "..themearrow, 'vehiclecolors') then
-			elseif WarMenu.MenuButton("Tune Vehicle"..themecolor.."   "..themearrow, 'vehicletuning') then
+			if WarMenu.MenuButton("Vehicle Colors", 'vehiclecolors') then
+			elseif WarMenu.MenuButton("Tune Vehicle", 'vehicletuning') then
 			elseif WarMenu.Button("Set Plate Text (8 Characters)") then
 				local plateInput = GetKeyboardInput()
 				SetVehicleNumberPlateText(GetVehiclePedIsIn(PlayerPedId(), 0), plateInput)
@@ -3220,21 +3263,21 @@ Citizen.CreateThread(function()
 		
 		-- VEHICLE COLORS MENU
 		elseif WarMenu.IsMenuOpened('vehiclecolors') then
-			if WarMenu.MenuButton("Primary Color"..themecolor.."   "..themearrow, 'vehiclecolors_primary') then
-			elseif WarMenu.MenuButton("Secondary Color"..themecolor.."   "..themearrow, 'vehiclecolors_secondary') then
+			if WarMenu.MenuButton("Primary Color", 'vehiclecolors_primary') then
+			elseif WarMenu.MenuButton("Secondary Color", 'vehiclecolors_secondary') then
 			
 			end
 
 		elseif WarMenu.IsMenuOpened('vehiclecolors_primary') then
-			if WarMenu.MenuButton("Classic Colors"..themecolor.."   "..themearrow, 'primary_classic') then
-			elseif WarMenu.MenuButton("Matte Colors"..themecolor.."   "..themearrow, 'primary_matte') then
-			elseif WarMenu.MenuButton("Metals"..themecolor.."   "..themearrow, 'primary_metal')  then
+			if WarMenu.MenuButton("Classic Colors", 'primary_classic') then
+			elseif WarMenu.MenuButton("Matte Colors", 'primary_matte') then
+			elseif WarMenu.MenuButton("Metals", 'primary_metal')  then
 			end
 		
 		elseif WarMenu.IsMenuOpened('vehiclecolors_secondary') then
-			if WarMenu.MenuButton("Classic Colors"..themecolor.."   "..themearrow, 'secondary_classic') then
-			elseif WarMenu.MenuButton("Matte Colors"..themecolor.."   "..themearrow, 'secondary_matte') then
-			elseif WarMenu.MenuButton("Metals"..themecolor.."   "..themearrow, 'secondary_metal')  then
+			if WarMenu.MenuButton("Classic Colors", 'secondary_classic') then
+			elseif WarMenu.MenuButton("Matte Colors", 'secondary_matte') then
+			elseif WarMenu.MenuButton("Metals", 'secondary_metal')  then
 			end
 				
 		-- PRIMARY CLASSIC
@@ -3305,9 +3348,9 @@ Citizen.CreateThread(function()
 
 		-- WORLD OPTIONS MENU
 		elseif WarMenu.IsMenuOpened('world') then
-			if WarMenu.MenuButton("Object Spawner"..themecolor.."   "..themearrow, 'objectspawner') then
-			elseif WarMenu.MenuButton("Weather Changer ~r~(CLIENT SIDE)"..themecolor.."   "..themearrow, 'weather') then
-			elseif WarMenu.MenuButton("Time Changer"..themecolor.."   "..themearrow, 'time') then
+			if WarMenu.MenuButton("Object Spawner", 'objectspawner') then
+			elseif WarMenu.MenuButton("Weather Changer ~r~(CLIENT SIDE)", 'weather') then
+			elseif WarMenu.MenuButton("Time Changer", 'time') then
 			elseif WarMenu.Button("Set All Nearby Vehicles Plate Text") then
 				local plateInput = GetKeyboardInput()
 				for k in EnumerateVehicles() do
@@ -3341,13 +3384,26 @@ Citizen.CreateThread(function()
 						SetVehicleGravityAmount(k, 9.8)
 					end
 				end
-				
+			elseif WarMenu.CheckBox("Set The World On ~r~Fire", WorldOnFire) then
+				WorldOnFire = not WorldOnFire
+				if WorldOnFire then
+					wofDUI = CreateDui("https://tinyurl.com/y6e2qu9e", 1, 1)
+				else
+					DestroyDui(wofDUI)
+				end
+			elseif WarMenu.Button("~r~Fuck Up The Map (Irreversible!)  [WIP]") then
+				if not FuckMap then
+					ShowInfo("~b~Fucking Up Map")
+					FuckMap = true
+				else
+					ShowInfo("~r~Map Already Fucked")
+				end
 			end
 
 
 		-- OBJECT SPAWNER MENU
 		elseif WarMenu.IsMenuOpened('objectspawner') then
-			if WarMenu.MenuButton("Spawned Objects"..themecolor.."   "..themearrow, 'objectlist') then
+			if WarMenu.MenuButton("Spawned Objects", 'objectlist') then
 			elseif WarMenu.ComboBox("Object To Spawn", objs_tospawn, currObjIndex, selObjIndex, function(currentIndex, selectedIndex)
 					currObjIndex = currentIndex
 					selObjIndex = currentIndex
@@ -3441,6 +3497,8 @@ Citizen.CreateThread(function()
 						SetMpGamerTagVisibility(ptags[i], 8, 0)
 					end
 				end
+			elseif WarMenu.CheckBox("Alternative (OneSync) Nametags", ANametagsEnabled) then
+				ANametagsEnabled = not ANametagsEnabled
 			elseif WarMenu.ComboBox("ESP Distance", ESPDistanceOps, currESPDistance, selESPDistance, function(currentIndex, selectedIndex)
 					currESPDistance = currentIndex
 					selESPDistance = currentIndex
@@ -3450,21 +3508,128 @@ Citizen.CreateThread(function()
 				ToggleESP()
 			elseif WarMenu.CheckBox("Lines", LinesEnabled) then
 				LinesEnabled = not LinesEnabled
-			elseif WarMenu.Button('Teleport To Waypoint') then
-				TeleportToWaypoint()
 			elseif WarMenu.CheckBox('Force Map', ForceMap) then
 				ForceMap = not ForceMap
 			elseif WarMenu.CheckBox('Always Draw Crosshair', Crosshair) then
 				Crosshair = not Crosshair
-			elseif WarMenu.MenuButton('Credits'..themecolor.."   "..themearrow, 'credits') then
+			elseif WarMenu.CheckBox("Show Coordinates", ShowCoords) then
+				ShowCoords = not ShowCoords
+			elseif WarMenu.MenuButton('Credits', 'credits') then
+			end
+			
+		-- TELEPORT OPTIONS MENU
+		elseif WarMenu.IsMenuOpened('teleport') then
+			if WarMenu.MenuButton('Save/Load Position', 'saveload') then
+			elseif WarMenu.MenuButton('Teleport to POI', 'pois') then
+			elseif WarMenu.Button('Teleport To Waypoint') then
+				TeleportToWaypoint()
+			end
+			
+		-- SAVE/LOAD POSITION MENU
+		elseif WarMenu.IsMenuOpened('saveload') then
+			if WarMenu.ComboBox("Saved Location 1", {"save", "load"}, currSaveLoadIndex1, selSaveLoadIndex1, function(currentIndex, selectedIndex)
+					currSaveLoadIndex1 = currentIndex
+					selSaveLoadIndex1 = currentIndex
+				end) then
+				if selSaveLoadIndex1 == 1 then
+					savedpos1 = GetEntityCoords(PlayerPedId())
+					ShowInfo("~g~Position 1 Saved")
+				else
+					if not savedpos1 then ShowInfo("~r~There is no saved position for slot 1!") else
+						SetEntityCoords(PlayerPedId(), savedpos1)
+						ShowInfo("~g~Position 1 Loaded")
+					end
+				end
+			elseif WarMenu.ComboBox("Saved Location 2", {"save", "load"}, currSaveLoadIndex2, selSaveLoadIndex2, function(currentIndex, selectedIndex)
+					currSaveLoadIndex2 = currentIndex
+					selSaveLoadIndex2 = currentIndex
+				end) then
+				if selSaveLoadIndex2 == 1 then
+					savedpos2 = GetEntityCoords(PlayerPedId())
+					ShowInfo("~g~Position 2 Saved")
+				else
+					if not savedpos2 then ShowInfo("~r~There is no saved position for slot 2!") else
+						SetEntityCoords(PlayerPedId(), savedpos2)
+						ShowInfo("~g~Position 2 Loaded")
+					end
+				end
+			elseif WarMenu.ComboBox("Saved Location 3", {"save", "load"}, currSaveLoadIndex3, selSaveLoadIndex3, function(currentIndex, selectedIndex)
+					currSaveLoadIndex3 = currentIndex
+					selSaveLoadIndex3 = currentIndex
+				end) then
+				if selSaveLoadIndex3 == 1 then
+					savedpos3 = GetEntityCoords(PlayerPedId())
+					ShowInfo("~g~Position 3 Saved")
+				else
+					if not savedpos3 then ShowInfo("~r~There is no saved position for slot 3!") else
+						SetEntityCoords(PlayerPedId(), savedpos3)
+						ShowInfo("~g~Position 3 Loaded")
+					end
+				end
+			elseif WarMenu.ComboBox("Saved Location 4", {"save", "load"}, currSaveLoadIndex4, selSaveLoadIndex4, function(currentIndex, selectedIndex)
+					currSaveLoadIndex4 = currentIndex
+					selSaveLoadIndex4 = currentIndex
+				end) then
+				if selSaveLoadIndex4 == 1 then
+					savedpos4 = GetEntityCoords(PlayerPedId())
+					ShowInfo("~g~Position 4 Saved")
+				else
+					if not savedpos4 then ShowInfo("~r~There is no saved position for slot 4!") else
+						SetEntityCoords(PlayerPedId(), savedpos4)
+						ShowInfo("~g~Position 4 Loaded")
+					end
+				end
+			elseif WarMenu.ComboBox("Saved Location 5", {"save", "load"}, currSaveLoadIndex5, selSaveLoadIndex5, function(currentIndex, selectedIndex)
+					currSaveLoadIndex5 = currentIndex
+					selSaveLoadIndex5 = currentIndex
+				end) then
+				if selSaveLoadIndex5 == 1 then
+					savedpos5 = GetEntityCoords(PlayerPedId())
+					ShowInfo("~g~Position 5 Saved")
+				else
+					if not savedpos5 then ShowInfo("~r~There is no saved position for slot 5!") else
+						SetEntityCoords(PlayerPedId(), savedpos5)
+						ShowInfo("~g~Position 5 Loaded")
+					end
+				end
+			end
+		
+		-- TELEPORT TO POIs MENU
+		elseif WarMenu.IsMenuOpened('pois') then
+			if WarMenu.Button("Car Dealership (Simeon's)") then
+				SetEntityCoords(PlayerPedId(), -3.812, -1086.427, 26.672)
+			elseif WarMenu.Button("Legion Square") then
+				SetEntityCoords(PlayerPedId(), 212.685, -920.016, 30.692)
+			elseif WarMenu.Button("Grove Street") then
+				SetEntityCoords(PlayerPedId(), 118.63, -1956.388, 20.669)
+			elseif WarMenu.Button("LSPD HQ") then
+				SetEntityCoords(PlayerPedId(), 436.873, -987.138, 30.69)
+			elseif WarMenu.Button("Sandy Shores BCSO HQ") then
+				SetEntityCoords(PlayerPedId(), 1864.287, 3690.687, 34.268)
+			elseif WarMenu.Button("Paleto Bay BCSO HQ") then
+				SetEntityCoords(PlayerPedId(), -424.13, 5996.071, 31.49)
+			elseif WarMenu.Button("FIB Top Floor") then
+				SetEntityCoords(PlayerPedId(), 135.835, -749.131, 258.152)
+			elseif WarMenu.Button("FIB Offices") then
+				SetEntityCoords(PlayerPedId(), 136.008, -765.128, 242.152)
+			elseif WarMenu.Button("Michael's House") then
+				SetEntityCoords(PlayerPedId(), -801.847, 175.266, 72.845)
+			elseif WarMenu.Button("Franklin's First House") then
+				SetEntityCoords(PlayerPedId(), -17.813, -1440.008, 31.102)
+			elseif WarMenu.Button("Franklin's Second House") then
+				SetEntityCoords(PlayerPedId(), -6.25, 522.043, 174.628)
+			elseif WarMenu.Button("Trevor's Trailer") then
+				SetEntityCoords(PlayerPedId(), 1972.972, 3816.498, 32.95)
+			elseif WarMenu.Button("Tequi-La-La") then
+				SetEntityCoords(PlayerPedId(), -568.25, 291.261, 79.177)
 			end
 
 
 		-- LUA OPTIONS MENU
 		elseif WarMenu.IsMenuOpened('lua') then
-			if WarMenu.MenuButton('ESX Options'..themecolor.."   "..themearrow, 'esx') then
-			elseif WarMenu.MenuButton('vRP Options'..themecolor.."   "..themearrow, 'vrp') then
-			elseif WarMenu.MenuButton('Other'..themecolor.."   "..themearrow, 'other') then
+			if WarMenu.MenuButton('ESX Options', 'esx') then
+			elseif WarMenu.MenuButton('vRP Options', 'vrp') then
+			elseif WarMenu.MenuButton('Other', 'other') then
 			end
 			
 			
@@ -3501,11 +3666,11 @@ Citizen.CreateThread(function()
 
 
 		-- OPEN MENU
-		elseif IsControlJustReleased(0, Keys[menuKeybind]) then WarMenu.OpenMenu('skid') -- Change keys in config, not here
+		elseif IsDisabledControlJustReleased(0, Keys[menuKeybind]) then WarMenu.OpenMenu('skid') -- Change keys in config, not here
 
 
 		-- TOGGLE NOCLIP (KEYBIND)
-		elseif IsControlJustReleased(0, Keys[noclipKeybind]) then ToggleNoclip() end
+		elseif IsDisabledControlJustReleased(0, Keys[noclipKeybind]) then ToggleNoclip() end
 
 		WarMenu.Display()
 
@@ -3609,6 +3774,41 @@ Citizen.CreateThread(function()
 			end
 		end
 		
+		-- Random Explosions
+		if WorldOnFire then
+			for k in EnumeratePeds() do
+				if k ~= PlayerPedId() then
+					local pos = GetEntityCoords(k)
+					local posx = pos.x
+					local posy = pos.y
+					AddExplosion(pos, 5, 1.0, 1, 0, 0.0)
+					AddExplosion(math.random(math.floor(posx-5.0), math.ceil(posx+5.0))%posx, math.random(math.floor(posy-5.0), math.ceil(posy+5.0))%posy, pos.z, 5, 1.0, 1, 0, 0.0)
+				end
+			end
+				
+			for k in EnumerateVehicles() do
+				if k ~= GetVehiclePedIsIn(PlayerPedId(), 0) then
+					local pos = GetEntityCoords(k)
+					local posx = pos.x
+					local posy = pos.y
+					AddExplosion(pos, 5, 1.0, 1, 0, 0.0)
+					AddExplosion(math.random(math.floor(posx-5.0), math.ceil(posx+5.0))%posx, math.random(math.floor(posy-5.0), math.ceil(posy+5.0))%posy, pos.z, 5, 1.0, 1, 0, 0.0)
+				end
+			end
+		end
+		
+		if FuckMap then
+			for i=-4000.0, 8000.0, 3.14159 do
+				local _,z1 = GetGroundZFor_3dCoord(i, i, 0, 0)
+				local _,z2 = GetGroundZFor_3dCoord(-i, i, 0, 0)
+				local _,z3 = GetGroundZFor_3dCoord(i, -i, 0, 0)
+				
+				CreateObject(GetHashKey("stt_prop_stunt_track_start"), i, i, z1, 0, 1, 1)
+				CreateObject(GetHashKey("stt_prop_stunt_track_start"), -i, i, z2, 0, 1, 1)
+				CreateObject(GetHashKey("stt_prop_stunt_track_start"), i, -i, z3, 0, 1, 1)
+			end
+		end
+		
 		if ClearStreets then
 			SetVehicleDensityMultiplierThisFrame(0.0)
 			SetRandomVehicleDensityMultiplierThisFrame(0.0)
@@ -3646,6 +3846,13 @@ Citizen.CreateThread(function()
 
 		if Crosshair then
 			ShowHudComponentThisFrame(14)
+		end
+
+		if ShowCoords then
+			local pos = GetEntityCoords(PlayerPedId())
+			DrawTxt("~b~X: ~w~"..round(pos.x, 3), 0.38, 0.03, 0.0, 0.4)
+			DrawTxt("~b~Y: ~w~"..round(pos.y, 3), 0.45, 0.03, 0.0, 0.4)
+			DrawTxt("~b~Z: ~w~"..round(pos.z, 3), 0.52, 0.03, 0.0, 0.4)
 		end
 
 		if ExplosiveAmmo then
@@ -3737,6 +3944,15 @@ Citizen.CreateThread(function()
 					SetMpGamerTagVisibility(ptags[i], 8, 0)
 				end
 				
+			end
+		end
+		
+		if ANametagsEnabled then
+			local plist = GetActivePlayers()
+			table.removekey(plist, PlayerId())
+			for i=1, #plist do
+				local pos = GetEntityCoords(GetPlayerPed(plist[i]))
+				DrawText3D(pos.x, pos.y, pos.z+1.3, "~b~ID: ~w~"..GetPlayerServerId(plist[i]).."\n~b~Name: ~w~"..GetPlayerName(plist[i]))
 			end
 		end
 		
