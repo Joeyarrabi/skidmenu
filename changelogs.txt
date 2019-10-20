@@ -1,6 +1,12 @@
-Last modified: 10/15/2019
+Last modified: 10/19/2019
 
 Skidmenu Changelogs:
+
+# 10/19/2019
+- Added vehicle speed multiplier, options range from x1 to x1000
+- Added easy handling / stick to floor
+- Renamed Custom Options to Lua Options
+- Added a few small ESX and VRP options to the Lua Options menu
 
 # 10/15/2019:
 - Just a few edits I made while trying to make vehicle possession undetectable
