@@ -57,7 +57,7 @@ menulist = {
 'vehicle',
 'world',
 'misc',
-'custom',
+'lua',
 
 -- PLAYER SUBMENUS
 'allplayer',
@@ -126,7 +126,7 @@ menulist = {
 -- MISC SUBMENUS
 'credits',
 
--- CUSTOM SUBMENUS
+-- LUA SUBMENUS
 'esx',
 'vrp',
 'other'
@@ -157,6 +157,10 @@ ObjRotation = 90
 GravityOps = {0.0, 5.0, 50.0, 100.0, 200.0, 500.0, 1000.0, 9999.9}
 -- Default
 GravAmount = 50.0
+
+-- Speed mod options
+SpeedModOps = {1.0, 1.5, 2.0, 3.0, 5.0, 10.0, 20.0, 50.0, 100.0, 500.0, 1000.0}
+SpeedModAmt = 1.0
 
 -- ESP Distance Options
 ESPDistanceOps = {50.0, 100.0, 500.0, 1000.0, 2000.0, 5000.0, 10000.0}
@@ -2543,6 +2547,9 @@ Citizen.CreateThread(function()
 	local currGravIndex = 3
 	local selGravIndex = 3
 	
+	local currSpeedIndex = 1
+	local selSpeedIndex = 1
+	
 	local currAttackTypeIndex = 1
 	local selAttackTypeIndex = 1
 	
@@ -2575,7 +2582,7 @@ Citizen.CreateThread(function()
 	WarMenu.CreateSubMenu('vehicle', 'skid', 'Vehicle Options')
 	WarMenu.CreateSubMenu('world', 'skid', 'World Options')
 	WarMenu.CreateSubMenu('misc', 'skid', 'Misc Options')
-	WarMenu.CreateSubMenu('custom', 'skid', 'Custom Options')
+	WarMenu.CreateSubMenu('lua', 'skid', 'Lua Options')
 
 	-- PLAYER MENU SUBMENUS
 	WarMenu.CreateSubMenu('allplayer', 'player', 'All Players')
@@ -2644,10 +2651,10 @@ Citizen.CreateThread(function()
 	-- MISC MENU SUBMENUS
 	WarMenu.CreateSubMenu('credits', 'misc', 'Credits')
 
-	-- CUSTOM MENU SUBMENUS
-	WarMenu.CreateSubMenu('esx', 'custom', 'ESX Options')
-	WarMenu.CreateSubMenu('vrp', 'custom', 'vRP Options')
-	WarMenu.CreateSubMenu('other', 'custom', 'Other')
+	-- LUA MENU SUBMENUS
+	WarMenu.CreateSubMenu('esx', 'lua', 'ESX Options')
+	WarMenu.CreateSubMenu('vrp', 'lua', 'vRP Options')
+	WarMenu.CreateSubMenu('other', 'lua', 'Other')
 
 	WarMenu.InitializeTheme()
 
@@ -2661,7 +2668,7 @@ Citizen.CreateThread(function()
 			elseif WarMenu.MenuButton('Vehicle Options'..themecolor.."   "..themearrow, 'vehicle') then
 			elseif WarMenu.MenuButton('World Options'..themecolor.."   "..themearrow, 'world') then
 			elseif WarMenu.MenuButton('Misc Options'..themecolor.."   "..themearrow, 'misc') then
-			elseif WarMenu.MenuButton('Custom Options'..themecolor.."   "..themearrow, 'custom') then
+			elseif WarMenu.MenuButton('Lua Options'..themecolor.."   "..themearrow, 'lua') then
 			elseif WarMenu.Button('Exit') then WarMenu.CloseMenu()
 			elseif WarMenu.Button('~r~Panic (Kill Menu)') then break
 			end
@@ -2924,6 +2931,25 @@ Citizen.CreateThread(function()
 				SetVehicleDirtLevel(veh, 0)
 			elseif WarMenu.CheckBox("Collision", Collision) then
 				Collision = not Collision
+			elseif WarMenu.ComboBox("Speed Multiplier", SpeedModOps, currSpeedIndex, selSpeedIndex, function(currentIndex, selectedIndex)
+					currSpeedIndex = currentIndex
+					selSpeedIndex = currentIndex
+					SpeedModAmt = SpeedModOps[currSpeedIndex]
+					
+					if SpeedModAmt == 1.0 then
+						SetVehicleEnginePowerMultiplier(GetVehiclePedIsIn(PlayerPedId(), 0), SpeedModAmt)
+					else
+						SetVehicleEnginePowerMultiplier(GetVehiclePedIsIn(PlayerPedId(), 0), SpeedModAmt * 20.0)
+					end
+				end) then
+			elseif WarMenu.CheckBox("Easy Handling / Stick To Floor", EasyHandling) then
+				EasyHandling = not EasyHandling
+				local veh = GetVehiclePedIsIn(PlayerPedId(), 0)
+				if not EasyHandling then
+					SetVehicleGravityAmount(veh, 9.8)
+				else
+					SetVehicleGravityAmount(veh, 30.0)
+				end
 			elseif WarMenu.CheckBox("Deadly Bulldozer", DeadlyBulldozer) then
 				DeadlyBulldozer = not DeadlyBulldozer
 				if DeadlyBulldozer then
@@ -3434,14 +3460,41 @@ Citizen.CreateThread(function()
 			end
 
 
-		-- CUSTOM OPTIONS MENU
-		elseif WarMenu.IsMenuOpened('custom') then
+		-- LUA OPTIONS MENU
+		elseif WarMenu.IsMenuOpened('lua') then
 			if WarMenu.MenuButton('ESX Options'..themecolor.."   "..themearrow, 'esx') then
 			elseif WarMenu.MenuButton('vRP Options'..themecolor.."   "..themearrow, 'vrp') then
 			elseif WarMenu.MenuButton('Other'..themecolor.."   "..themearrow, 'other') then
 			end
-
-
+			
+			
+		-- ESX OPTIONS
+		elseif WarMenu.IsMenuOpened('esx') then
+			if WarMenu.Button("~b~ESX ~w~Restore Hunger") then
+				TriggerEvent("esx_status:set", "hunger", 100000)
+			elseif WarMenu.Button("~b~ESX ~w~Restore Thirst") then
+				TriggerEvent("esx_status:set", "thirst", 100000)
+			elseif WarMenu.Button("~b~ESX ~w~Revive Self") then
+				TriggerServerEvent('esx_ambulancejob:revive', GetPlayerServerId(PlayerId()))
+			elseif WarMenu.Button("~b~ESX ~w~Revive By ID") then
+				local serverID = GetKeyboardInput()
+				TriggerServerEvent('esx_ambulancejob:revive', serverID)
+			end
+			
+			
+		--- VRP Options
+		elseif WarMenu.IsMenuOpened('vrp') then
+			if WarMenu.Button("~r~vRP ~w~Toggle Handcuffs") then
+				vRP.toggleHandcuff()
+			elseif WarMenu.Button("~r~vRP ~w~Clear Wanted Level") then
+				vRP.applyWantedLevel(0)
+			elseif WarMenu.Button("~r~ vRP ~w~Give Money (vrp_trucker)") then
+				local money = GetKeyboardInput()  
+				local distance = money/3.80 -- money is distance*3.80
+				vRPtruckS = Tunnel.getInterface("vRP_trucker","vRP_trucker")
+				vRPtruckS.finishTruckingDelivery({distance})
+			end
+			
 		-- CREDITS
 		elseif WarMenu.IsMenuOpened('credits') then
 			for i = 1, #developers do if WarMenu.Button(developers[i]) then end end
