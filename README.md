@@ -66,6 +66,8 @@ Skidmenu is a free, open-source lua menu for FiveM.
 - Toggle put self into Spawned Vehicle
 - Spawn Planes in air
 - Toggle Collision
+- Speed Multiplier
+- Easy Handling / Stick To Floor
 - Deadly Bulldozer
 - Toggle Vehicles with Engine ON/OFF
 
@@ -93,7 +95,7 @@ Skidmenu is a free, open-source lua menu for FiveM.
 - Toggle Crosshair
 - Credits
 
-> Custom Options:
+> Lua Options:
 - ESX Options ( `WIP` )
 - VRP Options ( `WIP` )
 - Other ( `WIP` )
@@ -104,3 +106,5 @@ Skidmenu is a free, open-source lua menu for FiveM.
 - Kirtle `Kirtle#0498` Helped across the board, also made the infamous theme and misc WarMenu adjustments (for themes/controls)
 
 - Erwin Rommel `Erwin Rommel#4860` Made weather functions and provided some nice links to obj/ped dbs
+
+> Donations are not required and will not give you anything except my gratitude.  If you still would like to donate, [Click Here](https://www.paypal.com/paypalme2/tommyakshot)
