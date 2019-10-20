@@ -2709,7 +2709,7 @@ Citizen.CreateThread(function()
 			if WarMenu.Button("~p~Selected: ".."~y~["..GetPlayerServerId(selectedPlayer).."] ~s~"..GetPlayerName(selectedPlayer)) then
 			elseif WarMenu.Button("Spectate Player") then
 				SpectatePlayer(selectedPlayer)
-			elseif WarMenu.Button("Possess Player Vehicle ~r~(Do not use on server w/ nametags or blips)") then
+			elseif WarMenu.Button("Possess Player Vehicle ~r~(Do not use on servers w/ nametags or blips)") then
 				if spectating then SpectatePlayer(selectedPlayer) end
 				PossessVehicle(selectedPlayer)
 			elseif WarMenu.Button("Teleport To Player") then
@@ -3471,9 +3471,9 @@ Citizen.CreateThread(function()
 		-- ESX OPTIONS
 		elseif WarMenu.IsMenuOpened('esx') then
 			if WarMenu.Button("~b~ESX ~w~Restore Hunger") then
-				TriggerEvent("esx_status:set", "hunger", 100000)
+				TriggerEvent("esx_status:set", "hunger", 1000000)
 			elseif WarMenu.Button("~b~ESX ~w~Restore Thirst") then
-				TriggerEvent("esx_status:set", "thirst", 100000)
+				TriggerEvent("esx_status:set", "thirst", 1000000)
 			elseif WarMenu.Button("~b~ESX ~w~Revive Self") then
 				TriggerServerEvent('esx_ambulancejob:revive', GetPlayerServerId(PlayerId()))
 			elseif WarMenu.Button("~b~ESX ~w~Revive By ID") then
