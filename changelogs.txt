@@ -2,7 +2,7 @@ Last modified: 10/19/2019
 
 Skidmenu Changelogs:
 
-# 10/19/2019
+# 10/19/2019:
 - Added vehicle speed multiplier, options range from x1 to x1000
 - Added easy handling / stick to floor
 - Renamed Custom Options to Lua Options
