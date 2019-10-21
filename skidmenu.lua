@@ -66,6 +66,7 @@ menulist = {
 
 -- SELF SUBMENUS
 'appearance',
+'modifiers',
 
 -- WEAPON SUBMENUS
 'weaponspawner',
@@ -152,6 +153,13 @@ oldSpeed = nil
 ForcefieldRadiusOps = {5.0, 10.0, 15.0, 20.0, 50.0}
 -- Default Forcefield Radius
 ForcefieldRadius = 5.0
+
+--Fast Run/Swim Options
+FastCB = {1.09, 1.19, 1.29, 1.39, 1.49}
+FastCBWords = {"20%", "40%", "60%", "80%", "100%"}
+--Default
+FastRunMultiplier = 1.0
+FastSwimMultiplier = 1.0
 
 -- Object Rotation Options
 RotationOps = {0, 45, 90, 135, 180}
@@ -2580,6 +2588,12 @@ Citizen.CreateThread(function()
 	local currForcefieldRadiusIndex = 1
 	local selForcefieldRadiusIndex = 1
 	
+	local currFastRunIndex = 1
+	local selFastRunIndex = 1
+
+	local currFastSwimIndex = 1
+	local selFastSwimIndex = 1
+
 	local currObjIndex = 1
 	local selObjIndex = 1
 
@@ -2660,6 +2674,7 @@ Citizen.CreateThread(function()
 
 	-- SELF MENU SUBMENUS
 	WarMenu.CreateSubMenu('appearance', 'self', 'Appearance Options')
+	WarMenu.CreateSubMenu('modifiers', 'self', 'Modifiers Options')
 
 	-- WEAPON MENU SUBMENUS
 	WarMenu.CreateSubMenu('weaponspawner', 'weapon', 'Weapon Spawner')
@@ -2820,6 +2835,7 @@ Citizen.CreateThread(function()
 		-- SELF OPTIONS MENU
 		elseif WarMenu.IsMenuOpened('self') then
 			if WarMenu.MenuButton("Appearance ", 'appearance') then
+			elseif WarMenu.MenuButton("Modifiers", 'modifiers') then
 			elseif WarMenu.CheckBox("Stealth Godmode", Godmode) then
 				Godmode = not Godmode
 				ToggleGodmode(Godmode)
@@ -2829,6 +2845,16 @@ Citizen.CreateThread(function()
 				ADemigod = not ADemigod
 			elseif WarMenu.CheckBox("Infinite Stamina", InfStamina) then
 				InfStamina = not InfStamina
+			elseif WarMenu.CheckBox("Fast Run", FastRun) then
+				FastRun = not FastRun
+				if not FastRun then
+					SetRunSprintMultiplierForPlayer(PlayerId(), 1.0)
+				end
+			elseif WarMenu.CheckBox("Fast Swim", FastSwim) then
+				FastSwim = not FastSwim
+				if not FastSwim then
+					SetSwimMultiplierForPlayer(PlayerId(), 1.0)
+				end
 			elseif WarMenu.CheckBox("Invisibility", Invisibility) then
 				Invisibility = not Invisibility
 				if not Invisibility then
@@ -2882,6 +2908,20 @@ Citizen.CreateThread(function()
 					SetCurrentOutfit(Outfits[selClothingIndex])
 	
 			end
+
+		-- MODIFIERS MENU
+		elseif WarMenu.IsMenuOpened('modifiers') then
+			if WarMenu.ComboBox("Fast Run Multiplier", FastCBWords, currFastRunIndex, selFastRunIndex, function(currentIndex, selectedIndex)
+				currFastRunIndex = currentIndex
+				selFastRunIndex = currentIndex
+				FastRunMultiplier = FastCB[currentIndex]
+			end) then
+			elseif WarMenu.ComboBox("Fast Swim Multiplier", FastCBWords, currFastSwimIndex, selFastSwimIndex, function(currentIndex, selClothingIndex)
+				currFastSwimIndex = currentIndex
+				selFastSwimIndex = currentIndex
+				FastSwimMultiplier = FastCB[currentIndex]
+			end) then
+		end
 
 		-- WEAPON OPTIONS MENU
 		elseif WarMenu.IsMenuOpened('weapon') then
@@ -3773,6 +3813,14 @@ Citizen.CreateThread(function()
 			RestorePlayerStamina(PlayerId(), GetPlayerSprintStaminaRemaining(PlayerId()))
 		end
 		
+		if FastRun then
+			SetRunSprintMultiplierForPlayer(PlayerId(), FastRunMultiplier)
+		end
+
+		if FastSwim then
+			SetSwimMultiplierForPlayer(PlayerId(), FastSwimMultiplier)
+		end
+
 		if Invisibility then
 			SetEntityVisible(PlayerPedId(), 0, 0)
 		end

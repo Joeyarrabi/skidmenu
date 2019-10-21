@@ -22,6 +22,8 @@ Skidmenu is a free, open-source lua menu for FiveM.
 > Self Options:
 - Stealth/Demi Godmode
 - Infinite Stamina
+- Fast Run
+- Fast Swim
 - Invisibility
 - ForceMod ( `Thanks to: Ideo` )
 - ForceField/Shockwave ( `Thanks to: scmorio` )
@@ -35,7 +37,7 @@ Skidmenu is a free, open-source lua menu for FiveM.
 - Spectate Player
 - Teleport to Player
 - Track Player
-- Give Health/Armour ( `Not works in some servers` )
+- Give Health/Armour ( `Doesn't work in some servers` )
 - Explode Player
 - Cancel Animation/Task Player
 - Nearby Peds Attack Player
