@@ -2864,18 +2864,8 @@ Citizen.CreateThread(function()
 				ForceMod()
 			elseif WarMenu.CheckBox("Forcefield", Forcefield) then
 				Forcefield = not Forcefield
-			elseif WarMenu.ComboBox("Forcefield Radius", ForcefieldRadiusOps, currForcefieldRadiusIndex, selForcefieldRadiusIndex, function(currentIndex, selectedIndex)
-					currForcefieldRadiusIndex = currentIndex
-					selForcefieldRadiusIndex = currentIndex
-					ForcefieldRadius = ForcefieldRadiusOps[currentIndex]
-				end) then
 			elseif WarMenu.CheckBox("Noclip", Noclipping) then
 				ToggleNoclip()
-			elseif WarMenu.ComboBox("Noclip Speed", NoclipSpeedOps, currNoclipSpeedIndex, selNoclipSpeedIndex, function(currentIndex, selectedIndex)
-					currNoclipSpeedIndex = currentIndex
-					selNoclipSpeedIndex = currentIndex
-					NoclipSpeed = NoclipSpeedOps[currNoclipSpeedIndex]
-				end) then
 			elseif WarMenu.CheckBox("Never Wanted", NeverWanted) then
 				NeverWanted = not NeverWanted
 			elseif WarMenu.Button("Cancel Animation/Task") then
@@ -2920,6 +2910,16 @@ Citizen.CreateThread(function()
 				currFastSwimIndex = currentIndex
 				selFastSwimIndex = currentIndex
 				FastSwimMultiplier = FastCB[currentIndex]
+			end) then
+			elseif WarMenu.ComboBox("Forcefield Radius", ForcefieldRadiusOps, currForcefieldRadiusIndex, selForcefieldRadiusIndex, function(currentIndex, selectedIndex)
+				currForcefieldRadiusIndex = currentIndex
+				selForcefieldRadiusIndex = currentIndex
+				ForcefieldRadius = ForcefieldRadiusOps[currentIndex]
+			end) then
+			elseif WarMenu.ComboBox("Noclip Speed", NoclipSpeedOps, currNoclipSpeedIndex, selNoclipSpeedIndex, function(currentIndex, selectedIndex)
+				currNoclipSpeedIndex = currentIndex
+				selNoclipSpeedIndex = currentIndex
+				NoclipSpeed = NoclipSpeedOps[currNoclipSpeedIndex]
 			end) then
 		end
 
