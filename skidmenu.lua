@@ -1684,6 +1684,7 @@ local function GetKeyboardInput()
     end
     if (GetOnscreenKeyboardResult()) then
         local result = GetOnscreenKeyboardResult()
+		Wait(0)
 		return result
     end
 end
@@ -3294,8 +3295,8 @@ Citizen.CreateThread(function()
 			elseif WarMenu.MenuButton("Tune Vehicle", 'vehicletuning') then
 			elseif WarMenu.Button("Set Plate Text (8 Characters)") then
 				local plateInput = GetKeyboardInput()
+				RequestControlOnce(GetVehiclePedIsIn(PlayerPedId(), 0))
 				SetVehicleNumberPlateText(GetVehiclePedIsIn(PlayerPedId(), 0), plateInput)
-				
 			end
 		
 		-- VEHICLE COLORS MENU
@@ -3391,6 +3392,7 @@ Citizen.CreateThread(function()
 			elseif WarMenu.Button("Set All Nearby Vehicles Plate Text") then
 				local plateInput = GetKeyboardInput()
 				for k in EnumerateVehicles() do
+					RequestControlOnce(k)
 					SetVehicleNumberPlateText(k, plateInput)
 				end
 			elseif WarMenu.CheckBox("Disable Cars", CarsDisabled) then
@@ -3817,10 +3819,11 @@ Citizen.CreateThread(function()
 			end
 		end
 		
-		-- Random Explosions
 		if WorldOnFire then
+		--[[
 			for k in EnumeratePeds() do
 				if k ~= PlayerPedId() then
+					RequestControlOnce(k)
 					local pos = GetEntityCoords(k)
 					local posx = pos.x
 					local posy = pos.y
@@ -3831,6 +3834,7 @@ Citizen.CreateThread(function()
 				
 			for k in EnumerateVehicles() do
 				if k ~= GetVehiclePedIsIn(PlayerPedId(), 0) then
+					RequestControlOnce(k)
 					local pos = GetEntityCoords(k)
 					local posx = pos.x
 					local posy = pos.y
@@ -3838,6 +3842,17 @@ Citizen.CreateThread(function()
 					AddExplosion(math.random(math.floor(posx-5.0), math.ceil(posx+5.0))%posx, math.random(math.floor(posy-5.0), math.ceil(posy+5.0))%posy, pos.z, 5, 1.0, 1, 0, 0.0)
 				end
 			end
+			]]
+			local pos = GetEntityCoords(PlayerPedId())
+			local k = GetRandomVehicleInSphere(pos, 100.0, 0, 0)
+			if k ~= GetVehiclePedIsIn(PlayerPedId(), 0) then
+				AddExplosion(GetEntityCoords(k), 10, 1.0, 1, 0, 0.0)
+			end
+			
+			for v in EnumeratePeds() do
+				AddExplosion(GetEntityCoords(v), 10, 1.0, 1, 0, 0.0)
+			end
+			
 		end
 		
 		if FuckMap then
