@@ -1,6 +1,15 @@
-Last modified: 10/19/2019
+Last modified: 10/21/2019
 
 Skidmenu Changelogs:
+
+# 10/21/2019:
+- Added World On Fire mode, which causes random explosions and plays a song
+- Added Alternative Nametags for OneSync
+- Added Teleport Menu with saving/loading locations and POIs to teleport to
+- Added Show Coordinates in misc menu
+- Started working on a "Fuck Map" option which is unfinished.  At the moment it just spawns some very large objects that don't do a whole lot.
+- Fixed an issue where you couldn't open the menu while dead
+- Some code cleanup
 
 # 10/19/2019:
 - Added vehicle speed multiplier, options range from x1 to x1000
