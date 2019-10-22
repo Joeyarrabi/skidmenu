@@ -1,6 +1,25 @@
-Last modified: 10/21/2019
+Last modified: 10/22/2019
 
 Skidmenu Changelogs:
+
+# 10/22/2019:
+- Improved World On Fire.  Still is not quire the way I want it, but this is better.
+
+# 10/22/2019:
+- Improved Noclip to ensure invisibility (for server with anti invisibility).
+- Improved Noclip to also noclip the player's car if they are in one.
+
+# 10/21/2019:
+- Fixed setting all plate test by requesting control of the vehicle first (works for *most* net vehicles but some will not show changes for other players)
+- Some changes in WOF mode (not final)
+- Fixed an issue with GetKeyboardInput() that was caused by the previous commit
+
+# 10/21/2019:
+- *Actually* fixed the menu not being usable while dead
+- Added Aimbot Bone selection (Head, Chest, Left/Right Arm/Leg, Dick)
+- Added Alternative Demigod where you will not die at all unless you are killed in one shot
+- Made Alternative Nametags not draw through walls by default & not draw when not needed
+- Fixed ForceGun to work for net vehicles
 
 # 10/21/2019:
 - Added World On Fire mode, which causes random explosions and plays a song
