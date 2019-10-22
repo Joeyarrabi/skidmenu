@@ -20,6 +20,8 @@ Skidmenu is a free, open-source lua menu for FiveM.
 - Theme Changer
 
 > Self Options:
+- Appearance Menu
+- Modifiers Menu
 - Stealth/Demi Godmode
 - Infinite Stamina
 - Fast Run
@@ -28,7 +30,6 @@ Skidmenu is a free, open-source lua menu for FiveM.
 - ForceMod ( `Thanks to: Ideo` )
 - ForceField/Shockwave ( `Thanks to: scmorio` )
 - Noclip
-- Model/Appearance Changer
 - Never Wanted
 - Cancel Animation/Task
 - Suicide
@@ -87,8 +88,9 @@ Skidmenu is a free, open-source lua menu for FiveM.
 
 > Misc Options:
 - Theme Changer
-- Blips
+- Blips ( `Thanks to: scammer` )
 - Nametags
+- Alternative (OneSync) Nametags
 - ESP Distance
 - ESP
 - Lines
