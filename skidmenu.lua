@@ -2524,17 +2524,11 @@ function WarMenu.ComboBox2(text, items, currentIndex, selectedIndex, callback)
 		return true
 	elseif isCurrent then
 		if currentKey == keys.left then
-            if currentIndex > 1 then 
-                currentIndex = currentIndex - 1 
-            elseif currentIndex == 1 then
-                currentIndex = 1 
-            end
+            if currentIndex > 1 then currentIndex = currentIndex - 1 
+            elseif currentIndex == 1 then currentIndex = 1 end
 		elseif currentKey == keys.right then
-            if currentIndex < itemsCount then 
-                currentIndex = currentIndex + 1 
-            elseif currentIndex == itemsCount then
-                currentIndex = itemsCount
-            end
+            if currentIndex < itemsCount then  currentIndex = currentIndex + 1 
+            elseif currentIndex == itemsCount then currentIndex = itemsCount end
 		end
 	else
 		currentIndex = selectedIndex
@@ -2542,6 +2536,103 @@ function WarMenu.ComboBox2(text, items, currentIndex, selectedIndex, callback)
 
 	callback(currentIndex, selectedIndex)
     return false
+end
+
+-- Button with a slider
+function WarMenu.ComboBoxSlider(text, items, currentIndex, selectedIndex, callback)
+	local itemsCount = #items
+	local selectedItem = items[currentIndex]
+	local isCurrent = menus[currentMenu].currentOption == (optionCount + 1)
+
+	if itemsCount > 1 and isCurrent then
+		selectedItem = tostring(selectedItem)
+	end
+
+	if WarMenu.Button2(text, itemsCount, currentIndex) then
+		selectedIndex = currentIndex
+		callback(currentIndex, selectedIndex)
+		return true
+	elseif isCurrent then
+		if currentKey == keys.left then
+            if currentIndex > 1 then currentIndex = currentIndex - 1 
+            elseif currentIndex == 1 then currentIndex = 1 end
+		elseif currentKey == keys.right then
+            if currentIndex < itemsCount then currentIndex = currentIndex + 1 
+            elseif currentIndex == itemsCount then currentIndex = itemsCount end
+		end
+	else
+		currentIndex = selectedIndex
+	end
+
+	callback(currentIndex, selectedIndex)
+	return false
+end
+
+local function drawButton2(text, itemsCount, currentIndex)
+	local x = menus[currentMenu].x + menus[currentMenu].width / 2
+	local multiplier = nil
+
+	if menus[currentMenu].currentOption <= menus[currentMenu].maxOptionCount and optionCount <= menus[currentMenu].maxOptionCount then
+		multiplier = optionCount
+	elseif optionCount > menus[currentMenu].currentOption - menus[currentMenu].maxOptionCount and optionCount <= menus[currentMenu].currentOption then
+		multiplier = optionCount - (menus[currentMenu].currentOption - menus[currentMenu].maxOptionCount)
+	end
+
+	if multiplier then
+		local y = menus[currentMenu].y + titleHeight + buttonHeight + (buttonHeight * multiplier) - buttonHeight / 2
+		local backgroundColor = nil
+		local textColor = nil
+		local subTextColor = nil
+		local shadow = false
+
+		if menus[currentMenu].currentOption == optionCount then
+			backgroundColor = menus[currentMenu].menuFocusBackgroundColor
+			textColor = menus[currentMenu].menuFocusTextColor
+			subTextColor = menus[currentMenu].menuFocusTextColor
+		else
+			backgroundColor = menus[currentMenu].menuBackgroundColor
+			textColor = menus[currentMenu].menuTextColor
+			subTextColor = menus[currentMenu].menuSubTextColor
+			shadow = true
+		end
+
+        local sliderWidth = (menus[currentMenu].width / 3) / itemsCount
+        local subtractionToX = (((sliderWidth * (currentIndex + 1)) - (sliderWidth * currentIndex)) / 2)
+
+        -- Draw order from top to bottom
+        drawRect(x, y, menus[currentMenu].width, buttonHeight, backgroundColor) -- Button Rectangle
+        drawRect((menus[currentMenu].x + 0.1625) + (subtractionToX * itemsCount), y, sliderWidth * itemsCount, buttonHeight / 2, textColor) -- Slide Outline
+        drawRect((menus[currentMenu].x + 0.1625) + (subtractionToX * currentIndex), y, sliderWidth * currentIndex, buttonHeight / 2, menus[currentMenu].titleColor) -- Slide
+        drawText(text, menus[currentMenu].x + buttonTextXOffset, y - (buttonHeight / 2) + buttonTextYOffset, buttonFont, textColor, buttonScale, false, shadow) -- Text
+	end
+end
+
+function WarMenu.Button2(text, itemsCount, currentIndex)
+	local buttonText = text
+
+	if menus[currentMenu] then
+		optionCount = optionCount + 1
+
+		local isCurrent = menus[currentMenu].currentOption == optionCount
+
+		drawButton2(text, itemsCount, currentIndex)
+
+		if isCurrent then
+			if currentKey == keys.select then
+				PlaySoundFrontend(-1, menus[currentMenu].buttonPressedSound.name, menus[currentMenu].buttonPressedSound.set, true)
+				debugPrint(buttonText..' button pressed')
+				return true
+			elseif currentKey == keys.left or currentKey == keys.right then
+				PlaySoundFrontend(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
+			end
+		end
+
+		return false
+	else
+		debugPrint('Failed to create '..buttonText..' button: '..tostring(currentMenu)..' menu doesn\'t exist')
+
+		return false
+	end
 end
 
 -- Texture Handling
@@ -2941,6 +3032,11 @@ Citizen.CreateThread(function()
                     currNoclipSpeedIndex = currentIndex
                     selNoclipSpeedIndex = currentIndex
                     NoclipSpeed = NoclipSpeedOps[currNoclipSpeedIndex]
+                    end) then
+            elseif WarMenu.ComboBoxSlider("ComboBox Slider test", FastCBWords, currFastSwimIndex, selFastSwimIndex, function(currentIndex, selClothingIndex)
+                    currFastSwimIndex = currentIndex
+                    selFastSwimIndex = currentIndex
+                    FastSwimMultiplier = FastCB[currentIndex]
                     end) then
             end
         
