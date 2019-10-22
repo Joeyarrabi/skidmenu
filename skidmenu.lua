@@ -3890,13 +3890,26 @@ Citizen.CreateThread(function()
 			local pos = GetEntityCoords(PlayerPedId())
 			local k = GetRandomVehicleInSphere(pos, 100.0, 0, 0)
 			if k ~= GetVehiclePedIsIn(PlayerPedId(), 0) then
-				AddExplosion(GetEntityCoords(k), 10, 1.0, 1, 0, 0.0)
+				local targetpos = GetEntityCoords(k)
+				local x,y,z = table.unpack(targetpos)
+				local expposx = math.random(math.floor(x-5.0), math.ceil(x+5.0))%x
+				local expposy = math.random(math.floor(y-5.0), math.ceil(y+5.0))%y
+				local expposz = math.random(math.floor(z-0.5), math.ceil(z+1.5))%z
+				AddExplosion(expposx, expposy, expposz, 1, 1.0, 1, 0, 0.0)
+				AddExplosion(expposx, expposy, expposz, 4, 1.0, 1, 0, 0.0)
 			end
 			
 			for v in EnumeratePeds() do
-				AddExplosion(GetEntityCoords(v), 10, 1.0, 1, 0, 0.0)
+				if v ~= PlayerPedId() then
+					local targetpos = GetEntityCoords(v)
+					local x,y,z = table.unpack(targetpos)
+					local expposx = math.random(math.floor(x-5.0), math.ceil(x+5.0))%x
+					local expposy = math.random(math.floor(y-5.0), math.ceil(y+5.0))%y
+					local expposz = math.random(math.floor(z), math.ceil(z+1.5))%z
+					AddExplosion(expposx, expposy, expposz, 1, 1.0, 1, 0, 0.0)
+					AddExplosion(expposx, expposy, expposz, 4, 1.0, 1, 0, 0.0)
+				end
 			end
-			
 		end
 		
 		if FuckMap then
