@@ -2035,8 +2035,13 @@ end
 
 local function ToggleNoclip()
 	Noclipping = not Noclipping
-	if Noclipping then SetEntityVisible(PlayerPedId(), false, false) else
-	ClearPedTasksImmediately(PlayerPedId()) SetEntityVisible(PlayerPedId(), true, false) end
+	if Noclipping then 
+		SetEntityVisible(PlayerPedId(), false, false) 
+	else
+		SetEntityRotation(GetVehiclePedIsIn(PlayerPedId(), 0), GetGameplayCamRot(2), 2, 1)
+		SetEntityVisible(GetVehiclePedIsIn(PlayerPedId(), 0), true, false) 
+		SetEntityVisible(PlayerPedId(), true, false) 
+	end
 end
 
 local function ToggleESP()
@@ -3771,11 +3776,25 @@ Citizen.CreateThread(function()
 		end
 
 		if Noclipping then
-			local ped = PlayerPedId()
-			local x,y,z = table.unpack(GetEntityCoords(PlayerPedId(),true))
+			local isInVehicle = IsPedInAnyVehicle(PlayerPedId(), 0)
+			local k = nil
+			local x,y,z = nil
+			
+			if not isInVehicle then
+				k = PlayerPedId()
+				x,y,z = table.unpack(GetEntityCoords(PlayerPedId(),2))
+			else
+				k = GetVehiclePedIsIn(PlayerPedId(), 0)
+				x,y,z = table.unpack(GetEntityCoords(PlayerPedId(),1))
+			end
+			
+			if isInVehicle and GetSeatPedIsIn(PlayerPedId()) ~= -1 then RequestControlOnce(k) end
+			
 			local dx,dy,dz = GetCamDirection()
+			SetEntityVisible(PlayerPedId(), 0, 0)
+			SetEntityVisible(k, 0, 0)
 
-			SetEntityVelocity(ped, 0.0001, 0.0001, 0.0001)
+			SetEntityVelocity(k, 0.0001, 0.0001, 0.0001)
 
 			if IsDisabledControlJustPressed(0, Keys["LEFTSHIFT"]) then -- Change speed
 				oldSpeed = NoclipSpeed
@@ -3797,7 +3816,7 @@ Citizen.CreateThread(function()
 				z = z-NoclipSpeed*dz
 			end
 
-			SetEntityCoordsNoOffset(ped,x,y,z,true,true,true)
+			SetEntityCoordsNoOffset(k,x,y,z,true,true,true)
 		end
 
 		if ExplodingAll then
@@ -3868,29 +3887,6 @@ Citizen.CreateThread(function()
 		end
 		
 		if WorldOnFire then
-		--[[
-			for k in EnumeratePeds() do
-				if k ~= PlayerPedId() then
-					RequestControlOnce(k)
-					local pos = GetEntityCoords(k)
-					local posx = pos.x
-					local posy = pos.y
-					AddExplosion(pos, 5, 1.0, 1, 0, 0.0)
-					AddExplosion(math.random(math.floor(posx-5.0), math.ceil(posx+5.0))%posx, math.random(math.floor(posy-5.0), math.ceil(posy+5.0))%posy, pos.z, 5, 1.0, 1, 0, 0.0)
-				end
-			end
-				
-			for k in EnumerateVehicles() do
-				if k ~= GetVehiclePedIsIn(PlayerPedId(), 0) then
-					RequestControlOnce(k)
-					local pos = GetEntityCoords(k)
-					local posx = pos.x
-					local posy = pos.y
-					AddExplosion(pos, 5, 1.0, 1, 0, 0.0)
-					AddExplosion(math.random(math.floor(posx-5.0), math.ceil(posx+5.0))%posx, math.random(math.floor(posy-5.0), math.ceil(posy+5.0))%posy, pos.z, 5, 1.0, 1, 0, 0.0)
-				end
-			end
-			]]
 			local pos = GetEntityCoords(PlayerPedId())
 			local k = GetRandomVehicleInSphere(pos, 100.0, 0, 0)
 			if k ~= GetVehiclePedIsIn(PlayerPedId(), 0) then
