@@ -150,8 +150,8 @@ ForcefieldRadiusOps = {5.0, 10.0, 15.0, 20.0, 50.0}
 ForcefieldRadius = 5.0
 
 --Fast Run/Swim Options
-FastCB = {1.09, 1.19, 1.29, 1.39, 1.49}
-FastCBWords = {"20%", "40%", "60%", "80%", "100%"}
+FastCB = {1.0, 1.09, 1.19, 1.29, 1.39, 1.49}
+FastCBWords = {"+0%", "+20%", "+40%", "+60%", "+80%", "+100%"}
 -- Default
 FastRunMultiplier = 1.0
 FastSwimMultiplier = 1.0
@@ -2474,13 +2474,13 @@ function WarMenu.SetTheme(id, theme)
         buttonTextYOffset = 0.005 --0.005
         
         themecolor = '~u~'
-        themearrow = "~p~>~u~>"
+        themearrow = "~u~>"
     elseif theme == "infamous" then
         WarMenu.SetMenuBackgroundColor(id, 38, 38, 38, 80)
         WarMenu.SetTitleBackgroundColor(id, 92, 212, 249, 170)
         WarMenu.SetTitleColor(id, 240, 240, 240, 255)
         WarMenu.SetMenuSubTextColor(id, 240, 240, 240, 255)
-        WarMenu.SetMenuFocusBackgroundColor(id, 107, 216, 250, 230)
+        WarMenu.SetMenuFocusBackgroundColor(id, 100, 220, 250, 180)
         WarMenu.SetFont(id, 4)
         WarMenu.SetMenuX(id, .725)
         WarMenu.SetMenuY(id, .1)
@@ -2548,7 +2548,7 @@ function WarMenu.ComboBoxSlider(text, items, currentIndex, selectedIndex, callba
 		selectedItem = tostring(selectedItem)
 	end
 
-	if WarMenu.Button2(text, itemsCount, currentIndex) then
+	if WarMenu.Button2(text, items, itemsCount, currentIndex) then
 		selectedIndex = currentIndex
 		callback(currentIndex, selectedIndex)
 		return true
@@ -2568,7 +2568,7 @@ function WarMenu.ComboBoxSlider(text, items, currentIndex, selectedIndex, callba
 	return false
 end
 
-local function drawButton2(text, itemsCount, currentIndex)
+local function drawButton2(text, items, itemsCount, currentIndex)
 	local x = menus[currentMenu].x + menus[currentMenu].width / 2
 	local multiplier = nil
 
@@ -2596,18 +2596,19 @@ local function drawButton2(text, itemsCount, currentIndex)
 			shadow = true
 		end
 
-        local sliderWidth = (menus[currentMenu].width / 3) / itemsCount
+        local sliderWidth = ((menus[currentMenu].width / 3) / itemsCount)*1.2
         local subtractionToX = (((sliderWidth * (currentIndex + 1)) - (sliderWidth * currentIndex)) / 2)
 
         -- Draw order from top to bottom
         drawRect(x, y, menus[currentMenu].width, buttonHeight, backgroundColor) -- Button Rectangle
-        drawRect((menus[currentMenu].x + 0.1625) + (subtractionToX * itemsCount), y, sliderWidth * itemsCount, buttonHeight / 2, textColor) -- Slide Outline
-        drawRect((menus[currentMenu].x + 0.1625) + (subtractionToX * currentIndex), y, sliderWidth * currentIndex, buttonHeight / 2, menus[currentMenu].titleColor) -- Slide
+        drawRect((menus[currentMenu].x + 0.155) + (subtractionToX * itemsCount), y, sliderWidth * (itemsCount-1), buttonHeight / 2.15, {r = 70, g = 70, b = 150, a = 150}) -- Slide Outline
+        drawRect((menus[currentMenu].x + 0.155) + (subtractionToX * currentIndex), y, sliderWidth * (currentIndex-1), buttonHeight / 2.15, {r = 50, g = 50, b = 180, a = 150}) -- Slide
         drawText(text, menus[currentMenu].x + buttonTextXOffset, y - (buttonHeight / 2) + buttonTextYOffset, buttonFont, textColor, buttonScale, false, shadow) -- Text
+		drawText(items[currentIndex], menus[currentMenu].x + 0.195, y - (buttonHeight / 2.2) + buttonTextYOffset, buttonFont, {r = 250, g = 250, b = 250, a = 255}, buttonScale, false, shadow) -- Current Item Text
 	end
 end
 
-function WarMenu.Button2(text, itemsCount, currentIndex)
+function WarMenu.Button2(text, items, itemsCount, currentIndex)
 	local buttonText = text
 
 	if menus[currentMenu] then
@@ -2615,7 +2616,7 @@ function WarMenu.Button2(text, itemsCount, currentIndex)
 
 		local isCurrent = menus[currentMenu].currentOption == optionCount
 
-		drawButton2(text, itemsCount, currentIndex)
+		drawButton2(text, items, itemsCount, currentIndex)
 
 		if isCurrent then
 			if currentKey == keys.select then
@@ -2865,16 +2866,16 @@ Citizen.CreateThread(function()
         -- MAIN MENU
         if WarMenu.IsMenuOpened('skid') then
             if WarMenu.MenuButton('Player Options', 'player') then
-                elseif WarMenu.MenuButton('Self Options', 'self') then
-                elseif WarMenu.MenuButton('Weapon Options', 'weapon') then
-                    elseif WarMenu.MenuButton('Vehicle Options', 'vehicle') then
-                    elseif WarMenu.MenuButton('World Options', 'world') then
-                        elseif WarMenu.MenuButton('Misc Options', 'misc') then
-                        elseif WarMenu.MenuButton('Teleport Options', 'teleport') then
-                            elseif WarMenu.MenuButton('Lua Options', 'lua') then
-                            elseif WarMenu.Button('Exit') then WarMenu.CloseMenu()
-                            elseif WarMenu.Button('~r~Panic (Kill Menu)') then break
-                            end
+            elseif WarMenu.MenuButton('Self Options', 'self') then
+            elseif WarMenu.MenuButton('Weapon Options', 'weapon') then
+            elseif WarMenu.MenuButton('Vehicle Options', 'vehicle') then
+            elseif WarMenu.MenuButton('World Options', 'world') then
+            elseif WarMenu.MenuButton('Misc Options', 'misc') then
+            elseif WarMenu.MenuButton('Teleport Options', 'teleport') then
+            elseif WarMenu.MenuButton('Lua Options', 'lua') then
+            elseif WarMenu.Button('Exit') then WarMenu.CloseMenu()
+            elseif WarMenu.Button('~r~Panic (Kill Menu)') then break
+            end
         
         
         -- PLAYER OPTIONS MENU
@@ -2958,16 +2959,18 @@ Citizen.CreateThread(function()
                     ADemigod = not ADemigod
                 elseif WarMenu.CheckBox("Infinite Stamina", InfStamina) then
                     InfStamina = not InfStamina
-                elseif WarMenu.CheckBox("Fast Run", FastRun) then
-                    FastRun = not FastRun
-                    if not FastRun then
-                        SetRunSprintMultiplierForPlayer(PlayerId(), 1.0)
-                    end
-                elseif WarMenu.CheckBox("Fast Swim", FastSwim) then
-                    FastSwim = not FastSwim
-                    if not FastSwim then
-                        SetSwimMultiplierForPlayer(PlayerId(), 1.0)
-                    end
+                elseif WarMenu.ComboBoxSlider("Fast Run", FastCBWords, currFastRunIndex, selFastRunIndex, function(currentIndex, selClothingIndex)
+                    currFastRunIndex = currentIndex
+                    selFastRunIndex = currentIndex
+                    FastRunMultiplier = FastCB[currentIndex]
+                    SetRunSprintMultiplierForPlayer(PlayerId(), FastRunMultiplier)
+                    end) then
+				elseif WarMenu.ComboBoxSlider("Fast Swim", FastCBWords, currFastSwimIndex, selFastSwimIndex, function(currentIndex, selClothingIndex)
+                    currFastSwimIndex = currentIndex
+                    selFastSwimIndex = currentIndex
+                    FastSwimMultiplier = FastCB[currentIndex]
+                    SetSwimMultiplierForPlayer(PlayerId(), FastSwimMultiplier)
+                    end) then
                 elseif WarMenu.CheckBox("Invisibility", Invisibility) then
                     Invisibility = not Invisibility
                     if not Invisibility then
@@ -3013,17 +3016,7 @@ Citizen.CreateThread(function()
         
         -- MODIFIERS MENU
         elseif WarMenu.IsMenuOpened('modifiers') then
-            if WarMenu.ComboBox2("Fast Run Multiplier", FastCBWords, currFastRunIndex, selFastRunIndex, function(currentIndex, selectedIndex)
-                currFastRunIndex = currentIndex
-                selFastRunIndex = currentIndex
-                FastRunMultiplier = FastCB[currentIndex]
-            end) then
-            elseif WarMenu.ComboBox2("Fast Swim Multiplier", FastCBWords, currFastSwimIndex, selFastSwimIndex, function(currentIndex, selClothingIndex)
-                    currFastSwimIndex = currentIndex
-                    selFastSwimIndex = currentIndex
-                    FastSwimMultiplier = FastCB[currentIndex]
-                    end) then
-            elseif WarMenu.ComboBox("Forcefield Radius", ForcefieldRadiusOps, currForcefieldRadiusIndex, selForcefieldRadiusIndex, function(currentIndex, selectedIndex)
+            if WarMenu.ComboBox("Forcefield Radius", ForcefieldRadiusOps, currForcefieldRadiusIndex, selForcefieldRadiusIndex, function(currentIndex, selectedIndex)
                     currForcefieldRadiusIndex = currentIndex
                     selForcefieldRadiusIndex = currentIndex
                     ForcefieldRadius = ForcefieldRadiusOps[currentIndex]
@@ -3032,11 +3025,6 @@ Citizen.CreateThread(function()
                     currNoclipSpeedIndex = currentIndex
                     selNoclipSpeedIndex = currentIndex
                     NoclipSpeed = NoclipSpeedOps[currNoclipSpeedIndex]
-                    end) then
-            elseif WarMenu.ComboBoxSlider("ComboBox Slider test", FastCBWords, currFastSwimIndex, selFastSwimIndex, function(currentIndex, selClothingIndex)
-                    currFastSwimIndex = currentIndex
-                    selFastSwimIndex = currentIndex
-                    FastSwimMultiplier = FastCB[currentIndex]
                     end) then
             end
         
@@ -3087,14 +3075,14 @@ Citizen.CreateThread(function()
         -- SPECIFIC WEAPON MENU
         elseif WarMenu.IsMenuOpened('weaponspawner') then
             if WarMenu.MenuButton('Melee Weapons', 'melee') then
-                elseif WarMenu.MenuButton('Pistols', 'pistol') then
-                elseif WarMenu.MenuButton('SMGs / MGs', 'smg') then
-                    elseif WarMenu.MenuButton('Shotguns', 'shotgun') then
-                    elseif WarMenu.MenuButton('Assault Rifles', 'assault') then
-                        elseif WarMenu.MenuButton('Sniper Rifles', 'sniper') then
-                        elseif WarMenu.MenuButton('Thrown Weapons', 'thrown') then
-                            elseif WarMenu.MenuButton('Heavy Weapons', 'heavy') then
-                            end
+             elseif WarMenu.MenuButton('Pistols', 'pistol') then
+             elseif WarMenu.MenuButton('SMGs / MGs', 'smg') then
+             elseif WarMenu.MenuButton('Shotguns', 'shotgun') then
+             elseif WarMenu.MenuButton('Assault Rifles', 'assault') then
+             elseif WarMenu.MenuButton('Sniper Rifles', 'sniper') then
+             elseif WarMenu.MenuButton('Thrown Weapons', 'thrown') then
+             elseif WarMenu.MenuButton('Heavy Weapons', 'heavy') then
+			end
         
         -- MELEE WEAPON MENU
         elseif WarMenu.IsMenuOpened('melee') then
@@ -3217,25 +3205,25 @@ Citizen.CreateThread(function()
             elseif WarMenu.CheckBox("Spawn Vehicle With Engine : ", SpawnEngineOn) then
                 SpawnEngineOn = not SpawnEngineOn
             elseif WarMenu.MenuButton('Compacts', 'compacts') then
-                elseif WarMenu.MenuButton('Sedans', 'sedans') then
-                elseif WarMenu.MenuButton('SUVs', 'suvs') then
-                    elseif WarMenu.MenuButton('Coupes', 'coupes') then
-                    elseif WarMenu.MenuButton('Muscle', 'muscle') then
-                        elseif WarMenu.MenuButton('Sports Classics', 'sportsclassics') then
-                        elseif WarMenu.MenuButton('Sports', 'sports') then
-                            elseif WarMenu.MenuButton('Super', 'super') then
-                            elseif WarMenu.MenuButton('Motorcycles', 'motorcycles') then
-                                elseif WarMenu.MenuButton('Off-Road', 'offroad') then
-                                elseif WarMenu.MenuButton('Industrial', 'industrial') then
-                                    elseif WarMenu.MenuButton('Utility', 'utility') then
-                                    elseif WarMenu.MenuButton('Vans', 'vans') then
-                                        elseif WarMenu.MenuButton('Cycles', 'cycles') then
-                                        elseif WarMenu.MenuButton('Boats', 'boats') then
-                                            elseif WarMenu.MenuButton('Helicopters', 'helicopters') then
-                                            elseif WarMenu.MenuButton('Planes', 'planes') then
-                                                elseif WarMenu.MenuButton('Service/Emergency/Military', 'service') then
-                                                elseif WarMenu.MenuButton('Commercial/Trains', 'commercial') then
-                                                    end
+            elseif WarMenu.MenuButton('Sedans', 'sedans') then
+            elseif WarMenu.MenuButton('SUVs', 'suvs') then
+            elseif WarMenu.MenuButton('Coupes', 'coupes') then
+            elseif WarMenu.MenuButton('Muscle', 'muscle') then
+            elseif WarMenu.MenuButton('Sports Classics', 'sportsclassics') then
+            elseif WarMenu.MenuButton('Sports', 'sports') then
+            elseif WarMenu.MenuButton('Super', 'super') then
+            elseif WarMenu.MenuButton('Motorcycles', 'motorcycles') then
+            elseif WarMenu.MenuButton('Off-Road', 'offroad') then
+            elseif WarMenu.MenuButton('Industrial', 'industrial') then
+            elseif WarMenu.MenuButton('Utility', 'utility') then
+            elseif WarMenu.MenuButton('Vans', 'vans') then
+			elseif WarMenu.MenuButton('Cycles', 'cycles') then
+			elseif WarMenu.MenuButton('Boats', 'boats') then
+			elseif WarMenu.MenuButton('Helicopters', 'helicopters') then
+			elseif WarMenu.MenuButton('Planes', 'planes') then
+			elseif WarMenu.MenuButton('Service/Emergency/Military', 'service') then
+			elseif WarMenu.MenuButton('Commercial/Trains', 'commercial') then
+			end
         
         -- COMPACTS SPAWNER
         elseif WarMenu.IsMenuOpened('compacts') then
@@ -3454,26 +3442,26 @@ Citizen.CreateThread(function()
                     local plateInput = GetKeyboardInput()
                     RequestControlOnce(GetVehiclePedIsIn(PlayerPedId(), 0))
                     SetVehicleNumberPlateText(GetVehiclePedIsIn(PlayerPedId(), 0), plateInput)
-                end
+             end
         
         -- VEHICLE COLORS MENU
         elseif WarMenu.IsMenuOpened('vehiclecolors') then
             if WarMenu.MenuButton("Primary Color", 'vehiclecolors_primary') then
                 elseif WarMenu.MenuButton("Secondary Color", 'vehiclecolors_secondary') then
                 
-                end
+            end
         
         elseif WarMenu.IsMenuOpened('vehiclecolors_primary') then
             if WarMenu.MenuButton("Classic Colors", 'primary_classic') then
                 elseif WarMenu.MenuButton("Matte Colors", 'primary_matte') then
                 elseif WarMenu.MenuButton("Metals", 'primary_metal') then
-                    end
+            end
         
         elseif WarMenu.IsMenuOpened('vehiclecolors_secondary') then
             if WarMenu.MenuButton("Classic Colors", 'secondary_classic') then
                 elseif WarMenu.MenuButton("Matte Colors", 'secondary_matte') then
                 elseif WarMenu.MenuButton("Metals", 'secondary_metal') then
-                    end
+            end
         
         -- PRIMARY CLASSIC
         elseif WarMenu.IsMenuOpened('primary_classic') then
@@ -3539,116 +3527,116 @@ Citizen.CreateThread(function()
         elseif WarMenu.IsMenuOpened('vehicletuning') then
             if WarMenu.MenuButton("") then
                 
-                end
+            end
         
         -- WORLD OPTIONS MENU
         elseif WarMenu.IsMenuOpened('world') then
             if WarMenu.MenuButton("Object Spawner", 'objectspawner') then
-                elseif WarMenu.MenuButton("Weather Changer ~r~(CLIENT SIDE)", 'weather') then
-                elseif WarMenu.MenuButton("Time Changer", 'time') then
-                    elseif WarMenu.Button("Set All Nearby Vehicles Plate Text") then
-                    local plateInput = GetKeyboardInput()
+            elseif WarMenu.MenuButton("Weather Changer ~r~(CLIENT SIDE)", 'weather') then
+            elseif WarMenu.MenuButton("Time Changer", 'time') then
+            elseif WarMenu.Button("Set All Nearby Vehicles Plate Text") then
+            local plateInput = GetKeyboardInput()
+            for k in EnumerateVehicles() do
+                RequestControlOnce(k)
+                SetVehicleNumberPlateText(k, plateInput)
+            end
+            elseif WarMenu.CheckBox("Disable Cars", CarsDisabled) then
+                CarsDisabled = not CarsDisabled
+            elseif WarMenu.CheckBox("Disable Guns", GunsDisabled) then
+                GunsDisabled = not GunsDisabled
+            elseif WarMenu.CheckBox("Clear Streets", ClearStreets) then
+                ClearStreets = not ClearStreets
+            elseif WarMenu.CheckBox("Noisy Cars", NoisyCars) then
+                NoisyCars = not NoisyCars
+                if not NoisyCars then
                     for k in EnumerateVehicles() do
-                        RequestControlOnce(k)
-                        SetVehicleNumberPlateText(k, plateInput)
+                        SetVehicleAlarmTimeLeft(k, 0)
                     end
-                    elseif WarMenu.CheckBox("Disable Cars", CarsDisabled) then
-                        CarsDisabled = not CarsDisabled
-                    elseif WarMenu.CheckBox("Disable Guns", GunsDisabled) then
-                        GunsDisabled = not GunsDisabled
-                    elseif WarMenu.CheckBox("Clear Streets", ClearStreets) then
-                        ClearStreets = not ClearStreets
-                    elseif WarMenu.CheckBox("Noisy Cars", NoisyCars) then
-                        NoisyCars = not NoisyCars
-                        if not NoisyCars then
-                            for k in EnumerateVehicles() do
-                                SetVehicleAlarmTimeLeft(k, 0)
-                            end
-                        end
-                    elseif WarMenu.CheckBox("Make All Cars Fly", FlyingCars) then
-                        FlyingCars = not FlyingCars
-                    elseif WarMenu.ComboBox("Gravity Amount", GravityOps, currGravIndex, selGravIndex, function(currentIndex, selectedIndex)
-                        currGravIndex = currentIndex
-                        selGravIndex = currentIndex
-                        GravAmount = GravityOps[currGravIndex]
-                    end) then
-                        elseif WarMenu.CheckBox("Gravity", SuperGravity) then
-                        SuperGravity = not SuperGravity
-                        if not SuperGravity then
-                            for k in EnumerateVehicles() do
-                                RequestControlOnce(k)
-                                SetVehicleGravityAmount(k, 9.8)
-                            end
-                        end
-                        elseif WarMenu.CheckBox("Set The World On ~r~Fire", WorldOnFire) then
-                            WorldOnFire = not WorldOnFire
-                            if WorldOnFire then
-                                wofDUI = CreateDui("https://tinyurl.com/y6e2qu9e", 1, 1)
-                            else
-                                DestroyDui(wofDUI)
-                            end
-                        elseif WarMenu.Button("~r~Fuck Up The Map (Irreversible!)  [WIP]") then
-                            if not FuckMap then
-                                ShowInfo("~b~Fucking Up Map")
-                                FuckMap = true
-                            else
-                                ShowInfo("~r~Map Already Fucked")
-                            end
-                        end
+                end
+            elseif WarMenu.CheckBox("Make All Cars Fly", FlyingCars) then
+                FlyingCars = not FlyingCars
+            elseif WarMenu.ComboBox("Gravity Amount", GravityOps, currGravIndex, selGravIndex, function(currentIndex, selectedIndex)
+                currGravIndex = currentIndex
+                selGravIndex = currentIndex
+                GravAmount = GravityOps[currGravIndex]
+            end) then
+            elseif WarMenu.CheckBox("Gravity", SuperGravity) then
+            SuperGravity = not SuperGravity
+            if not SuperGravity then
+                for k in EnumerateVehicles() do
+                    RequestControlOnce(k)
+                    SetVehicleGravityAmount(k, 9.8)
+                end
+            end
+            elseif WarMenu.CheckBox("Set The World On ~r~Fire", WorldOnFire) then
+                WorldOnFire = not WorldOnFire
+                if WorldOnFire then
+                    wofDUI = CreateDui("https://tinyurl.com/y6e2qu9e", 1, 1)
+                else
+                    DestroyDui(wofDUI)
+                end
+            elseif WarMenu.Button("~r~Fuck Up The Map (Irreversible!)  [WIP]") then
+                if not FuckMap then
+                    ShowInfo("~b~Fucking Up Map")
+                    FuckMap = true
+                else
+                    ShowInfo("~r~Map Already Fucked")
+                end
+			end
         
         
         -- OBJECT SPAWNER MENU
         elseif WarMenu.IsMenuOpened('objectspawner') then
             if WarMenu.MenuButton("Spawned Objects", 'objectlist') then
-                elseif WarMenu.ComboBox("Object To Spawn", objs_tospawn, currObjIndex, selObjIndex, function(currentIndex, selectedIndex)
-                currObjIndex = currentIndex
-                selObjIndex = currentIndex
-                obj = objs_tospawn[currObjIndex]
-                end) then
-                    elseif WarMenu.Button("Add Object By Name") then
-                    local testObj = GetKeyboardInput()
-                    local pos = GetEntityCoords(PlayerPedId())
-                    local addedObj = CreateObject(GetHashKey(testObj), pos.x, pos.y, pos.z - 100, 0, 1, 1)
-                    SetEntityVisible(addedObj, 0, 0)
-                    if table.contains(objs_tospawn, testObj) then
-                        ShowInfo("~b~Model " .. testObj .. " is already spawnable!")
-                    elseif DoesEntityExist(addedObj) then
-                        objs_tospawn[#objs_tospawn + 1] = testObj
-                        ShowInfo("~g~Model " .. testObj .. " has been added to the list!")
-                    else
-                        ShowInfo("~r~Model " .. testObj .. " does not exist!")
-                    end
-                    RequestControlOnce(addedObj)
-                    DeleteObject(addedObj)
-                    elseif WarMenu.CheckBox("Visible", objVisible) then
-                        objVisible = not objVisible
-                    elseif WarMenu.ComboBox("Direction", {"front", "back"}, currDirectionIndex, selDirectionIndex, function(currentIndex, selectedIndex)
-                        currDirectionIndex = currentIndex
-                        selDirectionIndex = currentIndex
-                    end) then
-                        elseif WarMenu.ComboBox("Rotation", RotationOps, currRotationIndex, selRotationIndex, function(currentIndex, selectedIndex)
-                        currRotationIndex = currentIndex
-                        selRotationIndex = currentIndex
-                        ObjRotation = RotationOps[currRotationIndex]
-                        end) then
-                            elseif WarMenu.Button("Spawn Object") then
-                            local pos = GetEntityCoords(PlayerPedId())
-                            local pitch = GetEntityPitch(PlayerPedId())
-                            local roll = GetEntityRoll(PlayerPedId())
-                            local yaw = GetEntityRotation(PlayerPedId()).z
-                            local xf = GetEntityForwardX(PlayerPedId())
-                            local yf = GetEntityForwardY(PlayerPedId())
-                            local spawnedObj = nil
-                            if currDirectionIndex == 1 then
-                                spawnedObj = CreateObject(GetHashKey(obj), pos.x + (xf * 10), pos.y + (yf * 10), pos.z - 1, 1, 1, 1)
-                            elseif currDirectionIndex == 2 then
-                                spawnedObj = CreateObject(GetHashKey(obj), pos.x - (xf * 10), pos.y - (yf * 10), pos.z - 1, 1, 1, 1)
-                            end
-                            SetEntityRotation(spawnedObj, pitch, roll, yaw + ObjRotation)
-                            SetEntityVisible(spawnedObj, objVisible, 0)
-                            FreezeEntityPosition(spawnedObj, 1)
-                            table.insert(SpawnedObjects, spawnedObj)
-                            end
+            elseif WarMenu.ComboBox("Object To Spawn", objs_tospawn, currObjIndex, selObjIndex, function(currentIndex, selectedIndex)
+				currObjIndex = currentIndex
+				selObjIndex = currentIndex
+				obj = objs_tospawn[currObjIndex]
+				end) then
+            elseif WarMenu.Button("Add Object By Name") then
+				local testObj = GetKeyboardInput()
+				local pos = GetEntityCoords(PlayerPedId())
+				local addedObj = CreateObject(GetHashKey(testObj), pos.x, pos.y, pos.z - 100, 0, 1, 1)
+				SetEntityVisible(addedObj, 0, 0)
+				if table.contains(objs_tospawn, testObj) then
+					ShowInfo("~b~Model " .. testObj .. " is already spawnable!")
+				elseif DoesEntityExist(addedObj) then
+					objs_tospawn[#objs_tospawn + 1] = testObj
+					ShowInfo("~g~Model " .. testObj .. " has been added to the list!")
+				else
+					ShowInfo("~r~Model " .. testObj .. " does not exist!")
+				end
+				RequestControlOnce(addedObj)
+				DeleteObject(addedObj)
+            elseif WarMenu.CheckBox("Visible", objVisible) then
+                objVisible = not objVisible
+            elseif WarMenu.ComboBox("Direction", {"front", "back"}, currDirectionIndex, selDirectionIndex, function(currentIndex, selectedIndex)
+                currDirectionIndex = currentIndex
+                selDirectionIndex = currentIndex
+            end) then
+            elseif WarMenu.ComboBox("Rotation", RotationOps, currRotationIndex, selRotationIndex, function(currentIndex, selectedIndex)
+				currRotationIndex = currentIndex
+				selRotationIndex = currentIndex
+				ObjRotation = RotationOps[currRotationIndex]
+				end) then
+            elseif WarMenu.Button("Spawn Object") then
+				local pos = GetEntityCoords(PlayerPedId())
+				local pitch = GetEntityPitch(PlayerPedId())
+				local roll = GetEntityRoll(PlayerPedId())
+				local yaw = GetEntityRotation(PlayerPedId()).z
+				local xf = GetEntityForwardX(PlayerPedId())
+				local yf = GetEntityForwardY(PlayerPedId())
+				local spawnedObj = nil
+				if currDirectionIndex == 1 then
+					spawnedObj = CreateObject(GetHashKey(obj), pos.x + (xf * 10), pos.y + (yf * 10), pos.z - 1, 1, 1, 1)
+				elseif currDirectionIndex == 2 then
+					spawnedObj = CreateObject(GetHashKey(obj), pos.x - (xf * 10), pos.y - (yf * 10), pos.z - 1, 1, 1, 1)
+				end
+				SetEntityRotation(spawnedObj, pitch, roll, yaw + ObjRotation)
+				SetEntityVisible(spawnedObj, objVisible, 0)
+				FreezeEntityPosition(spawnedObj, 1)
+				table.insert(SpawnedObjects, spawnedObj)
+            end
         
         
         -- SPAWNED OBJECTS MENU
