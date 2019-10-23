@@ -124,6 +124,7 @@ menulist = {
         'time',
         
         -- MISC SUBMENUS
+		'esp',
         'credits',
         
         -- TELEPORT SUBMENUS
@@ -1688,9 +1689,8 @@ end
 -- END UTILITY FUNCTIONS
 -- MENU FUNCTIONS
 function SpectatePlayer(id)
-    spectating = not spectating
     local player = GetPlayerPed(id)
-    if spectating then
+    if Spectating then
         RequestCollisionAtCoord(GetEntityCoords(player))
         NetworkSetInSpectatorMode(true, player)
     else
@@ -2032,13 +2032,27 @@ end
 
 local function ToggleESP()
     ESPEnabled = not ESPEnabled
+	local updateTime = 0
+	local _,x,y = nil
+	
+	Citizen.CreateThread(function()
+		while ESPEnabled do
+            local plist = GetActivePlayers()
+            table.removekey(plist, PlayerId())
+            for i = 1, #plist do
+				local targetCoords = GetEntityCoords(GetPlayerPed(plist[i]))
+				_, x, y = GetScreenCoordFromWorldCoord(targetCoords.x, targetCoords.y, targetCoords.z)
+			end
+			Wait(updateTime)
+		end
+	end)
+	
     Citizen.CreateThread(function()
         while ESPEnabled do
             local plist = GetActivePlayers()
             table.removekey(plist, PlayerId())
             for i = 1, #plist do
                 local targetCoords = GetEntityCoords(GetPlayerPed(plist[i]))
-                local _, x, y = GetScreenCoordFromWorldCoord(targetCoords.x, targetCoords.y, targetCoords.z)
                 local distance = GetDistanceBetweenCoords(GetEntityCoords(PlayerPedId()), targetCoords)
                 if distance <= EspDistance then
                     local _, wephash = GetCurrentPedWeapon(GetPlayerPed(plist[i]), 1)
@@ -2056,6 +2070,7 @@ local function ToggleESP()
                     DrawTxt(espstring2, x - 0.05, y - 0.03, 0.0, 0.2)
                 end
             end
+			updateTime = EspDistance-50
             Wait(0)
         end
     end)
@@ -2718,6 +2733,18 @@ Citizen.CreateThread(function()
     local currThemeIndex = 1
     local selThemeIndex = 1
     
+	local currPFuncIndex = 1
+	local selPFuncIndex = 1
+	
+	local currVFuncIndex = 1
+	local selVFuncIndex = 1
+	
+	local currSeatIndex = 1
+	local selSeatIndex = 1
+	
+	local currTireIndex = 1
+	local selTireIndex = 1
+	
     local currNoclipSpeedIndex = 1
     local selNoclipSpeedIndex = 1
     
@@ -2771,10 +2798,18 @@ Citizen.CreateThread(function()
     
     -- GLOBALS
     local TrackedPlayer = nil
+	local SpectatedPlayer = nil
     local PossessingVeh = false
 	local pvblip = nil
 	local pvehicle = nil
     local pvehicleText = ""
+	local IsPlayerHost = nil
+	
+	if NetworkIsHost() then
+		IsPlayerHost = "~g~Yes"
+	else
+		IsPlayerHost = "~r~No"
+	end
 	
     local savedpos1 = nil
     local savedpos2 = nil
@@ -2874,6 +2909,7 @@ Citizen.CreateThread(function()
     WarMenu.CreateSubMenu('time', 'world', 'Time Changer')
     
     -- MISC MENU SUBMENUS
+	WarMenu.CreateSubMenu('esp', 'misc', 'ESP & Visual Options')
     WarMenu.CreateSubMenu('credits', 'misc', 'Credits')
     
     -- TELEPORT MENU SUBMENUS
@@ -2937,39 +2973,112 @@ Citizen.CreateThread(function()
         -- SPECIFIC PLAYER OPTIONS
         elseif WarMenu.IsMenuOpened('playeroptions') then
             if WarMenu.Button("~p~Selected: " .. "~y~[" .. GetPlayerServerId(selectedPlayer) .. "] ~s~" .. GetPlayerName(selectedPlayer)) then
-                elseif WarMenu.Button("Spectate Player") then
-                SpectatePlayer(selectedPlayer)
-                elseif WarMenu.Button("Possess Player Vehicle ~r~(Do not use on servers w/ nametags or blips)") then
-                    if spectating then SpectatePlayer(selectedPlayer) end
-                    PossessVehicle(selectedPlayer)
-                elseif WarMenu.Button("Teleport To Player") then
-                    TeleportToPlayer(selectedPlayer)
-                elseif WarMenu.CheckBox("Track Player", Tracking, "Tracking: Nobody", "Tracking: "..GetPlayerName(selectedPlayer)) then
-                    Tracking = not Tracking
-                    TrackedPlayer = GetPlayerPed(selectedPlayer)
-                elseif WarMenu.Button("Give Health") then
-                    SetEntityHealth(GetPlayerPed(selectedPlayer), 200)
-                elseif WarMenu.Button("Give Armor") then
-                    SetPedArmour(GetPlayerPed(selectedPlayer), 100)
-                elseif WarMenu.Button("Explode Player") then
-                    ExplodePlayer(selectedPlayer)
-                elseif WarMenu.Button("Cancel Animation/Task") then
-                    ClearPedTasksImmediately(GetPlayerPed(selectedPlayer))
-                elseif WarMenu.Button("Nearby Peds Attack Player") then
-                    PedAttack(selectedPlayer, PedAttackType)
-                elseif WarMenu.ComboBox("Ped Attack Type", PedAttackOps, currAttackTypeIndex, selAttackTypeIndex, function(currentIndex, selectedIndex)
-                    currAttackTypeIndex = currentIndex
-                    selAttackTypeIndex = currentIndex
-                    PedAttackType = currentIndex
-                end) then
-                    --elseif WarMenu.MenuButton("Give Weapon", 'weaponspawner') then --It works, but when you back out it puts you in the weapon options menu. (too lazy to fix)
-                    elseif WarMenu.Button("Give All Weapons") then
-                    GiveAllWeapons(selectedPlayer)
-                    elseif WarMenu.Button("Strip Weapons") then
-                        StripPlayer(selectedPlayer)
-                    elseif WarMenu.Button("Kick From Vehicle") then
-                        KickFromVeh(selectedPlayer)
-                    end
+			elseif WarMenu.CheckBox("Spectate Player", Spectating, "Spectating: Nobody", "Spectating: "..GetPlayerName(SpectatedPlayer)) then
+				Spectating = not Spectating
+				SpectatePlayer(selectedPlayer)
+				SpectatedPlayer = selectedPlayer
+            elseif WarMenu.Button("Possess Player Vehicle ~r~(Do not use on servers w/ nametags or blips)") then
+                if Spectating then SpectatePlayer(selectedPlayer) end
+                PossessVehicle(selectedPlayer)
+            elseif WarMenu.Button("Teleport To Player") then
+				local confirm = GetKeyboardInput("Are you Sure? ~g~Y~w~/~r~N")
+				if string.lower(confirm) == "y" then
+					TeleportToPlayer(selectedPlayer)
+				else
+					ShowInfo("~r~Operation Canceled")
+				end
+			elseif WarMenu.ComboBox("Teleport Into Player's Vehicle", {"Front Right", "Back Left", "Back Right"}, currSeatIndex, selSeatIndex, function(currentIndex, selClothingIndex)
+                    currSeatIndex = currentIndex
+                    selSeatIndex = currentIndex
+                    end) then
+					if not IsPedInAnyVehicle(GetPlayerPed(selectedPlayer), 0) then
+						ShowInfo("~r~Player Not In Vehicle!")
+					else
+						local confirm = GetKeyboardInput("Are you Sure? ~g~Y~w~/~r~N")
+						if string.lower(confirm) == "y" then
+							local veh = GetVehiclePedIsIn(GetPlayerPed(selectedPlayer), 0)
+							if selSeatIndex == 1 then
+								if IsVehicleSeatFree(veh, 0) then
+									SetPedIntoVehicle(PlayerPedId(), veh, 0)
+								else
+									ShowInfo("~r~Seat Taken Or Does Not Exist!")
+								end
+							elseif selSeatIndex == 2 then
+								if IsVehicleSeatFree(veh, 1) then
+									SetPedIntoVehicle(PlayerPedId(), veh, 1)
+								else
+									ShowInfo("~r~Seat Taken Or Does Not Exist!")
+								end
+							elseif selSeatIndex == 3 then
+								if IsVehicleSeatFree(veh, 2) then
+									SetPedIntoVehicle(PlayerPedId(), veh, 2)
+								else
+									ShowInfo("~r~Seat Taken Or Does Not Exist!")
+								end
+							end
+						end
+					end		
+            elseif WarMenu.CheckBox("Track Player", Tracking, "Tracking: Nobody", "Tracking: "..GetPlayerName(TrackedPlayer)) then
+                Tracking = not Tracking
+                TrackedPlayer = selectedPlayer
+			elseif WarMenu.Button("Launch Player's Vehicle") then
+				if not IsPedInAnyVehicle(GetPlayerPed(selectedPlayer), 0) then
+					ShowInfo("~r~Player Not In Vehicle!")
+				else
+					local veh = GetVehiclePedIsIn(GetPlayerPed(selectedPlayer), 0)
+					RequestControlOnce(veh)
+					ApplyForceToEntity(veh, 3, 0.0, 0.0, 5000000.0, 0.0, 0.0, 0.0, 0, 0, 1, 1, 0, 1)
+				end
+			elseif WarMenu.Button("Slam Player's Vehicle") then
+				if not IsPedInAnyVehicle(GetPlayerPed(selectedPlayer), 0) then
+					ShowInfo("~r~Player Not In Vehicle!")
+				else
+					local veh = GetVehiclePedIsIn(GetPlayerPed(selectedPlayer), 0)
+					RequestControlOnce(veh)
+					ApplyForceToEntity(veh, 3, 0.0, 0.0, -5000000.0, 0.0, 0.0, 0.0, 0, 0, 1, 1, 0, 1)
+				end
+			elseif WarMenu.ComboBox("Pop Player's Vehicle Tire", {"Front Left", "Front Right", "Back Left", "Back Right", "All"}, currTireIndex, selTireIndex, function(currentIndex, selClothingIndex)
+                    currTireIndex = currentIndex
+                    selTireIndex = currentIndex
+                    end) then
+					if not IsPedInAnyVehicle(GetPlayerPed(selectedPlayer), 0) then
+						ShowInfo("~r~Player Not In Vehicle!")
+					else
+						local veh = GetVehiclePedIsIn(GetPlayerPed(selectedPlayer), 0)
+						RequestControlOnce(veh)
+						if selTireIndex == 1 then
+							SetVehicleTyreBurst(veh, 0, 1, 1000.0)
+						elseif selTireIndex == 2 then
+							SetVehicleTyreBurst(veh, 1, 1, 1000.0)
+						elseif selTireIndex == 3 then
+							SetVehicleTyreBurst(veh, 4, 1, 1000.0)
+						elseif selTireIndex == 4 then
+							SetVehicleTyreBurst(veh, 5, 1, 1000.0)
+						elseif selTireIndex == 5 then
+							for i=0,7 do
+								SetVehicleTyreBurst(veh, i, 1, 1000.0)
+							end
+						end
+					end
+            elseif WarMenu.Button("Explode Player") then
+                ExplodePlayer(selectedPlayer)
+            elseif WarMenu.Button("Cancel Animation/Task") then
+                ClearPedTasksImmediately(GetPlayerPed(selectedPlayer))
+            elseif WarMenu.Button("Nearby Peds Attack Player") then
+                PedAttack(selectedPlayer, PedAttackType)
+            elseif WarMenu.ComboBox("Ped Attack Type", PedAttackOps, currAttackTypeIndex, selAttackTypeIndex, function(currentIndex, selectedIndex)
+                currAttackTypeIndex = currentIndex
+                selAttackTypeIndex = currentIndex
+                PedAttackType = currentIndex
+            end) then
+            --elseif WarMenu.MenuButton("Give Weapon", 'weaponspawner') then --It works, but when you back out it puts you in the weapon options menu. (too lazy to fix)
+            elseif WarMenu.Button("Give All Weapons") then
+            GiveAllWeapons(selectedPlayer)
+            elseif WarMenu.Button("Strip Weapons") then
+                StripPlayer(selectedPlayer)
+            elseif WarMenu.Button("Kick From Vehicle") then
+                KickFromVeh(selectedPlayer)
+            end
         
         
         -- SELF OPTIONS MENU
@@ -2983,6 +3092,26 @@ Citizen.CreateThread(function()
                     Demigod = not Demigod
                 elseif WarMenu.CheckBox("Alternative Demigod Mode", ADemigod) then
                     ADemigod = not ADemigod
+				elseif WarMenu.ComboBox("Player Functions", {"Heal Player", "Give Player Armor", "Remove Player Armor", "Clean Player", "Suicide", "Cancel Anim/Task"}, currPFuncIndex, selPFuncIndex, function(currentIndex, selClothingIndex)
+                    currPFuncIndex = currentIndex
+                    selPFuncIndex = currentIndex
+                    end) then
+					if selPFuncIndex == 1 then
+						SetEntityHealth(PlayerPedId(), 200)
+					elseif selPFuncIndex == 2 then
+						SetPedArmour(PlayerPedId(), 100)
+					elseif selPFuncIndex == 3 then
+						SetPedArmour(PlayerPedId(), 0)
+					elseif selPFuncIndex == 4 then
+						ClearPedBloodDamage(PlayerPedId())
+						ClearPedWetness(PlayerPedId())
+						ClearPedEnvDirt(PlayerPedId())
+						ResetPedVisibleDamage(PlayerPedId())
+					elseif selPFuncIndex == 5 then
+						SetEntityHealth(PlayerPedId(), 0)
+					elseif selPFuncIndex == 6 then
+						ClearPedTasksImmediately(PlayerPedId())
+					end
                 elseif WarMenu.CheckBox("Infinite Stamina", InfStamina) then
                     InfStamina = not InfStamina
                 elseif WarMenu.ComboBoxSlider("Fast Run", FastCBWords, currFastRunIndex, selFastRunIndex, function(currentIndex, selClothingIndex)
@@ -3012,10 +3141,6 @@ Citizen.CreateThread(function()
                     ToggleNoclip()
                 elseif WarMenu.CheckBox("Never Wanted", NeverWanted) then
                     NeverWanted = not NeverWanted
-                elseif WarMenu.Button("Cancel Animation/Task") then
-                    ClearPedTasksImmediately(PlayerPedId())
-                elseif WarMenu.Button("Suicide") then
-                    SetEntityHealth(PlayerPedId(), 0)
                 end
         
         
@@ -3177,16 +3302,22 @@ Citizen.CreateThread(function()
                 elseif WarMenu.MenuButton("Vehicle Control Menu", 'vehiclemenu') then
                 elseif WarMenu.CheckBox("Vehicle Godmode", VehGodmode) then
                     VehGodmode = not VehGodmode
-                elseif WarMenu.Button("Repair Vehicle") then
-                    local veh = GetVehiclePedIsIn(PlayerPedId(), 0)
-                    FixVeh(veh)
-                    SetVehicleEngineOn(veh, 1, 1)
-                elseif WarMenu.Button("Clean Vehicle") then
-                    local veh = GetVehiclePedIsIn(PlayerPedId(), 0)
-                    SetVehicleDirtLevel(veh, 0)
+				elseif WarMenu.ComboBox("Vehicle Functions", {"Repair Vehicle", "Clean Vehicle", "Dirty Vehicle"}, currVFuncIndex, selVFuncIndex, function(currentIndex, selClothingIndex)
+                    currVFuncIndex = currentIndex
+                    selVFuncIndex = currentIndex
+                    end) then
+					local veh = GetVehiclePedIsIn(PlayerPedId(), 0)
+					if selVFuncIndex == 1 then
+						FixVeh(veh)
+						SetVehicleEngineOn(veh, 1, 1)
+					elseif selVFuncIndex == 2 then
+						SetVehicleDirtLevel(veh, 0)
+					elseif selVFuncIndex == 3 then
+						SetVehicleDirtLevel(veh, 15.0)
+					end
                 elseif WarMenu.CheckBox("Collision", Collision) then
                     Collision = not Collision
-                elseif WarMenu.ComboBox("Speed Multiplier", SpeedModOps, currSpeedIndex, selSpeedIndex, function(currentIndex, selectedIndex)
+                elseif WarMenu.ComboBoxSlider("Speed Multiplier", SpeedModOps, currSpeedIndex, selSpeedIndex, function(currentIndex, selectedIndex)
                     currSpeedIndex = currentIndex
                     selSpeedIndex = currentIndex
                     SpeedModAmt = SpeedModOps[currSpeedIndex]
@@ -3770,13 +3901,28 @@ Citizen.CreateThread(function()
             end
         
         -- WEATHER CHANGER MENU
+		elseif WarMenu.IsMenuOpened('weather') then
+		
+		
         -- MISC OPTIONS MENU
         elseif WarMenu.IsMenuOpened('misc') then
             if WarMenu.ComboBox('Theme', themes, currThemeIndex, selThemeIndex, function(currentIndex, selectedIndex)
                 currThemeIndex = currentIndex
                 selThemeIndex = selectedIndex
             end) then theme = themes[selThemeIndex]WarMenu.InitializeTheme()
-            elseif WarMenu.CheckBox("Blips", BlipsEnabled) then
+			elseif WarMenu.MenuButton("ESP & Visual", 'esp') then
+            elseif WarMenu.CheckBox('Force Map', ForceMap) then
+                ForceMap = not ForceMap
+            elseif WarMenu.CheckBox('Always Draw Crosshair', Crosshair) then
+                Crosshair = not Crosshair
+            elseif WarMenu.CheckBox("Show Coordinates", ShowCoords) then
+                ShowCoords = not ShowCoords
+            elseif WarMenu.MenuButton('Credits', 'credits') then
+            end
+					
+		-- ESP OPTIONS MENU
+		elseif WarMenu.IsMenuOpened('esp') then
+			if WarMenu.CheckBox("Blips", BlipsEnabled) then
                 ToggleBlips()
             elseif WarMenu.CheckBox("Nametags", NametagsEnabled) then
                 NametagsEnabled = not NametagsEnabled
@@ -3797,24 +3943,17 @@ Citizen.CreateThread(function()
                 ANametagsEnabled = not ANametagsEnabled
             elseif WarMenu.CheckBox("Draw Alternative Nametags Through Walls", ANametagsNotNeedLOS) then
                 ANametagsNotNeedLOS = not ANametagsNotNeedLOS
-            elseif WarMenu.ComboBox("ESP Distance", ESPDistanceOps, currESPDistance, selESPDistance, function(currentIndex, selectedIndex)
+			elseif WarMenu.CheckBox("ESP", ESPEnabled) then
+				ToggleESP()
+            elseif WarMenu.ComboBoxSlider("ESP Distance", ESPDistanceOps, currESPDistance, selESPDistance, function(currentIndex, selectedIndex)
                 currESPDistance = currentIndex
                 selESPDistance = currentIndex
                 EspDistance = ESPDistanceOps[currESPDistance]
             end) then
-                elseif WarMenu.CheckBox("ESP", ESPEnabled) then
-                ToggleESP()
-                elseif WarMenu.CheckBox("Lines", LinesEnabled) then
-                    LinesEnabled = not LinesEnabled
-                elseif WarMenu.CheckBox('Force Map', ForceMap) then
-                    ForceMap = not ForceMap
-                elseif WarMenu.CheckBox('Always Draw Crosshair', Crosshair) then
-                    Crosshair = not Crosshair
-                elseif WarMenu.CheckBox("Show Coordinates", ShowCoords) then
-                    ShowCoords = not ShowCoords
-                elseif WarMenu.MenuButton('Credits', 'credits') then
-                    end
-        
+            elseif WarMenu.CheckBox("Lines", LinesEnabled) then
+                LinesEnabled = not LinesEnabled
+			end
+       
         -- TELEPORT OPTIONS MENU
         elseif WarMenu.IsMenuOpened('teleport') then
             if WarMenu.MenuButton('Save/Load Position', 'saveload') then
@@ -4036,7 +4175,7 @@ Citizen.CreateThread(function()
         end
         
         if Tracking then
-            local coords = GetEntityCoords(TrackedPlayer)
+            local coords = GetEntityCoords(GetPlayerPed(TrackedPlayer))
             SetNewWaypoint(coords.x, coords.y)
         end
         
