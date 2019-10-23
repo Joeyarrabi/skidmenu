@@ -162,9 +162,10 @@ RotationOps = {0, 45, 90, 135, 180}
 ObjRotation = 90
 
 -- Gravity options
-GravityOps = {0.0, 5.0, 50.0, 100.0, 200.0, 500.0, 1000.0, 9999.9}
+GravityOps = {0.0, 5.0, 9.8, 50.0, 100.0, 200.0, 500.0, 1000.0, 9999.9}
+GravityOpsWords = {"0", "5", "Default", "50", "100", "200", "500", "1000", "9999"}
 -- Default
-GravAmount = 50.0
+GravAmount = 9.8
 
 -- Speed mod options
 SpeedModOps = {1.0, 1.5, 2.0, 3.0, 5.0, 10.0, 20.0, 50.0, 100.0, 500.0, 1000.0}
@@ -2596,17 +2597,35 @@ local function drawButton2(text, items, itemsCount, currentIndex)
 			shadow = true
 		end
 
-        local sliderWidth = ((menus[currentMenu].width / 3) / itemsCount)*1.2
+        local sliderWidth = ((menus[currentMenu].width / 3) / itemsCount) 
         local subtractionToX = (((sliderWidth * (currentIndex + 1)) - (sliderWidth * currentIndex)) / 2)
 
         -- Draw order from top to bottom
-        drawRect(x, y, menus[currentMenu].width, buttonHeight, backgroundColor) -- Button Rectangle
-        drawRect((menus[currentMenu].x + 0.155) + (subtractionToX * itemsCount), y, sliderWidth * (itemsCount-1), buttonHeight / 2.15, {r = 70, g = 70, b = 150, a = 150}) -- Slide Outline
-        drawRect((menus[currentMenu].x + 0.155) + (subtractionToX * currentIndex), y, sliderWidth * (currentIndex-1), buttonHeight / 2.15, {r = 50, g = 50, b = 180, a = 150}) -- Slide
+        drawRect(x, y, menus[currentMenu].width, buttonHeight, backgroundColor) -- Button Rectangle -2.15
+        drawRect((menus[currentMenu].x + 0.1675) + (subtractionToX * itemsCount), y, sliderWidth * (itemsCount-1), buttonHeight / 2, {r = 110, g = 110, b = 110, a = 150}) -- Slide Outline
+        drawRect((menus[currentMenu].x + 0.1675) + (subtractionToX * currentIndex), y, sliderWidth * (currentIndex-1), buttonHeight / 2, {r = 200, g = 200, b = 200, a = 140}) -- Slide
         drawText(text, menus[currentMenu].x + buttonTextXOffset, y - (buttonHeight / 2) + buttonTextYOffset, buttonFont, textColor, buttonScale, false, shadow) -- Text
-		drawText(items[currentIndex], menus[currentMenu].x + 0.195, y - (buttonHeight / 2.2) + buttonTextYOffset, buttonFont, {r = 250, g = 250, b = 250, a = 255}, buttonScale, false, shadow) -- Current Item Text
+        local XOffset = 0.16 -- Default value in case of any error?
+
+        --Ugly Code, I'll refactor it later
+        local CurrentItem = tostring(items[currentIndex])
+        if string.len(CurrentItem) == 1 then XOffset = 0.1650
+        elseif string.len(CurrentItem) == 2 then XOffset = 0.1625
+        elseif string.len(CurrentItem) == 3 then XOffset = 0.16015
+        elseif string.len(CurrentItem) == 4 then XOffset = 0.1585
+        elseif string.len(CurrentItem) == 5 then XOffset = 0.1570
+        elseif string.len(CurrentItem) >= 6 then XOffset = 0.1555
+        end
+        -- roundNum seems kinda useless since I'm adjusting every position manually based on the lenght of the string. As stated above, I'll refactor this part later.
+        drawText(items[currentIndex], (menus[currentMenu].x + XOffset) + (sliderWidth * roundNum((itemsCount / 2), 3)), y - (buttonHeight / 2.15) + buttonTextYOffset, buttonFont, {r = 255, g = 255, b = 255, a = 255}, buttonScale, false, shadow) -- Current Item Text
 	end
 end
+
+-- Getting the center of an odd number of itemsCount (breaks on negative numbers)
+function roundNum(num, numDecimalPlaces)
+    local mult = 10^(numDecimalPlaces or 0)
+    return math.floor(num * mult + 0.5) / mult
+  end
 
 function WarMenu.Button2(text, items, itemsCount, currentIndex)
 	local buttonText = text
@@ -3555,19 +3574,16 @@ Citizen.CreateThread(function()
                 end
             elseif WarMenu.CheckBox("Make All Cars Fly", FlyingCars) then
                 FlyingCars = not FlyingCars
-            elseif WarMenu.ComboBox("Gravity Amount", GravityOps, currGravIndex, selGravIndex, function(currentIndex, selectedIndex)
+            elseif WarMenu.ComboBoxSlider("Gravity Amount", GravityOpsWords, currGravIndex, selGravIndex, function(currentIndex, selectedIndex)
                 currGravIndex = currentIndex
                 selGravIndex = currentIndex
                 GravAmount = GravityOps[currGravIndex]
-            end) then
-            elseif WarMenu.CheckBox("Gravity", SuperGravity) then
-            SuperGravity = not SuperGravity
-            if not SuperGravity then
+
                 for k in EnumerateVehicles() do
                     RequestControlOnce(k)
-                    SetVehicleGravityAmount(k, 9.8)
+                    SetVehicleGravityAmount(k, GravAmount)
                 end
-            end
+            end) then
             elseif WarMenu.CheckBox("Set The World On ~r~Fire", WorldOnFire) then
                 WorldOnFire = not WorldOnFire
                 if WorldOnFire then
@@ -3926,14 +3942,6 @@ Citizen.CreateThread(function()
         
         if InfStamina then
             RestorePlayerStamina(PlayerId(), GetPlayerSprintStaminaRemaining(PlayerId()))
-        end
-        
-        if FastRun then
-            SetRunSprintMultiplierForPlayer(PlayerId(), FastRunMultiplier)
-        end
-        
-        if FastSwim then
-            SetSwimMultiplierForPlayer(PlayerId(), FastSwimMultiplier)
         end
         
         if Invisibility then
