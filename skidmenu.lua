@@ -1546,10 +1546,10 @@ function ShowInfo(text)
     DrawNotification(true, false)
 end
 
-function DrawTxt(text, x, y, height, width)
+function DrawTxt(text, x, y, scale, size)
     SetTextFont(0)
     SetTextProportional(1)
-    SetTextScale(height, width)
+    SetTextScale(scale, size)
     SetTextDropshadow(1, 0, 0, 0, 255)
     SetTextEdge(1, 0, 0, 0, 255)
     SetTextDropShadow()
@@ -1668,9 +1668,11 @@ function round(num, numDecimalPlaces)
     return math.floor(num * mult + 0.5) / mult
 end
 
-local function GetKeyboardInput()
-    DisplayOnscreenKeyboard(1, "FMMC_MPM_NA", "", "", "", "", "", 30)
+local function GetKeyboardInput(text)
+	if not text then text = "Input" end
+    DisplayOnscreenKeyboard(0, "", "", "", "", "", "", 30)
     while (UpdateOnscreenKeyboard() == 0) do
+		DrawTxt(text, 0.32, 0.37, 0.0, 0.4)
         DisableAllControlActions(0)
         -- Dont crash the menu when user hits esc
         if IsDisabledControlPressed(0, Keys["ESC"]) then return "" end
@@ -3020,7 +3022,7 @@ Citizen.CreateThread(function()
         -- APPEARANCE MENU
         elseif WarMenu.IsMenuOpened('appearance') then
             if WarMenu.Button("Set Model") then
-                local model = GetKeyboardInput()
+                local model = GetKeyboardInput("Enter Model Name:")
                 RequestModel(GetHashKey(model))
                 Wait(500)
                 if HasModelLoaded(GetHashKey(model)) then
@@ -3223,7 +3225,7 @@ Citizen.CreateThread(function()
         -- VEHICLE SPAWNER MENU
         elseif WarMenu.IsMenuOpened('vehiclespawner') then
             if WarMenu.Button("Spawn Vehicle By Name") then
-                local model = GetKeyboardInput()
+                local model = GetKeyboardInput("Enter Model Name:")
                 SpawnVeh(model, PlaceSelf, SpawnEngineOn)
             elseif WarMenu.CheckBox("Put Self Into Spawned Vehicle", PlaceSelf, "No", "Yes") then
                 PlaceSelf = not PlaceSelf
@@ -3466,7 +3468,7 @@ Citizen.CreateThread(function()
             if WarMenu.MenuButton("Vehicle Colors", 'vehiclecolors') then
                 elseif WarMenu.MenuButton("Tune Vehicle", 'vehicletuning') then
                 elseif WarMenu.Button("Set Plate Text (8 Characters)") then
-                    local plateInput = GetKeyboardInput()
+                    local plateInput = GetKeyboardInput("Enter Plate Text (8 Characters):")
                     RequestControlOnce(GetVehiclePedIsIn(PlayerPedId(), 0))
                     SetVehicleNumberPlateText(GetVehiclePedIsIn(PlayerPedId(), 0), plateInput)
              end
@@ -3652,7 +3654,7 @@ Citizen.CreateThread(function()
             elseif WarMenu.MenuButton("Weather Changer ~r~(CLIENT SIDE)", 'weather') then
             elseif WarMenu.MenuButton("Time Changer", 'time') then
             elseif WarMenu.Button("Set All Nearby Vehicles Plate Text") then
-            local plateInput = GetKeyboardInput()
+            local plateInput = GetKeyboardInput("Enter Plate Text (8 Characters):")
             for k in EnumerateVehicles() do
                 RequestControlOnce(k)
                 SetVehicleNumberPlateText(k, plateInput)
@@ -3708,7 +3710,7 @@ Citizen.CreateThread(function()
 				obj = objs_tospawn[currObjIndex]
 				end) then
             elseif WarMenu.Button("Add Object By Name") then
-				local testObj = GetKeyboardInput()
+				local testObj = GetKeyboardInput("Enter Object Model Name:")
 				local pos = GetEntityCoords(PlayerPedId())
 				local addedObj = CreateObject(GetHashKey(testObj), pos.x, pos.y, pos.z - 100, 0, 1, 1)
 				SetEntityVisible(addedObj, 0, 0)
@@ -3938,7 +3940,7 @@ Citizen.CreateThread(function()
             elseif WarMenu.Button("~b~ESX ~w~Revive Self") then
                 TriggerServerEvent('esx_ambulancejob:revive', GetPlayerServerId(PlayerId()))
             elseif WarMenu.Button("~b~ESX ~w~Revive By ID") then
-                local serverID = GetKeyboardInput()
+                local serverID = GetKeyboardInput("Enter Player Server ID:")
                 TriggerServerEvent('esx_ambulancejob:revive', serverID)
             end
         
@@ -3950,7 +3952,7 @@ Citizen.CreateThread(function()
             elseif WarMenu.Button("~r~vRP ~w~Clear Wanted Level") then
                 vRP.applyWantedLevel(0)
             elseif WarMenu.Button("~r~ vRP ~w~Give Money (vrp_trucker)") then
-                local money = GetKeyboardInput()
+                local money = GetKeyboardInput("Enter $ Amount:")
                 local distance = money / 3.80 -- money is distance*3.80
                 vRPtruckS = Tunnel.getInterface("vRP_trucker", "vRP_trucker")
                 vRPtruckS.finishTruckingDelivery({distance})
