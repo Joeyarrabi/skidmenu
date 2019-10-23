@@ -3568,7 +3568,7 @@ Citizen.CreateThread(function()
 					SetBlipSprite(pvblip, 225) -- Full list of blips https://marekkraus.sk/gtav/blips/list.html
 					SetBlipColour(pvblip, 84) -- Full list of the available blips colors https://i.imgur.com/Hvyx6cE.png
 					ShowInfo("~g~Current Vehicle Saved")
-					pvehicleText = GetLabelText(GetDisplayNameFromVehicleModel(GetEntityModel(GetVehiclePedIsUsing(PlayerPedId())))).." "..pvehicle
+					pvehicleText = GetLabelText(GetDisplayNameFromVehicleModel(GetEntityModel(pvehicle))).." "..pvehicle
                 elseif SavedVehicle then
 					SavedVehicle = not SavedVehicle
 					pvehicle = nil
