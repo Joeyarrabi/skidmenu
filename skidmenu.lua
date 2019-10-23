@@ -81,6 +81,7 @@ menulist = {
         -- VEHICLE SUBMENUS
         'vehiclespawner',
         'vehiclemods',
+        'vehiclemenu',
         
         'vehiclecolors',
         'vehiclecolors_primary',
@@ -2823,6 +2824,7 @@ Citizen.CreateThread(function()
     -- VEHICLE MENU SUBMENUS
     WarMenu.CreateSubMenu('vehiclespawner', 'vehicle', 'Vehicle Spawner')
     WarMenu.CreateSubMenu('vehiclemods', 'vehicle', 'Vehicle Mods')
+    WarMenu.CreateSubMenu('vehiclemenu', 'vehicle', 'Vehicle Menu')
     
     -- VEHICLE SPAWNER MENU
     WarMenu.CreateSubMenu('compacts', 'vehiclespawner', 'Compacts')
@@ -2990,6 +2992,8 @@ Citizen.CreateThread(function()
                     FastSwimMultiplier = FastCB[currentIndex]
                     SetSwimMultiplierForPlayer(PlayerId(), FastSwimMultiplier)
                     end) then
+                elseif WarMenu.CheckBox("Super Jump", SuperJump) then
+                    SuperJump = not SuperJump
                 elseif WarMenu.CheckBox("Invisibility", Invisibility) then
                     Invisibility = not Invisibility
                     if not Invisibility then
@@ -3165,6 +3169,7 @@ Citizen.CreateThread(function()
         elseif WarMenu.IsMenuOpened('vehicle') then
             if WarMenu.MenuButton("Vehicle Spawner", 'vehiclespawner') then
                 elseif WarMenu.MenuButton("Vehicle Mods", 'vehiclemods') then
+                elseif WarMenu.MenuButton("Vehicle Menu", 'vehiclemenu') then
                 elseif WarMenu.CheckBox("Vehicle Godmode", VehGodmode) then
                     VehGodmode = not VehGodmode
                 elseif WarMenu.Button("Repair Vehicle") then
@@ -3548,6 +3553,91 @@ Citizen.CreateThread(function()
                 
             end
         
+        -- VEHICLE MENU (WIP)
+        elseif WarMenu.IsMenuOpened('vehiclemenu') then
+            if WarMenu.Button("Save Car") then
+                if IsPedInAnyVehicle(PlayerId(), false) then
+                    RemoveBlip(blip)
+                    local vehicle = GetVehiclePedIsIn(PlayerPedId(), 0)
+                    Entity = vehicle
+                else
+                    RemoveBlip(blip)
+                    local vehicle = GetVehiclePedIsIn(PlayerPedId(), 1)
+                    Entity = vehicle
+                end
+
+                local blip = AddBlipForEntity(Entity)
+                SetBlipSprite(blip, 225) -- Full list of blips https://marekkraus.sk/gtav/blips/list.html
+                SetBlipColour(blip, 84) -- Full list of the available blips colors https://i.imgur.com/Hvyx6cE.png
+
+                -- Whenever the entity changes, the blip and entity needs to be reseted. Lots of other checks need to be made. (WIP)
+
+            elseif WarMenu.CheckBox("Left Front Door", LeftFrontDoor) then
+                LeftFrontDoor = not LeftFrontDoor
+                local vehicle = GetVehiclePedIsIn(PlayerPedId(), 0)
+                if LeftFrontDoor then
+                    SetVehicleDoorOpen(vehicle, 0, nil, true)
+                elseif not LeftFrontDoor then
+                    SetVehicleDoorShut(vehicle, 0, true)
+                end
+            elseif WarMenu.CheckBox("Right Front Door", RightFrontDoor) then -- Is closing when the driver seat has someone
+                RightFrontDoor = not RightFrontDoor
+                local vehicle = GetVehiclePedIsIn(PlayerPedId(), 0)
+                if RightFrontDoor then
+                SetVehicleDoorOpen(vehicle, 1, nil, true)
+                elseif not RightFrontDoor then
+                SetVehicleDoorShut(vehicle, 1, true)
+                end
+            elseif WarMenu.CheckBox("Left Back Door", LeftBackDoor) then
+                LeftBackDoor = not LeftBackDoor
+                local vehicle = GetVehiclePedIsIn(PlayerPedId(), 0)
+                if LeftBackDoor then
+                SetVehicleDoorOpen(vehicle, 2, nil, true)
+                elseif not LeftBackDoor then
+                SetVehicleDoorShut(vehicle, 2, true)
+                end
+            elseif WarMenu.CheckBox("Right Back Door", RightBackDoor) then
+                RightBackDoor = not RightBackDoor
+                local vehicle = GetVehiclePedIsIn(PlayerPedId(), 0)
+                if RightBackDoor then
+                SetVehicleDoorOpen(vehicle, 3, nil, true)
+                elseif not RightBackDoor then
+                SetVehicleDoorShut(vehicle, 3, true)
+                end
+            elseif WarMenu.CheckBox("Hood", FrontHood) then
+                FrontHood = not FrontHood
+                local vehicle = GetVehiclePedIsIn(PlayerPedId(), 0)
+                if FrontHood then
+                SetVehicleDoorOpen(vehicle, 4, nil, true)
+                elseif not FrontHood then
+                SetVehicleDoorShut(vehicle, 4, true)
+                end
+            elseif WarMenu.CheckBox("Trunk", Trunk) then
+                Trunk = not Trunk
+                local vehicle = GetVehiclePedIsIn(PlayerPedId(), 0)
+                if Trunk then
+                SetVehicleDoorOpen(vehicle, 5, nil, true)
+                elseif not Trunk then
+                SetVehicleDoorShut(vehicle, 5, true)
+                end
+            elseif WarMenu.CheckBox("Back", Back) then
+                Back = not Back
+                local vehicle = GetVehiclePedIsIn(PlayerPedId(), 0)
+                if Back then
+                SetVehicleDoorOpen(vehicle, 6, nil, true)
+                elseif not Back then
+                SetVehicleDoorShut(vehicle, 6, true)
+                end
+            elseif WarMenu.CheckBox("Back 2", Back2) then
+                Back2 = not Back2
+                local vehicle = GetVehiclePedIsIn(PlayerPedId(), 0)
+                if Back2 then
+                SetVehicleDoorOpen(vehicle, 7, nil, true)
+                elseif not Back2 then
+                SetVehicleDoorShut(vehicle, 7, true)
+                end
+            end
+
         -- WORLD OPTIONS MENU
         elseif WarMenu.IsMenuOpened('world') then
             if WarMenu.MenuButton("Object Spawner", 'objectspawner') then
@@ -3942,6 +4032,10 @@ Citizen.CreateThread(function()
         
         if InfStamina then
             RestorePlayerStamina(PlayerId(), GetPlayerSprintStaminaRemaining(PlayerId()))
+        end
+
+        if SuperJump then
+            SetSuperJumpThisFrame(PlayerId())
         end
         
         if Invisibility then

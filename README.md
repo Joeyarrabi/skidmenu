@@ -63,6 +63,7 @@ Skidmenu is a free, open-source lua menu for FiveM.
 > Vehicle Options:
 - Vehicle Spawner ( `With Categories` )
 - Vehicle Mods ( `WIP` )
+- Vehicle Menu ( `Doors Control and more (WIP)`)
 - Vehicle Godmode
 - Repair Vehicles
 - Clean Vehicle
