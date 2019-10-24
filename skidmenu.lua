@@ -189,6 +189,31 @@ PedAttackOps = {"All Weapons", "Melee Weapons", "Pistols", "Heavy Weapons"}
 --Default
 PedAttackType = 1
 
+-- Radios
+RadiosList = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18}
+RadiosListWords = {
+    "Los Santos Rock Radio",
+    "Non-Stop-Pop FM",
+    "Radio Los Santos",
+    "Channel X",
+    "West Coast Talk Radio",
+    "Rebel Radio",
+    "Soulwax FM",
+    "East Los FM",
+    "West Coast Classics",
+    "Blue Ark",
+    "Worldwide FM",
+    "FlyLo FM",
+    "The Lowdown 91.1",
+    "The Lab",
+    "Radio Mirror Park",
+    "Space 103.2",
+    "Vinewood Boulevard Radio",
+    "Blonded Los Santos 97.8 FM",
+    "Blaine County Radio",
+    -- Los Santos Underground Radio (Index doesn't work) |19| https://pastebin.com/Kj9t38KF
+}
+
 -- Objects to spawn
 -- https://cdn.rage.mp/public/odb/index.html
 objs_tospawn = {
@@ -2796,6 +2821,9 @@ Citizen.CreateThread(function()
     local currSaveLoadIndex5 = 1
     local selSaveLoadIndex5 = 1
     
+    local currRadioIndex = 1
+    local selRadioIndex = 1
+
     -- GLOBALS
     local TrackedPlayer = nil
 	local SpectatedPlayer = nil
@@ -3913,6 +3941,16 @@ Citizen.CreateThread(function()
 			elseif WarMenu.MenuButton("ESP & Visual", 'esp') then
             elseif WarMenu.CheckBox('Force Map', ForceMap) then
                 ForceMap = not ForceMap
+            elseif WarMenu.CheckBox("Portable Radio", Radio, "Disabled", "Enabled") then
+                Radio = not Radio
+                ShowInfo("~r~Portable Radio will override any vehicle's radio!")
+            elseif WarMenu.ComboBox2("Change Radio Station", RadiosListWords, currRadioIndex, selRadioIndex, function(currentIndex, selectedIndex)
+                -- If Radio (above) == true, whenever a ped enters a vehicle, the station selected on this combobox will override the vehicle's station
+                -- If Radio (above) == false, the values of this combobox will update depending on what station the player chooses using the GtaV radio selection
+                currRadioIndex = currentIndex
+                selRadioIndex = currentIndex
+                RadioStation = RadiosList[currentIndex]
+            end) then
             elseif WarMenu.CheckBox('Always Draw Crosshair', Crosshair) then
                 Crosshair = not Crosshair
             elseif WarMenu.CheckBox("Show Coordinates", ShowCoords) then
@@ -4437,6 +4475,32 @@ Citizen.CreateThread(function()
             end
         end
         
+        if Radio then
+            PortableRadio = true
+            SetRadioToStationIndex(RadioStation)
+        elseif not Radio then
+            PortableRadio = false
+        end
+
+        if PortableRadio then
+            SetVehicleRadioEnabled(GetVehiclePedIsIn(PlayerPedId(), 0), false)
+            SetMobilePhoneRadioState(true)
+            SetMobileRadioEnabledDuringGameplay(true)
+            HideHudComponentThisFrame(16)
+        elseif not PortableRadio then
+            SetVehicleRadioEnabled(GetVehiclePedIsIn(PlayerPedId(), 0), true)
+            SetMobilePhoneRadioState(false)
+            SetMobileRadioEnabledDuringGameplay(false)
+            ShowHudComponentThisFrame(16)
+            local radioIndex = GetPlayerRadioStationIndex()
+
+            if radioIndex + 1 ~= 19 then --Los Santos Underground Radio doesn't properly work
+                -- Updates the radio selections on the menu
+                currRadioIndex = radioIndex + 1
+                selRadioIndex = radioIndex + 1
+            end
+        end
+
         if ForceMap then
             DisplayRadar(true)
         end
