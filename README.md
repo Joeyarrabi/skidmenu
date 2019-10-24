@@ -108,13 +108,13 @@ Skidmenu is a free, open-source lua menu for FiveM.
 > Credits:
 
 > Developers:
-- tommyakshot `Joeyarrabi#7440` Main Developer
+- tommyakshot `Joeyarrabi#7440` - Main Developer
 
-- Kirtle `Kirtle#0498` Helped across the board, also made the infamous theme and misc WarMenu adjustments (for themes/controls)
+- Kirtle `Kirtle#0498` - Secondary Developer
 
-- Erwin Rommel `Erwin Rommel#4860` Made weather functions and provided some nice links to obj/ped dbs
+- Erwin Rommel `Erwin Rommel#4860` - Tertiary Developer and Maintenance
 
 > Testers:
-- Zach Helped test the menu extensively, and recommended lots of awesome features
+- Zach - Helped test the menu extensively and recommended lots of awesome features
 
 > Donations are not required and will not give you anything except my gratitude.  If you still would like to donate, [Click Here](https://www.paypal.com/paypalme2/tommyakshot)
