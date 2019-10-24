@@ -2866,8 +2866,8 @@ Citizen.CreateThread(function()
     WarMenu.CreateSubMenu('weapon', 'skid', 'Weapon Options')
     WarMenu.CreateSubMenu('vehicle', 'skid', 'Vehicle Options')
     WarMenu.CreateSubMenu('world', 'skid', 'World Options')
-	WarMenu.CreateSubMenu('teleport', 'skid', 'Teleport Options')
     WarMenu.CreateSubMenu('misc', 'skid', 'Misc Options')
+    WarMenu.CreateSubMenu('teleport', 'skid', 'Teleport Options')
     WarMenu.CreateSubMenu('lua', 'skid', 'Lua Options')
     
     -- PLAYER MENU SUBMENUS
@@ -2960,8 +2960,8 @@ Citizen.CreateThread(function()
             elseif WarMenu.MenuButton('Weapon Options', 'weapon') then
             elseif WarMenu.MenuButton('Vehicle Options', 'vehicle') then
             elseif WarMenu.MenuButton('World Options', 'world') then
-			elseif WarMenu.MenuButton('Teleport Options', 'teleport') then
             elseif WarMenu.MenuButton('Misc Options', 'misc') then
+            elseif WarMenu.MenuButton('Teleport Options', 'teleport') then
             elseif WarMenu.MenuButton('Lua Options', 'lua') then
             elseif WarMenu.Button('Exit') then WarMenu.CloseMenu()
             elseif WarMenu.Button('~r~Panic (Kill Menu)') then break
@@ -3015,7 +3015,7 @@ Citizen.CreateThread(function()
 				else
 					ShowInfo("~r~Operation Canceled")
 				end
-			elseif WarMenu.ComboBox("Teleport Into Players Vehicle", {"Front Right", "Back Left", "Back Right"}, currSeatIndex, selSeatIndex, function(currentIndex, selClothingIndex)
+			elseif WarMenu.ComboBox("Teleport Into Player's Vehicle", {"Front Right", "Back Left", "Back Right"}, currSeatIndex, selSeatIndex, function(currentIndex, selClothingIndex)
                     currSeatIndex = currentIndex
                     selSeatIndex = currentIndex
                     end) then
@@ -3049,7 +3049,7 @@ Citizen.CreateThread(function()
             elseif WarMenu.CheckBox("Track Player", Tracking, "Tracking: Nobody", "Tracking: "..GetPlayerName(TrackedPlayer)) then
                 Tracking = not Tracking
                 TrackedPlayer = selectedPlayer
-			elseif WarMenu.Button("Launch Players Vehicle") then
+			elseif WarMenu.Button("Launch Player's Vehicle") then
 				if not IsPedInAnyVehicle(GetPlayerPed(selectedPlayer), 0) then
 					ShowInfo("~r~Player Not In Vehicle!")
 				else
@@ -3057,7 +3057,7 @@ Citizen.CreateThread(function()
 					RequestControlOnce(veh)
 					ApplyForceToEntity(veh, 3, 0.0, 0.0, 5000000.0, 0.0, 0.0, 0.0, 0, 0, 1, 1, 0, 1)
 				end
-			elseif WarMenu.Button("Slam Players Vehicle") then
+			elseif WarMenu.Button("Slam Player's Vehicle") then
 				if not IsPedInAnyVehicle(GetPlayerPed(selectedPlayer), 0) then
 					ShowInfo("~r~Player Not In Vehicle!")
 				else
@@ -3065,7 +3065,7 @@ Citizen.CreateThread(function()
 					RequestControlOnce(veh)
 					ApplyForceToEntity(veh, 3, 0.0, 0.0, -5000000.0, 0.0, 0.0, 0.0, 0, 0, 1, 1, 0, 1)
 				end
-			elseif WarMenu.ComboBox("Pop Players Vehicle Tire", {"Front Left", "Front Right", "Back Left", "Back Right", "All"}, currTireIndex, selTireIndex, function(currentIndex, selClothingIndex)
+			elseif WarMenu.ComboBox("Pop Player's Vehicle Tire", {"Front Left", "Front Right", "Back Left", "Back Right", "All"}, currTireIndex, selTireIndex, function(currentIndex, selClothingIndex)
                     currTireIndex = currentIndex
                     selTireIndex = currentIndex
                     end) then
@@ -3194,6 +3194,9 @@ Citizen.CreateThread(function()
             end) then
                 SetCurrentOutfit(Outfits[selClothingIndex])
             end
+
+            -- Useful methods to retrieve max number of clothes/colors for each body part index
+            -- http://gtaxscripting.blogspot.com/2016/04/gta-v-peds-component-and-props.html
         
         -- MODIFIERS MENU
         elseif WarMenu.IsMenuOpened('modifiers') then
@@ -4494,7 +4497,7 @@ Citizen.CreateThread(function()
             ShowHudComponentThisFrame(16)
             local radioIndex = GetPlayerRadioStationIndex()
 
-            if radioIndex + 1 ~= 19 then --Los Santos Underground Radio doesn't properly work
+            if IsPedInAnyVehicle(GetPlayerPed(-1), false) and radioIndex + 1 ~= 19 then --Los Santos Underground Radio doesn't properly work
                 -- Updates the radio selections on the menu
                 currRadioIndex = radioIndex + 1
                 selRadioIndex = radioIndex + 1
