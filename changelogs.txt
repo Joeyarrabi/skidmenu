@@ -3,6 +3,9 @@ Last modified: 10/24/2019
 Skidmenu Changelogs:
 
 # 10/24/2019:
+- Fixed a display bug on the Portable Radio
+
+# 10/24/2019:
 - Moved ESP and Visual options to their own submenu in Misc Options
 - Spectated and Tracked player now show in the menu (they show if and who you are spectating)
 - Player Functions are now collapsed into a single combobox (heal, armor, remove armor, clean)
@@ -14,7 +17,7 @@ Skidmenu Changelogs:
 - Added confirmation for teleporting to player or into their vehicle
 - Changed vehicle speed combobox to a slider
 - Made ESP automatically change refresh rate depending on the selected distance (i.e. the higher the distance chosen, the slower the esp will update - to save FPS)
--Added a Portable Radio
+- Added a Portable Radio
 - Improved GetKeyboardInput()
 - Improved CheckBoxes to allow custom text for on/off
 - Used the new CheckBoxes in a few areas such as opened/closed doors, tracking player/vehicle
