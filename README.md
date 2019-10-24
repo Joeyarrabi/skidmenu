@@ -3,7 +3,7 @@
 ## Skidmenu
 Skidmenu is a free, open-source lua menu for FiveM.
 
-> Note: Anyone is free to use this menu and modify it as they please. All I ask in return is that you do not try to monetize this release, I made this because I was tired of seeing people trying to sell the same old reused code and charging ridiculous amounts for it
+> Note: Anyone is free to use this menu and modify it as they please. All I ask in return is that you do not try to monetize this release.
 
 > If you have suggestions: [Click Here](https://github.com/Joeyarrabi/skidmenu/issues)
 
@@ -24,7 +24,7 @@ Skidmenu is a free, open-source lua menu for FiveM.
 - Appearance Menu
 - Modifiers Menu
 - Stealth/Demi Godmode
-- Player Functions ( clean, heal, give/remove armor, cancel anim/task, suicide )
+- Player Functions ( `clean, heal, give/remove armor, cancel anim/task, suicide` )
 - Infinite Stamina
 - Fast Run
 - Fast Swim
@@ -37,12 +37,12 @@ Skidmenu is a free, open-source lua menu for FiveM.
 > Player Options:
 - Spectate Player
 - Possess Player Vehicle
-- Teleport to Player ( with confirmation )
-- Teleport Into Players Vehicle ( with seat selection and confirmation )
+- Teleport to Player ( `with confirmation` )
+- Teleport Into Players Vehicle ( `with seat selection and confirmation` )
 - Track Player
 - Launch Players Vehicle
 - Slam Players Vehicle
-- Pop Players Vehicle Tire ( with tire selection )
+- Pop Players Vehicle Tire ( `with tire selection` )
 - Explode Player
 - Cancel Animation/Task Player
 - Nearby Peds Attack Player
@@ -67,17 +67,13 @@ Skidmenu is a free, open-source lua menu for FiveM.
 > Vehicle Options:
 - Vehicle Spawner ( `With Categories` )
 - Vehicle Mods ( `WIP` )
-- Vehicle Menu ( `Doors Control and more (WIP)`)
+- Vehicle Control Menu ( `Personal Vehicle, Doors Control and more`)
 - Vehicle Godmode
-- Repair Vehicles
-- Clean Vehicle
-- Toggle put self into Spawned Vehicle
-- Spawn Planes in air
+- Vehicle Functions ( `repair, clean, dirty` )
 - Toggle Collision
 - Speed Multiplier
 - Easy Handling / Stick To Floor
 - Deadly Bulldozer
-- Toggle Vehicles with Engine ON/OFF
 
 > World Options:
 - Object Spawner
