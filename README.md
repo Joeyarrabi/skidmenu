@@ -87,6 +87,11 @@ Skidmenu is a free, open-source lua menu for FiveM.
 - Set All Nearby Vehicles Specific Plate
 - Set Gravity
 
+> Teleport Options:
+- Save/Load Position ( `save up to 5 positions` )
+- Teleport to POIs ( `i.e. Legion Square, LSPD HQ` )
+- Teleport to Waypoint
+
 > Misc Options:
 - Theme Changer
 - Blips ( `Thanks to: scammer` )
@@ -95,7 +100,6 @@ Skidmenu is a free, open-source lua menu for FiveM.
 - ESP Distance
 - ESP
 - Lines
-- Teleport to Waypoint
 - Force Map ( `Display Radar` )
 - Portable Radio
 - Toggle Crosshair
