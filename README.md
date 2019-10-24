@@ -15,14 +15,16 @@ Skidmenu is a free, open-source lua menu for FiveM.
 - Weapon options
 - Vehicle Options
 - World Options
+- Teleport Options
 - Misc Options
-- Custom Options
+- Lua Options
 - Theme Changer
 
 > Self Options:
 - Appearance Menu
 - Modifiers Menu
 - Stealth/Demi Godmode
+- Player Functions ( clean, heal, give/remove armor, cancel anim/task, suicide )
 - Infinite Stamina
 - Fast Run
 - Fast Swim
@@ -31,14 +33,16 @@ Skidmenu is a free, open-source lua menu for FiveM.
 - ForceField/Shockwave ( `Thanks to: scmorio` )
 - Noclip
 - Never Wanted
-- Cancel Animation/Task
-- Suicide
 
 > Player Options:
 - Spectate Player
-- Teleport to Player
+- Possess Player Vehicle
+- Teleport to Player ( with confirmation )
+- Teleport Into Players Vehicle ( with seat selection and confirmation )
 - Track Player
-- Give Health/Armour ( `Doesn't work in some servers` )
+- Launch Players Vehicle
+- Slam Players Vehicle
+- Pop Players Vehicle Tire ( with tire selection )
 - Explode Player
 - Cancel Animation/Task Player
 - Nearby Peds Attack Player
@@ -97,12 +101,14 @@ Skidmenu is a free, open-source lua menu for FiveM.
 - Lines
 - Teleport to Waypoint
 - Force Map ( `Display Radar` )
+- Portable Radio
 - Toggle Crosshair
+- Show Coordinates
 - Credits
 
 > Lua Options:
-- ESX Options ( `WIP` )
-- VRP Options ( `WIP` )
+- ESX Options
+- VRP Options
 - Other ( `WIP` )
 
 > Credits:
