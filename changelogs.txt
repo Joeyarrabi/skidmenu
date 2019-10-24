@@ -14,6 +14,13 @@ Skidmenu Changelogs:
 - Added confirmation for teleporting to player or into their vehicle
 - Changed vehicle speed combobox to a slider
 - Made ESP automatically change refresh rate depending on the selected distance (i.e. the higher the distance chosen, the slower the esp will update - to save FPS)
+-Added a Portable Radio
+- Improved GetKeyboardInput()
+- Improved CheckBoxes to allow custom text for on/off
+- Used the new CheckBoxes in a few areas such as opened/closed doors, tracking player/vehicle
+- Revised personal vehicle tracking
+- Added a Super Jump and a Vehicle Menu
+- Fixed stuff related to the Slider button
 
 # 10/22/2019:
 - Improved World On Fire.  Still is not quire the way I want it, but this is better.
