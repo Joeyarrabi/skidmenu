@@ -40,6 +40,7 @@ Skidmenu is a free, open-source lua menu for FiveM.
 - Teleport to Player ( `with confirmation` )
 - Teleport Into Players Vehicle ( `with seat selection and confirmation` )
 - Track Player
+- Fling Player
 - Launch Players Vehicle
 - Slam Players Vehicle
 - Pop Players Vehicle Tire ( `with tire selection` )
