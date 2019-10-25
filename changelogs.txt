@@ -1,6 +1,16 @@
-Last modified: 10/24/2019
+Last modified: 10/25/2019
 
 Skidmenu Changelogs:
+
+# 10/25/2019:
+- Organization, spelling
+- Began work on a web radio
+
+# 10/25/2019:
+- Fixed Appearance Options (So they now should work fully, for mp peds)
+- Made it so if the player isn't an mp ped, they won't be let into the customization menu (for now, prevents crashing the menu)
+- Replaced GetPlayerPed(-1) with PlayerPedId()
+- Added hat/hat texture sliders
 
 # 10/24/2019:
 - Fixed a display bug on the Portable Radio
