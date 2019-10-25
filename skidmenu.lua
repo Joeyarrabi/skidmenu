@@ -2910,6 +2910,7 @@ Citizen.CreateThread(function()
     -- GLOBALS
     local TrackedPlayer = nil
 	local SpectatedPlayer = nil
+	local FlingedPlayer = nil
     local PossessingVeh = false
 	local pvblip = nil
 	local pvehicle = nil
@@ -3137,21 +3138,56 @@ Citizen.CreateThread(function()
             elseif WarMenu.CheckBox("Track Player", Tracking, "Tracking: Nobody", "Tracking: "..GetPlayerName(TrackedPlayer)) then
                 Tracking = not Tracking
                 TrackedPlayer = selectedPlayer
+			elseif WarMenu.CheckBox("Fling Player", FlingingPlayer, "Flinging: Nobody", "Flinging: "..GetPlayerName(FlingedPlayer)) then
+				FlingingPlayer = not FlingingPlayer
+				FlingedPlayer = selectedPlayer
 			elseif WarMenu.Button("Launch Players Vehicle") then
 				if not IsPedInAnyVehicle(GetPlayerPed(selectedPlayer), 0) then
-					ShowInfo("~r~Player Not In Vehicle!")
+					ShowInfo("~r~Player Not In Vehicle!")		
 				else
+				
+					local wasSpeccing= false
+					local tmp = nil
+					if Spectating then
+						tmp = SpectatedPlayer
+						wasSpeccing = true
+						Spectating = not Spectating
+						SpectatePlayer(tmp)
+					end
+					
 					local veh = GetVehiclePedIsIn(GetPlayerPed(selectedPlayer), 0)
 					RequestControlOnce(veh)
 					ApplyForceToEntity(veh, 3, 0.0, 0.0, 5000000.0, 0.0, 0.0, 0.0, 0, 0, 1, 1, 0, 1)
+					
+					if wasSpeccing then
+						Spectating = not Spectating
+						SpectatePlayer(tmp)
+					end
+					
 				end
 			elseif WarMenu.Button("Slam Players Vehicle") then
 				if not IsPedInAnyVehicle(GetPlayerPed(selectedPlayer), 0) then
 					ShowInfo("~r~Player Not In Vehicle!")
 				else
+				
+					local wasSpeccing= false
+					local tmp = nil
+					if Spectating then
+						tmp = SpectatedPlayer
+						wasSpeccing = true
+						Spectating = not Spectating
+						SpectatePlayer(tmp)
+					end
+					
 					local veh = GetVehiclePedIsIn(GetPlayerPed(selectedPlayer), 0)
 					RequestControlOnce(veh)
 					ApplyForceToEntity(veh, 3, 0.0, 0.0, -5000000.0, 0.0, 0.0, 0.0, 0, 0, 1, 1, 0, 1)
+					
+					if wasSpeccing then
+						Spectating = not Spectating
+						SpectatePlayer(tmp)
+					end
+					
 				end
 			elseif WarMenu.ComboBox("Pop Players Vehicle Tire", {"Front Left", "Front Right", "Back Left", "Back Right", "All"}, currTireIndex, selTireIndex, function(currentIndex, selClothingIndex)
                     currTireIndex = currentIndex
@@ -3160,6 +3196,16 @@ Citizen.CreateThread(function()
 					if not IsPedInAnyVehicle(GetPlayerPed(selectedPlayer), 0) then
 						ShowInfo("~r~Player Not In Vehicle!")
 					else
+					
+						local wasSpeccing= false
+						local tmp = nil
+						if Spectating then
+							tmp = SpectatedPlayer
+							wasSpeccing = true
+							Spectating = not Spectating
+							SpectatePlayer(tmp)
+						end
+					
 						local veh = GetVehiclePedIsIn(GetPlayerPed(selectedPlayer), 0)
 						RequestControlOnce(veh)
 						if selTireIndex == 1 then
@@ -3175,9 +3221,18 @@ Citizen.CreateThread(function()
 								SetVehicleTyreBurst(veh, i, 1, 1000.0)
 							end
 						end
+						
+						if wasSpeccing then
+							Spectating = not Spectating
+							SpectatePlayer(tmp)
+						end
+					
 					end
             elseif WarMenu.Button("Explode Player") then
                 ExplodePlayer(selectedPlayer)
+			elseif WarMenu.Button("Silent Kill Player") then
+				local coords = GetEntityCoords(GetPlayerPed(selectedPlayer))
+                AddExplosion(coords.x, coords.y, coords.z, 4, 0.1, 0, 1, 0.0)
             elseif WarMenu.Button("Cancel Animation/Task") then
                 ClearPedTasksImmediately(GetPlayerPed(selectedPlayer))
             elseif WarMenu.Button("Nearby Peds Attack Player") then
@@ -3486,6 +3541,7 @@ Citizen.CreateThread(function()
                     selVFuncIndex = currentIndex
                     end) then
 					local veh = GetVehiclePedIsIn(PlayerPedId(), 0)
+					RequestControlOnce(veh)
 					if selVFuncIndex == 1 then
 						FixVeh(veh)
 						SetVehicleEngineOn(veh, 1, 1)
@@ -4381,17 +4437,26 @@ Citizen.CreateThread(function()
                 NoclipSpeed = oldSpeed
             end
             
-            if IsDisabledControlPressed(0, 32) then -- MOVE UP
+            if IsDisabledControlPressed(0, 32) then -- MOVE FORWARD
                 x = x + NoclipSpeed * dx
                 y = y + NoclipSpeed * dy
                 z = z + NoclipSpeed * dz
             end
             
-            if IsDisabledControlPressed(0, 269) then -- MOVE DOWN
+            if IsDisabledControlPressed(0, 269) then -- MOVE BACK
                 x = x - NoclipSpeed * dx
                 y = y - NoclipSpeed * dy
                 z = z - NoclipSpeed * dz
             end
+			
+			if IsDisabledControlPressed(0, Keys["SPACE"]) then -- MOVE UP
+                z = z + NoclipSpeed
+            end
+            
+			if IsDisabledControlPressed(0, Keys["LEFTCTRL"]) then -- MOVE DOWN
+                z = z - NoclipSpeed
+            end
+            
             
             SetEntityCoordsNoOffset(k, x, y, z, true, true, true)
         end
@@ -4405,6 +4470,11 @@ Citizen.CreateThread(function()
             SetNewWaypoint(coords.x, coords.y)
         end
         
+		if FlingingPlayer then
+			local coords = GetEntityCoords(GetPlayerPed(FlingedPlayer))
+			Citizen.InvokeNative(0xE3AD2BDBAEE269AC, coords.x, coords.y, coords.z, 4, 1.0, 0, 1, 0.0, 1)
+		end
+		
         if InfStamina then
             RestorePlayerStamina(PlayerId(), GetPlayerSprintStaminaRemaining(PlayerId()))
         end
