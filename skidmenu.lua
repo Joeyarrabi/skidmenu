@@ -24,12 +24,13 @@ people trying to sell the same old reused code and charging ridiculous amounts f
 ]]
 -- CONFIG
 --[[
-Add your name or don't - I don't care.
+If you make an edit and would like to add your name, feel free to do so.  
+Please leave the original developers somewhere in the credits.
 ]]
 developers = {
-    "tommyakshot - Joeyarrabi#7440", -- Out of respect for this free release, please leave my name somewhere in here.
-    "Kirtle - Kirtle#0498", -- Helped across the board, also made the infamous theme and misc WarMenu adjustments (for themes/controls)
-    "Erwin Rommel - Erwin Rommel#4860" -- Made weather functions and provided some nice links to obj/ped dbs
+    "tommyakshot - Joeyarrabi#7440", -- Main Developer
+    "Kirtle - Kirtle#0498", -- Secondary Developer
+    "Erwin Rommel - Erwin Rommel#4860" -- Tertiary Developer and GitHub Maintenance
 }
 
 menuName = "SkidMenu" -- The name of the menu
@@ -37,7 +38,7 @@ version = "1.0" -- Keep it simple
 theme = "infamous" -- Feel free to make your own
 themes = {"infamous", "basic", "dark", "skid"}-- Add themes here if you want them to be in the theme selector
 mpMessage = false -- Whether or not to use the big mp message
-menuKeybind = "DELETE" -- Key to open the menu. Supported ones are shown below - Find new ones at https://docs.fivem.net/game-references/controls/
+menuKeybind = "DELETE" -- Key to open the menu. Supported ones are shown below (line 1287) - Find new ones at https://docs.fivem.net/game-references/controls/
 noclipKeybind = "F3" -- Key to toggle Noclip
 startMessage = "∑ ~b~Welcome, " .. GetPlayerName(PlayerId()) .. "." -- The message that is shown when the menu is opened
 subMessage = "~w~Press ~b~" .. menuKeybind .. "~w~ to open the menu." -- subtitle of opening message
@@ -140,9 +141,9 @@ menulist = {
         'other'
 
 }
-
-
 -- END CONFIG
+
+
 -- Modify Skin Textures
 faceItemsList = {}
 faceTexturesList = {}
@@ -1306,7 +1307,6 @@ Citizen.CreateThread(function()
 end)
 
 -- Get vRP object
-vRP = {}
 vRP = Proxy.getInterface("vRP")
 
 -- Adapted from Force Mod by Ideo - https://www.gta5-mods.com/scripts/force-mod
@@ -4315,6 +4315,10 @@ Citizen.CreateThread(function()
                 local distance = money / 3.80 -- money is distance*3.80
                 vRPtruckS = Tunnel.getInterface("vRP_trucker", "vRP_trucker")
                 vRPtruckS.finishTruckingDelivery({distance})
+			elseif WarMenu.Button("~r~ vRP ~w~Give Casino Chips (vrp_casino)") then
+				local amount = GetKeyboardInput("Enter Chips Amount:")
+				vRPcasinoS = Tunnel.getInterface("vRP_casino","vRP_casino")
+				vRPcasinoS.payRouletteWinnings({amount, 2})
             end
         
         -- CREDITS
