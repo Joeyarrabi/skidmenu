@@ -2290,7 +2290,8 @@ end
 
 local function ShootAimbot(k)
     if IsEntityOnScreen(k) and HasEntityClearLosToEntityInFront(PlayerPedId(), k) and
-        not IsPedDeadOrDying(k) and not IsPedInVehicle(k, GetVehiclePedIsIn(k), false) and IsDisabledControlPressed(0, Keys["MOUSE1"]) then
+        not IsPedDeadOrDying(k) and not IsPedInVehicle(k, GetVehiclePedIsIn(k), false) and 
+		IsDisabledControlPressed(0, Keys["MOUSE1"]) and IsPlayerFreeAiming(PlayerId()) then
         local x, y, z = table.unpack(GetEntityCoords(k))
         local _, _x, _y = World3dToScreen2d(x, y, z)
         if _x > 0.25 and _x < 0.75 and _y > 0.25 and _y < 0.75 then
