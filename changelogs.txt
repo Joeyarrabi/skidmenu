@@ -3,6 +3,10 @@ Last modified: 10/25/2019
 Skidmenu Changelogs:
 
 # 10/25/2019:
+- *Should* fix an issue with ESP
+- Added customizable refresh time
+
+# 10/25/2019:
 - Left and Right Mouse Buttons are no longer interact with the menu.
 
 # 10/25/2019:
