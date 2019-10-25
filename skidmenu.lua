@@ -3319,11 +3319,13 @@ Citizen.CreateThread(function()
                         SetPedComponentVariation(PlayerPedId(), 0, faceItemsList[currentIndex]-1, 0, 0)
 						faceTexturesList = GetHeadTextures(faceItemsList[currentIndex]-1)
 						end) then
+						--[[ -- I dont think any MP faces have textures?
 					elseif WarMenu.ComboBox2("Face Texture", faceTexturesList, currFtextureIndex, selFtextureIndex, function(currentIndex, selectedIndex)
                         currFtextureIndex = currentIndex
                         selFtextureIndex = currentIndex
                         SetPedComponentVariation(PlayerPedId(), 0, faceItemsList[currFaceIndex]-1, faceTexturesList[currentIndex]-1, 0)
                     end) then
+						]]
                     elseif WarMenu.ComboBoxSlider("Mask", maskItemsList, currMaskIndex, selMaskIndex, function(currentIndex, selectedIndex) -- Can't use index 0 for some reason (Can't remove masks)
                         currMaskIndex = currentIndex
                         selMaskIndex = currentIndex
@@ -3333,12 +3335,12 @@ Citizen.CreateThread(function()
                         currHatIndex = currentIndex
                         selHatIndex = currentIndex
                         SetPedPropIndex(PlayerPedId(), 0, hatItemsList[currentIndex]-1, 0, 0)
-                        hatTexturesList = GetHatTextures(hatItemsList[currentIndex]-1) -- If the Texture index from the current hat is bigger than the next hat, the menu crashes
-						end) then
+                        hatTexturesList = GetHatTextures(GetPedPropIndex(PlayerPedId(), 0))
+						end) then	
 					elseif WarMenu.ComboBox2("Hat Texture", hatTexturesList, currHatTextureIndex, selHatTextureIndex, function(currentIndex, selectedIndex) -- Can't use index 0 for some reason (Can't remove masks)
                         currHatTextureIndex = currentIndex
                         selHatTextureIndex = currentIndex
-                        SetPedPropIndex(PlayerPedId(), 0, hatItemsList[currHatIndex]-1, hatTexturesList[currentIndex]-1, 0)
+                        SetPedPropIndex(PlayerPedId(), 0, GetPedPropIndex(PlayerPedId(), 0), currentIndex, 0)
 						end) then
 						
                     end
