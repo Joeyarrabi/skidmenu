@@ -184,8 +184,12 @@ SpeedModOps = {1.0, 1.5, 2.0, 3.0, 5.0, 10.0, 20.0, 50.0, 100.0, 500.0, 1000.0}
 SpeedModAmt = 1.0
 
 -- ESP Distance Options
-ESPDistanceOps = {50.0, 100.0, 500.0, 1000.0, 2000.0, 5000.0, 10000.0}
+ESPDistanceOps = {50.0, 100.0, 500.0, 1000.0, 2000.0, 5000.0}
 EspDistance = 500.0
+
+-- ESP Refresh Options
+ESPRefreshOps = {"0ms", "100ms", "250ms", "500ms", "1s", "2s", "5s"}
+ESPRefreshTime = 0
 
 -- Aimbot Bone Options
 AimbotBoneOps = {"Head", "Chest", "Left Arm", "Right Arm", "Left Leg", "Right Leg", "Dick"}
@@ -2113,8 +2117,7 @@ end
 
 local function ToggleESP()
     ESPEnabled = not ESPEnabled
-	local updateTime = 0
-	local _,x,y = nil
+	local _,x,y = false, 0.0, 0.0
 	
 	Citizen.CreateThread(function()
 		while ESPEnabled do
@@ -2124,7 +2127,7 @@ local function ToggleESP()
 				local targetCoords = GetEntityCoords(GetPlayerPed(plist[i]))
 				_, x, y = GetScreenCoordFromWorldCoord(targetCoords.x, targetCoords.y, targetCoords.z)
 			end
-			Wait(updateTime)
+			Wait(ESPRefreshTime)
 		end
 	end)
 	
@@ -2151,7 +2154,6 @@ local function ToggleESP()
                     DrawTxt(espstring2, x - 0.05, y - 0.03, 0.0, 0.2)
                 end
             end
-			updateTime = EspDistance-50
             Wait(0)
         end
     end)
@@ -2884,6 +2886,9 @@ Citizen.CreateThread(function()
     
     local currESPDistance = 3
     local selESPDistance = 3
+	
+	local currESPRefreshIndex = 1
+	local selESPRefreshIndex = 1
     
     local currAimbotBoneIndex = 1
     local selAimbotBoneIndex = 1
@@ -3195,64 +3200,64 @@ Citizen.CreateThread(function()
         -- SELF OPTIONS MENU
         elseif WarMenu.IsMenuOpened('self') then
             if WarMenu.MenuButton("Appearance ", 'appearance') then
-                elseif WarMenu.MenuButton("Modifiers", 'modifiers') then
-                elseif WarMenu.CheckBox("Stealth Godmode", Godmode) then
-                    Godmode = not Godmode
-                    ToggleGodmode(Godmode)
-                elseif WarMenu.CheckBox("Demigod Mode", Demigod) then
-                    Demigod = not Demigod
-                elseif WarMenu.CheckBox("Alternative Demigod Mode", ADemigod) then
-                    ADemigod = not ADemigod
-				elseif WarMenu.ComboBox("Player Functions", {"Heal Player", "Give Player Armor", "Remove Player Armor", "Clean Player", "Suicide", "Cancel Anim/Task"}, currPFuncIndex, selPFuncIndex, function(currentIndex, selClothingIndex)
-                    currPFuncIndex = currentIndex
-                    selPFuncIndex = currentIndex
-                    end) then
-					if selPFuncIndex == 1 then
-						SetEntityHealth(PlayerPedId(), 200)
-					elseif selPFuncIndex == 2 then
-						SetPedArmour(PlayerPedId(), 100)
-					elseif selPFuncIndex == 3 then
-						SetPedArmour(PlayerPedId(), 0)
-					elseif selPFuncIndex == 4 then
-						ClearPedBloodDamage(PlayerPedId())
-						ClearPedWetness(PlayerPedId())
-						ClearPedEnvDirt(PlayerPedId())
-						ResetPedVisibleDamage(PlayerPedId())
-					elseif selPFuncIndex == 5 then
-						SetEntityHealth(PlayerPedId(), 0)
-					elseif selPFuncIndex == 6 then
-						ClearPedTasksImmediately(PlayerPedId())
-					end
-                elseif WarMenu.CheckBox("Infinite Stamina", InfStamina) then
-                    InfStamina = not InfStamina
-                elseif WarMenu.ComboBoxSlider("Fast Run", FastCBWords, currFastRunIndex, selFastRunIndex, function(currentIndex, selClothingIndex)
-                    currFastRunIndex = currentIndex
-                    selFastRunIndex = currentIndex
-                    FastRunMultiplier = FastCB[currentIndex]
-                    SetRunSprintMultiplierForPlayer(PlayerId(), FastRunMultiplier)
-                    end) then
-				elseif WarMenu.ComboBoxSlider("Fast Swim", FastCBWords, currFastSwimIndex, selFastSwimIndex, function(currentIndex, selClothingIndex)
-                    currFastSwimIndex = currentIndex
-                    selFastSwimIndex = currentIndex
-                    FastSwimMultiplier = FastCB[currentIndex]
-                    SetSwimMultiplierForPlayer(PlayerId(), FastSwimMultiplier)
-                    end) then
-                elseif WarMenu.CheckBox("Super Jump", SuperJump) then
-                    SuperJump = not SuperJump
-                elseif WarMenu.CheckBox("Invisibility", Invisibility) then
-                    Invisibility = not Invisibility
-                    if not Invisibility then
-                        SetEntityVisible(PlayerPedId(), true)
-                    end
-                elseif WarMenu.CheckBox("Magneto Mode", ForceTog) then
-                    ForceMod()
-                elseif WarMenu.CheckBox("Forcefield", Forcefield) then
-                    Forcefield = not Forcefield
-                elseif WarMenu.CheckBox("Noclip", Noclipping) then
-                    ToggleNoclip()
-                elseif WarMenu.CheckBox("Never Wanted", NeverWanted) then
-                    NeverWanted = not NeverWanted
+            elseif WarMenu.MenuButton("Modifiers", 'modifiers') then
+            elseif WarMenu.CheckBox("Stealth Godmode", Godmode) then
+                Godmode = not Godmode
+                ToggleGodmode(Godmode)
+            elseif WarMenu.CheckBox("Demigod Mode", Demigod) then
+                Demigod = not Demigod
+            elseif WarMenu.CheckBox("Alternative Demigod Mode", ADemigod) then
+                ADemigod = not ADemigod
+			elseif WarMenu.ComboBox("Player Functions", {"Heal Player", "Give Player Armor", "Remove Player Armor", "Clean Player", "Suicide", "Cancel Anim/Task"}, currPFuncIndex, selPFuncIndex, function(currentIndex, selClothingIndex)
+                currPFuncIndex = currentIndex
+                selPFuncIndex = currentIndex
+                end) then
+				if selPFuncIndex == 1 then
+					SetEntityHealth(PlayerPedId(), 200)
+				elseif selPFuncIndex == 2 then
+					SetPedArmour(PlayerPedId(), 100)
+				elseif selPFuncIndex == 3 then
+					SetPedArmour(PlayerPedId(), 0)
+				elseif selPFuncIndex == 4 then
+					ClearPedBloodDamage(PlayerPedId())
+					ClearPedWetness(PlayerPedId())
+					ClearPedEnvDirt(PlayerPedId())
+					ResetPedVisibleDamage(PlayerPedId())
+				elseif selPFuncIndex == 5 then
+					SetEntityHealth(PlayerPedId(), 0)
+				elseif selPFuncIndex == 6 then
+					ClearPedTasksImmediately(PlayerPedId())
+				end
+            elseif WarMenu.CheckBox("Infinite Stamina", InfStamina) then
+                InfStamina = not InfStamina
+            elseif WarMenu.ComboBoxSlider("Fast Run", FastCBWords, currFastRunIndex, selFastRunIndex, function(currentIndex, selClothingIndex)
+                currFastRunIndex = currentIndex
+                selFastRunIndex = currentIndex
+                FastRunMultiplier = FastCB[currentIndex]
+                SetRunSprintMultiplierForPlayer(PlayerId(), FastRunMultiplier)
+                end) then
+			elseif WarMenu.ComboBoxSlider("Fast Swim", FastCBWords, currFastSwimIndex, selFastSwimIndex, function(currentIndex, selClothingIndex)
+                currFastSwimIndex = currentIndex
+                selFastSwimIndex = currentIndex
+                FastSwimMultiplier = FastCB[currentIndex]
+                SetSwimMultiplierForPlayer(PlayerId(), FastSwimMultiplier)
+                end) then
+            elseif WarMenu.CheckBox("Super Jump", SuperJump) then
+                SuperJump = not SuperJump
+            elseif WarMenu.CheckBox("Invisibility", Invisibility) then
+                Invisibility = not Invisibility
+                if not Invisibility then
+                    SetEntityVisible(PlayerPedId(), true)
                 end
+            elseif WarMenu.CheckBox("Magneto Mode", ForceTog) then
+                ForceMod()
+            elseif WarMenu.CheckBox("Forcefield", Forcefield) then
+                Forcefield = not Forcefield
+            elseif WarMenu.CheckBox("Noclip", Noclipping) then
+                ToggleNoclip()
+            elseif WarMenu.CheckBox("Never Wanted", NeverWanted) then
+                NeverWanted = not NeverWanted
+            end
         
         
         -- APPEARANCE MENU
@@ -4132,6 +4137,25 @@ Citizen.CreateThread(function()
                 currESPDistance = currentIndex
                 selESPDistance = currentIndex
                 EspDistance = ESPDistanceOps[currESPDistance]
+            end) then
+			elseif WarMenu.ComboBoxSlider("ESP Refresh Rate", ESPRefreshOps, currESPRefreshIndex, selESPRefreshIndex, function(currentIndex, selectedIndex)
+                currESPRefreshIndex = currentIndex
+                selESPRefreshIndex = currentIndex
+				if currentIndex == 1 then
+					ESPRefreshTime = 0
+				elseif currentIndex == 2 then
+					ESPRefreshTime = 100
+				elseif currentIndex == 3 then
+					ESPRefreshTime = 250
+				elseif currentIndex == 4 then
+					ESPRefreshTime = 500
+				elseif currentIndex == 5 then
+					ESPRefreshTime = 1000
+				elseif currentIndex == 6 then
+					ESPRefreshTime = 2000
+				elseif currentIndex == 7 then
+					ESPRefreshTime = 5000
+				end
             end) then
             elseif WarMenu.CheckBox("Lines", LinesEnabled) then
                 LinesEnabled = not LinesEnabled
