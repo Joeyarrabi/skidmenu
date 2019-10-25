@@ -3,6 +3,9 @@ Last modified: 10/25/2019
 Skidmenu Changelogs:
 
 # 10/25/2019:
+- Left and Right Mouse Buttons are no longer interact with the menu.
+
+# 10/25/2019:
 - Organization, spelling
 - Began work on a web radio
 
