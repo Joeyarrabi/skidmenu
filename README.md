@@ -29,7 +29,7 @@ Skidmenu is a free, open-source lua menu for FiveM.
 - Fast Run
 - Fast Swim
 - Invisibility
-- ForceMod ( `Thanks to: Ideo` )
+- Magneto Mode ( `Thanks to: Ideo & Menyoo Team` )
 - ForceField/Shockwave ( `Thanks to: scmorio` )
 - Noclip
 - Never Wanted
