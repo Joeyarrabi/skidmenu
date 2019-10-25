@@ -146,6 +146,8 @@ menulist = {
 faceItemsList = {}
 faceTexturesList = {}
 maskItemsList = {}
+hatItemsList = {}
+hatTexturesList = {}
 
 -- Noclip Speed Options
 NoclipSpeedOps = {1, 5, 10, 20, 30}
@@ -1490,7 +1492,7 @@ function RotationToDirection(rotation)
 end
 
 local function GetCamDirection()
-    local heading = GetGameplayCamRelativeHeading() + GetEntityHeading(GetPlayerPed(-1))
+    local heading = GetGameplayCamRelativeHeading() + GetEntityHeading(PlayerPedId())
     local pitch = GetGameplayCamRelativePitch()
     
     local x = -math.sin(heading * math.pi / 180.0)
@@ -1629,27 +1631,50 @@ local entityEnumerator = {
     end
 }
 
-local function HeadItems()
-    local headItems = GetNumberOfPedDrawableVariations(GetPlayerPed(-1), 0)
-    faceItemsList = {}
+local function GetHeadItems()
+    local headItems = GetNumberOfPedDrawableVariations(PlayerPedId(), 0)
+    local faceItemsList = {}
     for i = 1, headItems do
         faceItemsList[i] = i
     end
+	return faceItemsList
 end
 
-local function MaskItems()
-    local maskItems = GetNumberOfPedDrawableVariations(GetPlayerPed(-1), 1)
-    maskItemsList = {}
-    for i = 0, maskItems do
+local function GetMaskItems()
+    local maskItems = GetNumberOfPedDrawableVariations(PlayerPedId(), 1)
+    local maskItemsList = {}
+    for i = 1, maskItems do
         maskItemsList[i] = i
     end
+	return maskItemsList
 end
 
-local function HeadTextures()
-    local headTextures = GetNumberOfPedTextureVariations(GetPlayerPed(-1), 0, currFaceIndex)
-    for i = 0, headTextures do
-        faceTexturesList[i] = i
+local function GetHatItems()
+    local hatItems = GetNumberOfPedPropDrawableVariations(PlayerPedId(), 0)
+    local hatItemsList = {}
+    for i = 1, hatItems do
+        hatItemsList[i] = i
     end
+	return hatItemsList
+end
+
+local function GetHatTextures(hatID)
+	local hatTextures = GetNumberOfPedPropTextureVariations(PlayerPedId(), 0, hatID)
+	local hatTexturesList = {}
+	for i = 1, hatTextures do
+        hatTexturesList[i] = i
+    end
+	return hatTexturesList
+end
+
+
+local function GetHeadTextures(faceID)
+    local headTextures = GetNumberOfPedTextureVariations(PlayerPedId(), 0, faceID)
+	local headTexturesList = {}
+    for i = 1, headTextures do
+        headTexturesList[i] = i
+    end
+	return headTexturesList
 end
 
 local function EnumerateEntities(initFunc, moveFunc, disposeFunc)
@@ -2230,7 +2255,7 @@ function ToggleBlips()
                             if IsPauseMenuActive() then
                                 SetBlipAlpha(pblips[i], 255)
                             else
-                                x1, y1 = table.unpack(GetEntityCoords(GetPlayerPed(-1), true))
+                                x1, y1 = table.unpack(GetEntityCoords(PlayerPedId(), true))
                                 x2, y2 = table.unpack(GetEntityCoords(GetPlayerPed(plist[i]), true))
                                 distance = (math.floor(math.abs(math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2))) / -1)) + 900
                                 if distance < 0 then
@@ -2582,7 +2607,7 @@ function WarMenu.InitializeTheme()
     end
 end
 
--- ComboBox new index behaviour
+-- ComboBox w/ new index behaviour (does not wrap around)
 function WarMenu.ComboBox2(text, items, currentIndex, selectedIndex, callback)
 	local itemsCount = #items
 	local selectedItem = items[currentIndex]
@@ -2679,9 +2704,8 @@ local function drawButton2(text, items, itemsCount, currentIndex)
         -- Draw order from top to bottom
         if itemsCount >= 40 then
             stabilizer = 1.005
-        else
-            stabilizer = 1
         end
+		
         drawRect(x, y, menus[currentMenu].width, buttonHeight, backgroundColor) -- Button Rectangle -2.15
         drawRect(((menus[currentMenu].x + 0.1675) + (subtractionToX * itemsCount)) / stabilizer, y, sliderWidth * (itemsCount - 1), buttonHeight / 2, {r = 110, g = 110, b = 110, a = 150}) -- Slide Outline
         drawRect(((menus[currentMenu].x + 0.1675) + (subtractionToX * currentIndex)) / stabilizer, y, sliderWidth * (currentIndex - 1), buttonHeight / 2, {r = 200, g = 200, b = 200, a = 140}) -- Slide
@@ -2697,7 +2721,8 @@ local function drawButton2(text, items, itemsCount, currentIndex)
         elseif string.len(CurrentItem) >= 6 then XOffset = 0.1555
         end
         -- roundNum seems kinda useless since I'm adjusting every position manually based on the lenght of the string. As stated above, I'll refactor this part later.
-        drawText(items[currentIndex], ((menus[currentMenu].x + XOffset) + (sliderWidth * roundNum((itemsCount / 2), 3))) / stabilizer, y - (buttonHeight / 2.15) + buttonTextYOffset, buttonFont, {r = 255, g = 255, b = 255, a = 255}, buttonScale, false, shadow) -- Current Item Text
+		-- (sliderWidth * roundNum((itemsCount / 2), 3)
+        drawText(items[currentIndex], ((menus[currentMenu].x + XOffset) + 0.04) / stabilizer, y - (buttonHeight / 2.15) + buttonTextYOffset, buttonFont, {r = 255, g = 255, b = 255, a = 255}, buttonScale, false, shadow) -- Current Item Text
 	end
 end
 
@@ -2800,6 +2825,12 @@ Citizen.CreateThread(function()
 
     local currMaskIndex = 1
     local selMaskIndex = 1
+	
+	local currHatIndex = 1
+    local selHatIndex = 1
+	
+	local currHatTextureIndex = 1
+    local selHatTextureIndex = 1
 
     local currFtextureIndex = 1
     local selFtextureIndex = 1
@@ -2922,20 +2953,22 @@ Citizen.CreateThread(function()
     
     -- SELF MENU SUBMENUS
     WarMenu.CreateSubMenu('appearance', 'self', 'Appearance Options')
-        WarMenu.CreateSubMenu('modifyskintextures', 'appearance', "Modify Skin Textures")
-            WarMenu.CreateSubMenu('modifyhead', 'modifyskintextures', "Available Drawables")
     WarMenu.CreateSubMenu('modifiers', 'self', 'Modifiers Options')
+	
+	-- APPEARANCE SUBMENUS
+	WarMenu.CreateSubMenu('modifyskintextures', 'appearance', "Modify Skin Textures")
+    WarMenu.CreateSubMenu('modifyhead', 'modifyskintextures', "Available Drawables")
     
     -- WEAPON MENU SUBMENUS
     WarMenu.CreateSubMenu('weaponspawner', 'weapon', 'Weapon Spawner')
-        WarMenu.CreateSubMenu('melee', 'weaponspawner', 'Melee Weapons')
-        WarMenu.CreateSubMenu('pistol', 'weaponspawner', 'Pistols')
-        WarMenu.CreateSubMenu('smg', 'weaponspawner', 'SMGs / MGs')
-        WarMenu.CreateSubMenu('shotgun', 'weaponspawner', 'Shotguns')
-        WarMenu.CreateSubMenu('assault', 'weaponspawner', 'Assault Rifles')
-        WarMenu.CreateSubMenu('sniper', 'weaponspawner', 'Sniper Rifles')
-        WarMenu.CreateSubMenu('thrown', 'weaponspawner', 'Thrown Weapons')
-        WarMenu.CreateSubMenu('heavy', 'weaponspawner', 'Heavy Weapons')
+    WarMenu.CreateSubMenu('melee', 'weaponspawner', 'Melee Weapons')
+    WarMenu.CreateSubMenu('pistol', 'weaponspawner', 'Pistols')
+    WarMenu.CreateSubMenu('smg', 'weaponspawner', 'SMGs / MGs')
+    WarMenu.CreateSubMenu('shotgun', 'weaponspawner', 'Shotguns')
+    WarMenu.CreateSubMenu('assault', 'weaponspawner', 'Assault Rifles')
+    WarMenu.CreateSubMenu('sniper', 'weaponspawner', 'Sniper Rifles')
+    WarMenu.CreateSubMenu('thrown', 'weaponspawner', 'Thrown Weapons')
+    WarMenu.CreateSubMenu('heavy', 'weaponspawner', 'Heavy Weapons')
     
     -- VEHICLE MENU SUBMENUS
     WarMenu.CreateSubMenu('vehiclespawner', 'vehicle', 'Vehicle Spawner')
@@ -3248,30 +3281,58 @@ Citizen.CreateThread(function()
                 -- Useful methods to retrieve max number of clothes/colors for each body part index
                 -- http://gtaxscripting.blogspot.com/2016/04/gta-v-peds-component-and-props.html
             elseif WarMenu.IsMenuOpened('modifyskintextures') then
-                if WarMenu.MenuButton("Head (" ..tostring(GetNumberOfPedDrawableVariations(GetPlayerPed(-1), 0)).. ")", "modifyhead") then 
-                    HeadItems() -- Creates the list of available items to be used on the slider
-                    MaskItems()
-                end
+				--" ..tostring(GetNumberOfPedDrawableVariations(PlayerPedId(), 0)).. " Variations)" -- Removed this part for now
+                if WarMenu.MenuButton("Head", "modifyhead") then
+				
+					if GetEntityModel(PlayerPedId()) ~= GetHashKey("mp_m_freemode_01") then
+						WarMenu.CloseMenu()
+						WarMenu.OpenMenu('modifyskintextures') 
+						ShowInfo("~r~Only MP Models Supported For Now!") 
+					end
+					
+					faceItemsList = GetHeadItems()
+					faceTexturesList = GetHeadTextures(GetPedDrawableVariation(PlayerPedId(), 0))
+					maskItemsList = GetMaskItems()
+					hatItemsList = GetHatItems()
+					hatTexturesList = GetHatTextures(GetPedPropIndex(PlayerPedId(), 0))
+				end
                 
                 -- Head Menu
                 elseif WarMenu.IsMenuOpened('modifyhead') then
                     if WarMenu.ComboBoxSlider("Face", faceItemsList, currFaceIndex, selFaceIndex, function(currentIndex, selectedIndex)
-                        -- HeadTextures() -- Creates the list of available textures to be used on the slider
                         currFaceIndex = currentIndex
                         selFaceIndex = currentIndex 
-                        SetPedComponentVariation(GetPlayerPed(-1), 0, currentIndex, 0, 0)
+                        SetPedComponentVariation(PlayerPedId(), 0, faceItemsList[currentIndex]-1, 0, 0)
+						faceTexturesList = GetHeadTextures(faceItemsList[currentIndex]-1)
+						end) then
+					elseif WarMenu.ComboBox2("Face Texture", faceTexturesList, currFtextureIndex, selFtextureIndex, function(currentIndex, selectedIndex)
+                        currFtextureIndex = currentIndex
+                        selFtextureIndex = currentIndex
+                        SetPedComponentVariation(PlayerPedId(), 0, faceItemsList[currFaceIndex]-1, faceTexturesList[currentIndex]-1, 0)
                     end) then
                     elseif WarMenu.ComboBoxSlider("Mask", maskItemsList, currMaskIndex, selMaskIndex, function(currentIndex, selectedIndex) -- Can't use index 0 for some reason (Can't remove masks)
                         currMaskIndex = currentIndex
                         selMaskIndex = currentIndex
-                        SetPedComponentVariation(GetPlayerPed(-1), 1, currentIndex, 0, 0)
-                    end) then
+                        SetPedComponentVariation(PlayerPedId(), 1, maskItemsList[currentIndex]-1, 0, 0)
+						end) then
+					elseif WarMenu.ComboBoxSlider("Hat", hatItemsList, currHatIndex, selHatIndex, function(currentIndex, selectedIndex) -- Can't use index 0 for some reason (Can't remove masks)
+                        currHatIndex = currentIndex
+                        selHatIndex = currentIndex
+                        SetPedPropIndex(PlayerPedId(), 0, hatItemsList[currentIndex]-1, 0, 0)
+						hatTexturesList = GetHatTextures(hatItemsList[currentIndex]-1)
+						end) then
+					elseif WarMenu.ComboBox2("Hat Texture", hatTexturesList, currHatTextureIndex, selHatTextureIndex, function(currentIndex, selectedIndex) -- Can't use index 0 for some reason (Can't remove masks)
+                        currHatTextureIndex = currentIndex
+                        selHatTextureIndex = currentIndex
+                        SetPedPropIndex(PlayerPedId(), 0, hatItemsList[currHatIndex]-1, hatTexturesList[currentIndex]-1, 0)
+						end) then
+						
                     end
                     --[[
                     elseif WarMenu.ComboBox2("Texture", faceTexturesList, currFtextureIndex, selFtextureIndex, function(currentIndex, selectedIndex)
                         currFtextureIndex = currentIndex
                         selFtextureIndex = currentIndex
-                        SetPedComponentVariation(GetPlayerPed(-1), 0, currFaceIndex, currFtextureIndex, 0)
+                        SetPedComponentVariation(PlayerPedId(), 0, currFaceIndex, currFtextureIndex, 0)
                     end) then ]] -- Broken (Makes the head invisible?)
 
 
@@ -3336,13 +3397,13 @@ Citizen.CreateThread(function()
         -- SPECIFIC WEAPON MENU
         elseif WarMenu.IsMenuOpened('weaponspawner') then
             if WarMenu.MenuButton('Melee Weapons', 'melee') then
-             elseif WarMenu.MenuButton('Pistols', 'pistol') then
-             elseif WarMenu.MenuButton('SMGs / MGs', 'smg') then
-             elseif WarMenu.MenuButton('Shotguns', 'shotgun') then
-             elseif WarMenu.MenuButton('Assault Rifles', 'assault') then
-             elseif WarMenu.MenuButton('Sniper Rifles', 'sniper') then
-             elseif WarMenu.MenuButton('Thrown Weapons', 'thrown') then
-             elseif WarMenu.MenuButton('Heavy Weapons', 'heavy') then
+            elseif WarMenu.MenuButton('Pistols', 'pistol') then
+            elseif WarMenu.MenuButton('SMGs / MGs', 'smg') then
+            elseif WarMenu.MenuButton('Shotguns', 'shotgun') then
+            elseif WarMenu.MenuButton('Assault Rifles', 'assault') then
+            elseif WarMenu.MenuButton('Sniper Rifles', 'sniper') then
+            elseif WarMenu.MenuButton('Thrown Weapons', 'thrown') then
+            elseif WarMenu.MenuButton('Heavy Weapons', 'heavy') then
 			end
         
         -- MELEE WEAPON MENU
@@ -4574,7 +4635,7 @@ Citizen.CreateThread(function()
             ShowHudComponentThisFrame(16)
             local radioIndex = GetPlayerRadioStationIndex()
 
-            if IsPedInAnyVehicle(GetPlayerPed(-1), false) and radioIndex + 1 ~= 19 then --Los Santos Underground Radio doesn't properly work
+            if IsPedInAnyVehicle(PlayerPedId(), false) and radioIndex + 1 ~= 19 then --Los Santos Underground Radio doesn't properly work
                 -- Updates the radio selections on the menu
                 currRadioIndex = radioIndex + 1
                 selRadioIndex = radioIndex + 1
