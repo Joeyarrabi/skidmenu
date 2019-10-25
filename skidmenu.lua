@@ -64,7 +64,7 @@ menulist = {
         -- SELF SUBMENUS
         'appearance',
         'modifyskintextures',
-            'modifyhead',
+          'modifyhead',
         'modifiers',
         
         -- WEAPON SUBMENUS
@@ -127,6 +127,7 @@ menulist = {
         
         -- MISC SUBMENUS
 		'esp',
+		'webradio',
         'credits',
         
         -- TELEPORT SUBMENUS
@@ -2943,8 +2944,8 @@ Citizen.CreateThread(function()
     WarMenu.CreateSubMenu('weapon', 'skid', 'Weapon Options')
     WarMenu.CreateSubMenu('vehicle', 'skid', 'Vehicle Options')
     WarMenu.CreateSubMenu('world', 'skid', 'World Options')
+	WarMenu.CreateSubMenu('teleport', 'skid', 'Teleport Options')
     WarMenu.CreateSubMenu('misc', 'skid', 'Misc Options')
-    WarMenu.CreateSubMenu('teleport', 'skid', 'Teleport Options')
     WarMenu.CreateSubMenu('lua', 'skid', 'Lua Options')
     
     -- PLAYER MENU SUBMENUS
@@ -3019,6 +3020,7 @@ Citizen.CreateThread(function()
     
     -- MISC MENU SUBMENUS
 	WarMenu.CreateSubMenu('esp', 'misc', 'ESP & Visual Options')
+	WarMenu.CreateSubMenu('webradio', 'misc', 'Web Radio')
     WarMenu.CreateSubMenu('credits', 'misc', 'Credits')
     
     -- TELEPORT MENU SUBMENUS
@@ -3041,8 +3043,8 @@ Citizen.CreateThread(function()
             elseif WarMenu.MenuButton('Weapon Options', 'weapon') then
             elseif WarMenu.MenuButton('Vehicle Options', 'vehicle') then
             elseif WarMenu.MenuButton('World Options', 'world') then
+			elseif WarMenu.MenuButton('Teleport Options', 'teleport') then
             elseif WarMenu.MenuButton('Misc Options', 'misc') then
-            elseif WarMenu.MenuButton('Teleport Options', 'teleport') then
             elseif WarMenu.MenuButton('Lua Options', 'lua') then
             elseif WarMenu.Button('Exit') then WarMenu.CloseMenu()
             elseif WarMenu.Button('~r~Panic (Kill Menu)') then break
@@ -3096,7 +3098,7 @@ Citizen.CreateThread(function()
 				else
 					ShowInfo("~r~Operation Canceled")
 				end
-			elseif WarMenu.ComboBox("Teleport Into Player's Vehicle", {"Front Right", "Back Left", "Back Right"}, currSeatIndex, selSeatIndex, function(currentIndex, selClothingIndex)
+			elseif WarMenu.ComboBox("Teleport Into Players Vehicle", {"Front Right", "Back Left", "Back Right"}, currSeatIndex, selSeatIndex, function(currentIndex, selClothingIndex)
                     currSeatIndex = currentIndex
                     selSeatIndex = currentIndex
                     end) then
@@ -3130,7 +3132,7 @@ Citizen.CreateThread(function()
             elseif WarMenu.CheckBox("Track Player", Tracking, "Tracking: Nobody", "Tracking: "..GetPlayerName(TrackedPlayer)) then
                 Tracking = not Tracking
                 TrackedPlayer = selectedPlayer
-			elseif WarMenu.Button("Launch Player's Vehicle") then
+			elseif WarMenu.Button("Launch Players Vehicle") then
 				if not IsPedInAnyVehicle(GetPlayerPed(selectedPlayer), 0) then
 					ShowInfo("~r~Player Not In Vehicle!")
 				else
@@ -3138,7 +3140,7 @@ Citizen.CreateThread(function()
 					RequestControlOnce(veh)
 					ApplyForceToEntity(veh, 3, 0.0, 0.0, 5000000.0, 0.0, 0.0, 0.0, 0, 0, 1, 1, 0, 1)
 				end
-			elseif WarMenu.Button("Slam Player's Vehicle") then
+			elseif WarMenu.Button("Slam Players Vehicle") then
 				if not IsPedInAnyVehicle(GetPlayerPed(selectedPlayer), 0) then
 					ShowInfo("~r~Player Not In Vehicle!")
 				else
@@ -3146,7 +3148,7 @@ Citizen.CreateThread(function()
 					RequestControlOnce(veh)
 					ApplyForceToEntity(veh, 3, 0.0, 0.0, -5000000.0, 0.0, 0.0, 0.0, 0, 0, 1, 1, 0, 1)
 				end
-			elseif WarMenu.ComboBox("Pop Player's Vehicle Tire", {"Front Left", "Front Right", "Back Left", "Back Right", "All"}, currTireIndex, selTireIndex, function(currentIndex, selClothingIndex)
+			elseif WarMenu.ComboBox("Pop Players Vehicle Tire", {"Front Left", "Front Right", "Back Left", "Back Right", "All"}, currTireIndex, selTireIndex, function(currentIndex, selClothingIndex)
                     currTireIndex = currentIndex
                     selTireIndex = currentIndex
                     end) then
@@ -4082,6 +4084,7 @@ Citizen.CreateThread(function()
 			elseif WarMenu.MenuButton("ESP & Visual", 'esp') then
             elseif WarMenu.CheckBox('Force Map', ForceMap) then
                 ForceMap = not ForceMap
+			elseif WarMenu.MenuButton("Web Radio", 'webradio') then
             elseif WarMenu.CheckBox("Portable Radio", Radio, "Disabled", "Enabled") then
                 Radio = not Radio
                 ShowInfo("~r~Portable Radio will override any vehicle's radio!")
@@ -4132,14 +4135,27 @@ Citizen.CreateThread(function()
             elseif WarMenu.CheckBox("Lines", LinesEnabled) then
                 LinesEnabled = not LinesEnabled
 			end
+			
+		-- WEB RADIO MENU
+        elseif WarMenu.IsMenuOpened('webradio') then
+            if WarMenu.CheckBox("Classical", ClassicalRadio, "Status: Not Playing", "Status: Playing") then
+				ClassicalRadio = not ClassicalRadio
+				if ClassicalRadio then
+					RadioDUI = CreateDui("http://cms.stream.publicradio.org/cms.mp3", 1, 1)
+					ShowInfo("~b~Now Playing...")
+				else
+					DestroyDui(RadioDUI)
+					ShowInfo("~r~Web Radio Stopped!")
+				end
+			end
        
         -- TELEPORT OPTIONS MENU
         elseif WarMenu.IsMenuOpened('teleport') then
             if WarMenu.MenuButton('Save/Load Position', 'saveload') then
-                elseif WarMenu.MenuButton('Teleport to POI', 'pois') then
-                elseif WarMenu.Button('Teleport To Waypoint') then
-                    TeleportToWaypoint()
-                end
+            elseif WarMenu.MenuButton('Teleport to POI', 'pois') then
+            elseif WarMenu.Button('Teleport To Waypoint') then
+				TeleportToWaypoint()
+            end
         
         -- SAVE/LOAD POSITION MENU
         elseif WarMenu.IsMenuOpened('saveload') then
