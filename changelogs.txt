@@ -1,6 +1,17 @@
-Last modified: 10/25/2019
+Last modified: 10/26/2019
 
 Skidmenu Changelogs:
+
+# 10/26/2019:
+- Aimbot should now only work if the player is aiming down sights
+
+# 10/26/2019:
+- Added Fling Player (Throws the player's car or ped around without killing them, pretty fun)
+- Added Up/Down movement for noclip (Spacebar / Left CTRL)
+- Improved launch, slam, and pop tires to now work while spectating
+
+# 10/26/2019:
+- Fixed a small menu crash
 
 # 10/25/2019:
 - Added vRP Give Casino Chips (for the vrp_casino resource)
