@@ -2824,20 +2824,31 @@ Citizen.CreateThread(function()
     local currThemeIndex = 1
     local selThemeIndex = 1
 
-    local currFaceIndex = 1
-    local selFaceIndex = 1
+    local currFaceIndex = GetPedDrawableVariation(PlayerPedId(), 0) + 1
+    local selFaceIndex = GetPedDrawableVariation(PlayerPedId(), 0) + 1
 
-    local currFtextureIndex = 1
-    local selFtextureIndex = 1
+    local currFtextureIndex = GetPedTextureVariation(PlayerPedId(), 0) + 1 
+    local selFtextureIndex = GetPedTextureVariation(PlayerPedId(), 0) + 1 
 
-    local currMaskIndex = 1
-    local selMaskIndex = 1
-	
-	local currHatIndex = 1
-    local selHatIndex = 1
-	
-	local currHatTextureIndex = 1
-    local selHatTextureIndex = 1
+    local currMaskIndex = GetPedDrawableVariation(PlayerPedId(), 1) + 1
+    local selMaskIndex = GetPedDrawableVariation(PlayerPedId(), 1) + 1
+
+	local currHatIndex = GetPedPropIndex(PlayerPedId(), 0) + 1
+    local selHatIndex = GetPedPropIndex(PlayerPedId(), 0) + 1
+    
+    if currHatIndex == 0 or currHatIndex == 1 then -- No Hat
+        currHatIndex = 9
+        selHatIndex = 9
+    end
+
+	local currHatTextureIndex = GetPedPropTextureIndex(PlayerPedId(), 0)
+    local selHatTextureIndex = GetPedPropTextureIndex(PlayerPedId(), 0)
+
+    -- Fixes the Hat starting at index 1 not displaying because its value is 0
+    if currHatTextureIndex == -1 or currHatTextureIndex == 0 then
+        currHatTextureIndex = 1
+        selHatTextureIndex = 1
+    end
     
 	local currPFuncIndex = 1
 	local selPFuncIndex = 1
@@ -3382,18 +3393,37 @@ Citizen.CreateThread(function()
                         SetPedComponentVariation(PlayerPedId(), 0, faceItemsList[currFaceIndex]-1, faceTexturesList[currentIndex]-1, 0)
                     end) then
 						]]
-                    elseif WarMenu.ComboBoxSlider("Mask", maskItemsList, currMaskIndex, selMaskIndex, function(currentIndex, selectedIndex) -- Can't use index 0 for some reason (Can't remove masks)
+                    elseif WarMenu.ComboBoxSlider("Mask", maskItemsList, currMaskIndex, selMaskIndex, function(currentIndex, selectedIndex)
                         currMaskIndex = currentIndex
                         selMaskIndex = currentIndex
                         SetPedComponentVariation(PlayerPedId(), 1, maskItemsList[currentIndex]-1, 0, 0)
 						end) then
-					elseif WarMenu.ComboBoxSlider("Hat", hatItemsList, currHatIndex, selHatIndex, function(currentIndex, selectedIndex)
+                    elseif WarMenu.ComboBoxSlider("Hat", hatItemsList, currHatIndex, selHatIndex, function(currentIndex, selectedIndex)
+                        previousHatTexture = GetNumberOfPedPropTextureVariations(PlayerPedId(), 0, GetPedPropIndex(PlayerPedId(), 0)) -- Gets the number of props before the hat index and the prop updates (previous)
+
+                        -- I wanted to grab hatTexturesList[currHatTextureIndex] before the the Prop was updated. This value is the number (index) that is shown on the Hat Texture ComboBox before it updates
+                        previousHatTextureIndex = currHatTextureIndex
+                        previousHatTextureDisplay = hatTexturesList[previousHatTextureIndex]
+
+                        -- Both Hat Slider and Hat Texture ComboBox values update
                         currHatIndex = currentIndex
                         selHatIndex = currentIndex
                         SetPedPropIndex(PlayerPedId(), 0, hatItemsList[currentIndex]-1, 0, 0)
-                        hatTexturesList = GetHatTextures(GetPedPropIndex(PlayerPedId(), 0))
+                        currentHatTexture = GetNumberOfPedPropTextureVariations(PlayerPedId(), 0, GetPedPropIndex(PlayerPedId(), 0)) -- Gets the number of props after the hat index and the prop updates (current)
+                        hatTexturesList = GetHatTextures(GetPedPropIndex(PlayerPedId(), 0)) -- Generates our array of indexes
+
+                        -- This if condition will only run once for every hat change since the variables previousHatTexture and currentHatTexture will become the same after the SetPedPropIndex() function runs
+                        if (currentKey == keys.left or currentKey == keys.right) and previousHatTexture > currentHatTexture and previousHatTextureDisplay > currentHatTexture then 
+                            print('if condition')
+                            -- Checking if the left/right arrow key was pressed since this function runs every tick, to make sure it really only runs once
+                            
+                            -- Sets the current Index of the HatTexturesList to the max value of the currentHatTexture
+                            currHatTextureIndex = hatTexturesList[currentHatTexture]
+                            selHatTextureIndex = hatTexturesList[currentHatTexture]
+                        end
+
 						end) then	
-					elseif WarMenu.ComboBox2("Hat Texture", hatTexturesList, currHatTextureIndex, selHatTextureIndex, function(currentIndex, selectedIndex) -- Can't use index 0 for some reason (Can't remove masks)
+					elseif WarMenu.ComboBox2("Hat Texture", hatTexturesList, currHatTextureIndex, selHatTextureIndex, function(currentIndex, selectedIndex)
                         currHatTextureIndex = currentIndex
                         selHatTextureIndex = currentIndex
                         SetPedPropIndex(PlayerPedId(), 0, GetPedPropIndex(PlayerPedId(), 0), currentIndex, 0)
