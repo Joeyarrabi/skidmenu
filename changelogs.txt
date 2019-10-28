@@ -1,6 +1,12 @@
-Last modified: 10/26/2019
+Last modified: 10/28/2019
 
 Skidmenu Changelogs:
+
+# 10/28/2019:
+- The available drawables will now start at the ped's selected drawables instead of overwriting it with the index 1 of each.
+- When changing a drawable/prop, its texture will no longer display "nil" if the previous drawable/prop texture value was bigger than the maximum of the current one.
+- Fixed an bug that would occur on the first time launching the menu on a server where it would crash it when trying to get the current Ped Component Variations Index.
+- Added comments for easier understandment of the code.
 
 # 10/26/2019:
 - Aimbot should now only work if the player is aiming down sights
