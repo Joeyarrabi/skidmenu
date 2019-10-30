@@ -1,6 +1,9 @@
-Last modified: 10/28/2019
+Last modified: 10/30/2019
 
 Skidmenu Changelogs:
+
+# 10/30/2019:
+- Added Weather Changer
 
 # 10/28/2019:
 - The available drawables will now start at the ped's selected drawables instead of overwriting it with the index 1 of each.
