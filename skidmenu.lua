@@ -147,6 +147,8 @@ menulist = {
 -- Modify Skin Textures
 faceItemsList = {}
 faceTexturesList = {}
+hairItemsList = {}
+hairTextureList = {}
 maskItemsList = {}
 hatItemsList = {}
 hatTexturesList = {}
@@ -1661,6 +1663,33 @@ local function GetHeadItems()
 	return faceItemsList
 end
 
+local function GetHeadTextures(faceID)
+    local headTextures = GetNumberOfPedTextureVariations(PlayerPedId(), 0, faceID)
+	local headTexturesList = {}
+    for i = 1, headTextures do
+        headTexturesList[i] = i
+    end
+	return headTexturesList
+end
+
+local function GetHairItems()
+    local hairItems = GetNumberOfPedDrawableVariations(PlayerPedId(), 2)
+    local hairItemsList = {}
+    for i = 1, hairItems do
+        hairItemsList[i] = i
+    end
+    return hairItemsList
+end
+
+local function GetHairTextures(hairID)
+    local hairTexture = GetNumberOfPedTextureVariations(PlayerPedId(), 2, hairID)
+    local hairTextureList = {}
+    for i = 1, hairTexture do
+        hairTextureList[i] = i
+    end
+    return hairTextureList
+end
+
 local function GetMaskItems()
     local maskItems = GetNumberOfPedDrawableVariations(PlayerPedId(), 1)
     local maskItemsList = {}
@@ -1686,16 +1715,6 @@ local function GetHatTextures(hatID)
         hatTexturesList[i] = i
     end
 	return hatTexturesList
-end
-
-
-local function GetHeadTextures(faceID)
-    local headTextures = GetNumberOfPedTextureVariations(PlayerPedId(), 0, faceID)
-	local headTexturesList = {}
-    for i = 1, headTextures do
-        headTexturesList[i] = i
-    end
-	return headTexturesList
 end
 
 local function EnumerateEntities(initFunc, moveFunc, disposeFunc)
@@ -2846,6 +2865,12 @@ Citizen.CreateThread(function()
     local currFtextureIndex = GetPedTextureVariation(PlayerPedId(), 0) + 1 
     local selFtextureIndex = GetPedTextureVariation(PlayerPedId(), 0) + 1 
 
+    local currHairIndex = GetPedDrawableVariation(PlayerPedId(), 2) + 1
+    local selHairIndex = GetPedDrawableVariation(PlayerPedId(), 2) + 1
+
+    local currHairTextureIndex = GetPedTextureVariation(PlayerPedId(), 2) + 1
+    local selHairTextureIndex = GetPedTextureVariation(PlayerPedId(), 2) + 1
+
     local currMaskIndex = GetPedDrawableVariation(PlayerPedId(), 1) + 1
     local selMaskIndex = GetPedDrawableVariation(PlayerPedId(), 1) + 1
 
@@ -3391,7 +3416,9 @@ Citizen.CreateThread(function()
                     end
                     
 					faceItemsList = GetHeadItems()
-					faceTexturesList = GetHeadTextures(GetPedDrawableVariation(PlayerPedId(), 0))
+                    faceTexturesList = GetHeadTextures(GetPedDrawableVariation(PlayerPedId(), 0))
+                    hairItemsList = GetHairItems()
+                    hairTexturesList = GetHairTextures(GetPedDrawableVariation(PlayerPedId(), 2))
 					maskItemsList = GetMaskItems()
 					hatItemsList = GetHatItems()
                     hatTexturesList = GetHatTextures(GetPedPropIndex(PlayerPedId(), 0))
@@ -3411,7 +3438,29 @@ Citizen.CreateThread(function()
                         selFtextureIndex = currentIndex
                         SetPedComponentVariation(PlayerPedId(), 0, faceItemsList[currFaceIndex]-1, faceTexturesList[currentIndex]-1, 0)
                     end) then
-						]]
+                        ]]
+                    elseif WarMenu.ComboBoxSlider("Hair", hairItemsList, currHairIndex, selHairIndex, function(currentIndex, selectedIndex)
+                        previousHairTexture = GetNumberOfPedTextureVariations(PlayerPedId(), 2, GetPedDrawableVariation(PlayerPedId(), 2))
+                        
+                        previousHairTextureDisplay = hairTextureList[currHairTextureIndex]
+
+                        currHairIndex = currentIndex
+                        selHairIndex = currentIndex
+                        SetPedComponentVariation(PlayerPedId(), 2, hairItemsList[currentIndex]-1, 0, 0)
+                        currentHairTexture = GetNumberOfPedTextureVariations(PlayerPedId(), 2, GetPedDrawableVariation(PlayerPedId(), 2))
+                        hairTextureList = GetHairTextures(GetPedDrawableVariation(PlayerPedId(), 2))
+
+                        if (currentKey == keys.left or currentKey == keys.right) and previousHairTexture > currentHairTexture and previousHairTextureDisplay > currentHairTexture then
+                            currHairTextureIndex = hairTexturesList[currentHairTexture]
+                            selHairTextureIndex = hairTexturesList[currentHairTexture]
+                        end
+
+                        end) then
+                    elseif WarMenu.ComboBox2("Hair Color", hairTextureList, currHairTextureIndex, selHairTextureIndex, function(currentIndex, selectedIndex)
+                        currHairTextureIndex = currentIndex
+                        selHairTextureIndex = currentIndex
+                        SetPedComponentVariation(PlayerPedId(), 2, hairItemsList[currHairIndex]-1, currentIndex-1, 0)
+                        end) then
                     elseif WarMenu.ComboBoxSlider("Mask", maskItemsList, currMaskIndex, selMaskIndex, function(currentIndex, selectedIndex)
                         currMaskIndex = currentIndex
                         selMaskIndex = currentIndex
@@ -3421,8 +3470,7 @@ Citizen.CreateThread(function()
                         previousHatTexture = GetNumberOfPedPropTextureVariations(PlayerPedId(), 0, GetPedPropIndex(PlayerPedId(), 0)) -- Gets the number of props before the hat index and the prop updates (previous)
 
                         -- I wanted to grab hatTexturesList[currHatTextureIndex] before the the Prop was updated. This value is the number (index) that is shown on the Hat Texture ComboBox before it updates
-                        previousHatTextureIndex = currHatTextureIndex
-                        previousHatTextureDisplay = hatTexturesList[previousHatTextureIndex]
+                        previousHatTextureDisplay = hatTexturesList[currHatTextureIndex]
 
                         -- Both Hat Slider and Hat Texture ComboBox values update
                         currHatIndex = currentIndex
