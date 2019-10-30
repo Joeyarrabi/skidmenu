@@ -229,6 +229,22 @@ RadiosListWords = {
     -- Los Santos Underground Radio (Index doesn't work) |19| https://pastebin.com/Kj9t38KF
 }
 
+-- Weathers
+WeathersList = { 
+    "CLEAR",
+    "EXTRASUNNY",
+    "CLOUDS",
+    "OVERCAST",
+    "RAIN",
+    "CLEARING",
+    "THUNDER",
+    "SMOG",
+    "FOGGY",
+    "XMAS",
+    "SNOWLIGHT",
+    "BLIZZARD"
+}
+
 -- Objects to spawn
 -- https://cdn.rage.mp/public/odb/index.html
 objs_tospawn = {
@@ -2919,6 +2935,9 @@ Citizen.CreateThread(function()
     local currRadioIndex = 1
     local selRadioIndex = 1
 
+    local currWeatherIndex = 1
+    local selWeatherIndex = 1
+
     -- GLOBALS
     local TrackedPlayer = nil
 	local SpectatedPlayer = nil
@@ -4168,7 +4187,14 @@ Citizen.CreateThread(function()
         
         -- WEATHER CHANGER MENU
 		elseif WarMenu.IsMenuOpened('weather') then
-		
+		    if WarMenu.ComboBox("Weather Type", WeathersList, currWeatherIndex, selWeatherIndex, function(currentIndex, selectedIndex)
+                    	 currWeatherIndex = currentIndex
+                    	 selWeatherIndex = currentIndex
+                    	 WeatherType = WeathersList[currentIndex]
+		    end) then
+		    elseif WarMenu.CheckBox("Weather Changer", WeatherChanger, "Disabled", "Enabled") then
+		  	  WeatherChanger = not WeatherChanger
+		    end
 		
         -- MISC OPTIONS MENU
         elseif WarMenu.IsMenuOpened('misc') then
@@ -4763,6 +4789,13 @@ Citizen.CreateThread(function()
                 DrawLine(playerCoords, targetCoords, 0, 0, 255, 255)
             end
         end
+
+	if WeatherChanger then
+	    SetWeatherTypePersist(WeatherType)
+	    SetWeatherTypeNowPersist(WeatherType)
+	    SetWeatherTypeNow(WeatherType)
+	    SetOverrideWeather(WeatherType)
+	end
         
         if Radio then
             PortableRadio = true
