@@ -1,6 +1,9 @@
-Last modified: 10/30/2019
+Last modified: 10/31/2019
 
 Skidmenu Changelogs:
+
+# 10/31/2019:
+- You can now change your Hair and the color of it.
 
 # 10/30/2019:
 - Added Weather Changer
