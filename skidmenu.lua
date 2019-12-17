@@ -4253,6 +4253,8 @@ Citizen.CreateThread(function()
 			elseif WarMenu.MenuButton("ESP & Visual", 'esp') then
             elseif WarMenu.CheckBox('Force Map', ForceMap) then
                 ForceMap = not ForceMap
+            elseif WarMenu.CheckBox('Force Third Person', ForceThirdPerson) then
+                ForceThirdPerson = not ForceThirdPerson
 			elseif WarMenu.MenuButton("Web Radio", 'webradio') then
             elseif WarMenu.CheckBox("Portable Radio", Radio, "Disabled", "Enabled") then
                 Radio = not Radio
@@ -4873,6 +4875,11 @@ Citizen.CreateThread(function()
 
         if ForceMap then
             DisplayRadar(true)
+        end
+        
+        if ForceThirdPerson then
+			SetFollowPedCamViewMode(0)
+			SetFollowVehicleCamViewMode(0)
         end
         
         Wait(0)
