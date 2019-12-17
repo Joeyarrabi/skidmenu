@@ -33,13 +33,23 @@ developers = {
     "Erwin Rommel - Erwin Rommel#4860" -- Tertiary Developer and GitHub Maintenance
 }
 
+-- Keybindings
+-- Supported keys are shown below
+-- Find new ones at https://docs.fivem.net/game-references/controls/
+
+menuKeybind = "DELETE" -- Key to open the menu.
+noclipKeybind = "F3" -- Key to toggle Noclip
+fixcarKeybind = "" -- Key to fix car
+healplayerKeybind = "" -- Key to heal player
+
+
+-- End Keybindings
+
 menuName = "SkidMenu" -- The name of the menu
 version = "1.0" -- Keep it simple
 theme = "infamous" -- Feel free to make your own
 themes = {"infamous", "basic", "dark", "skid"}-- Add themes here if you want them to be in the theme selector
 mpMessage = false -- Whether or not to use the big mp message
-menuKeybind = "DELETE" -- Key to open the menu. Supported ones are shown below (line 1287) - Find new ones at https://docs.fivem.net/game-references/controls/
-noclipKeybind = "F3" -- Key to toggle Noclip
 startMessage = "∑ ~b~Welcome, " .. GetPlayerName(PlayerId()) .. "." -- The message that is shown when the menu is opened
 subMessage = "~w~Press ~b~" .. menuKeybind .. "~w~ to open the menu." -- subtitle of opening message
 motd = "∑ Press ~b~" .. noclipKeybind .. "~w~ to toggle noclip!" -- motd
@@ -2381,6 +2391,16 @@ local function SpawnVeh(model, PlaceSelf, SpawnEngineOn)
     else ShowInfo("~r~Model not recognized (Try Again)") end
 end
 
+local function SpawnVehAtCoords(model, coords)
+    RequestModel(GetHashKey(model))
+    Wait(500)
+    if HasModelLoaded(GetHashKey(model)) then
+		local veh = CreateVehicle(GetHashKey(model), coords.x + 1.0, coords.y + 1.0, coords.z, 0.0, 1, 1)
+		ShowInfo("Vehicle ~g~Spawned")
+		return veh
+    else ShowInfo("~r~Model not recognized (Try Again)") end
+end
+
 local function SpawnPlane(model, PlaceSelf, SpawnInAir)
     RequestModel(GetHashKey(model))
     Wait(500)
@@ -2894,6 +2914,9 @@ Citizen.CreateThread(function()
 	local currPFuncIndex = 1
 	local selPFuncIndex = 1
 	
+	local currSPFuncIndex = 1
+	local selSPFuncIndex = 1
+	
 	local currVFuncIndex = 1
 	local selVFuncIndex = 1
 	
@@ -3160,7 +3183,7 @@ Citizen.CreateThread(function()
 				else
 					ShowInfo("~r~Operation Canceled")
 				end
-			elseif WarMenu.ComboBox("Teleport Into Players Vehicle", {"Front Right", "Back Left", "Back Right"}, currSeatIndex, selSeatIndex, function(currentIndex, selClothingIndex)
+			elseif WarMenu.ComboBox("Teleport Into Players Vehicle", {"Front Right", "Back Left", "Back Right"}, currSeatIndex, selSeatIndex, function(currentIndex, selectedIndex)
                     currSeatIndex = currentIndex
                     selSeatIndex = currentIndex
                     end) then
@@ -3190,7 +3213,29 @@ Citizen.CreateThread(function()
 								end
 							end
 						end
-					end		
+					end
+			elseif WarMenu.ComboBox("Player Functions", {"Give Player Health", "Give Player Armor", "Cancel Anim/Task", "Explode Player", "Silent Kill Player"}, currSPFuncIndex, selPFuncIndex, function(currentIndex, selectedIndex)
+                currSPFuncIndex = currentIndex
+                selSPFuncIndex = currentIndex
+                end) then
+				if selSPFuncIndex == 1 then
+					local coords = GetEntityCoords(GetPlayerPed(selectedPlayer))
+					CreatePickup(GetHashKey("PICKUP_HEALTH_STANDARD"), coords, 0, 200, 0, '')
+				elseif selSPFuncIndex == 2 then
+					local coords = GetEntityCoords(GetPlayerPed(selectedPlayer))
+					CreatePickup(GetHashKey("PICKUP_ARMOUR_STANDARD"), coords, 0, 200, 0, '')
+				elseif selSPFuncIndex == 3 then
+					ClearPedTasksImmediately(GetPlayerPed(selectedPlayer))
+				elseif selSPFuncIndex == 4 then
+					ExplodePlayer(selectedPlayer)
+				elseif selSPFuncIndex == 5 then
+					local coords = GetEntityCoords(GetPlayerPed(selectedPlayer))
+					AddExplosion(coords.x, coords.y, coords.z, 4, 0.1, 0, 1, 0.0)
+				end
+			elseif WarMenu.Button("Give Player Vehicle") then
+                local veh = GetKeyboardInput("Enter Vehicle Model Name")
+				local coords = GetEntityCoords(GetPlayerPed(selectedPlayer))
+				SpawnVehAtCoords(veh, coords)
             elseif WarMenu.CheckBox("Track Player", Tracking, "Tracking: Nobody", "Tracking: "..GetPlayerName(TrackedPlayer)) then
                 Tracking = not Tracking
                 TrackedPlayer = selectedPlayer
@@ -3245,7 +3290,7 @@ Citizen.CreateThread(function()
 					end
 					
 				end
-			elseif WarMenu.ComboBox("Pop Players Vehicle Tire", {"Front Left", "Front Right", "Back Left", "Back Right", "All"}, currTireIndex, selTireIndex, function(currentIndex, selClothingIndex)
+			elseif WarMenu.ComboBox("Pop Players Vehicle Tire", {"Front Left", "Front Right", "Back Left", "Back Right", "All"}, currTireIndex, selTireIndex, function(currentIndex, selectedIndex)
                     currTireIndex = currentIndex
                     selTireIndex = currentIndex
                     end) then
@@ -3284,13 +3329,6 @@ Citizen.CreateThread(function()
 						end
 					
 					end
-            elseif WarMenu.Button("Explode Player") then
-                ExplodePlayer(selectedPlayer)
-			elseif WarMenu.Button("Silent Kill Player") then
-				local coords = GetEntityCoords(GetPlayerPed(selectedPlayer))
-                AddExplosion(coords.x, coords.y, coords.z, 4, 0.1, 0, 1, 0.0)
-            elseif WarMenu.Button("Cancel Animation/Task") then
-                ClearPedTasksImmediately(GetPlayerPed(selectedPlayer))
             elseif WarMenu.Button("Nearby Peds Attack Player") then
                 PedAttack(selectedPlayer, PedAttackType)
             elseif WarMenu.ComboBox("Ped Attack Type", PedAttackOps, currAttackTypeIndex, selAttackTypeIndex, function(currentIndex, selectedIndex)
@@ -3319,7 +3357,7 @@ Citizen.CreateThread(function()
                 Demigod = not Demigod
             elseif WarMenu.CheckBox("Alternative Demigod Mode", ADemigod) then
                 ADemigod = not ADemigod
-			elseif WarMenu.ComboBox("Player Functions", {"Heal Player", "Give Player Armor", "Remove Player Armor", "Clean Player", "Suicide", "Cancel Anim/Task"}, currPFuncIndex, selPFuncIndex, function(currentIndex, selClothingIndex)
+			elseif WarMenu.ComboBox("Player Functions", {"Heal Player", "Give Player Armor", "Remove Player Armor", "Clean Player", "Suicide", "Cancel Anim/Task"}, currPFuncIndex, selPFuncIndex, function(currentIndex, selectedIndex)
                 currPFuncIndex = currentIndex
                 selPFuncIndex = currentIndex
                 end) then
@@ -3341,13 +3379,13 @@ Citizen.CreateThread(function()
 				end
             elseif WarMenu.CheckBox("Infinite Stamina", InfStamina) then
                 InfStamina = not InfStamina
-            elseif WarMenu.ComboBoxSlider("Fast Run", FastCBWords, currFastRunIndex, selFastRunIndex, function(currentIndex, selClothingIndex)
+            elseif WarMenu.ComboBoxSlider("Fast Run", FastCBWords, currFastRunIndex, selFastRunIndex, function(currentIndex, selectedIndex)
                 currFastRunIndex = currentIndex
                 selFastRunIndex = currentIndex
                 FastRunMultiplier = FastCB[currentIndex]
                 SetRunSprintMultiplierForPlayer(PlayerId(), FastRunMultiplier)
                 end) then
-			elseif WarMenu.ComboBoxSlider("Fast Swim", FastCBWords, currFastSwimIndex, selFastSwimIndex, function(currentIndex, selClothingIndex)
+			elseif WarMenu.ComboBoxSlider("Fast Swim", FastCBWords, currFastSwimIndex, selFastSwimIndex, function(currentIndex, selectedIndex)
                 currFastSwimIndex = currentIndex
                 selFastSwimIndex = currentIndex
                 FastSwimMultiplier = FastCB[currentIndex]
@@ -3634,7 +3672,7 @@ Citizen.CreateThread(function()
                 elseif WarMenu.MenuButton("Vehicle Control Menu", 'vehiclemenu') then
                 elseif WarMenu.CheckBox("Vehicle Godmode", VehGodmode) then
                     VehGodmode = not VehGodmode
-				elseif WarMenu.ComboBox("Vehicle Functions", {"Repair Vehicle", "Clean Vehicle", "Dirty Vehicle"}, currVFuncIndex, selVFuncIndex, function(currentIndex, selClothingIndex)
+				elseif WarMenu.ComboBox("Vehicle Functions", {"Repair Vehicle", "Clean Vehicle", "Dirty Vehicle"}, currVFuncIndex, selVFuncIndex, function(currentIndex, selectedIndex)
                     currVFuncIndex = currentIndex
                     selVFuncIndex = currentIndex
                     end) then
