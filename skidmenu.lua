@@ -34,13 +34,13 @@ developers = {
 }
 
 -- Keybindings
--- Supported keys are shown below
+-- Supported keys are shown below (line 1316)
 -- Find new ones at https://docs.fivem.net/game-references/controls/
 
 menuKeybind = "DELETE" -- Key to open the menu.
 noclipKeybind = "F3" -- Key to toggle Noclip
-fixcarKeybind = "" -- Key to fix car
-healplayerKeybind = "" -- Key to heal player
+fixcarKeybind = "F1" -- Key to fix car
+healplayerKeybind = "F2" -- Key to heal player
 
 
 -- End Keybindings
@@ -138,6 +138,7 @@ menulist = {
         
         -- MISC SUBMENUS
 		'esp',
+		'keybindings',
 		'webradio',
         'credits',
         
@@ -3105,6 +3106,7 @@ Citizen.CreateThread(function()
     
     -- MISC MENU SUBMENUS
 	WarMenu.CreateSubMenu('esp', 'misc', 'ESP & Visual Options')
+	WarMenu.CreateSubMenu('keybindings', 'misc', 'Keybindings')
 	WarMenu.CreateSubMenu('webradio', 'misc', 'Web Radio')
     WarMenu.CreateSubMenu('credits', 'misc', 'Credits')
     
@@ -4289,6 +4291,7 @@ Citizen.CreateThread(function()
                 selThemeIndex = selectedIndex
             end) then theme = themes[selThemeIndex]WarMenu.InitializeTheme()
 			elseif WarMenu.MenuButton("ESP & Visual", 'esp') then
+			elseif WarMenu.MenuButton("Keybindings", 'keybindings') then
             elseif WarMenu.CheckBox('Force Map', ForceMap) then
                 ForceMap = not ForceMap
             elseif WarMenu.CheckBox('Force Third Person', ForceThirdPerson) then
@@ -4364,6 +4367,45 @@ Citizen.CreateThread(function()
                 LinesEnabled = not LinesEnabled
 			end
 			
+		-- KEYBINDS MENU
+		elseif WarMenu.IsMenuOpened('keybindings') then
+			if WarMenu.CheckBox("Menu Keybind:", 0, menuKeybind, menuKeybind) then
+				local key = string.upper(GetKeyboardInput("Input New Key Name (line 1316)"))
+				
+				if Keys[key] then
+					menuKeybind = key
+					ShowInfo("Menu bind has been set to ~g~"..key)
+				else
+					ShowInfo("~r~Key "..key.." is not valid!")
+				end
+			elseif WarMenu.CheckBox("Noclip Keybind:", 0, noclipKeybind, noclipKeybind) then
+				local key = string.upper(GetKeyboardInput("Input New Key Name (line 1316)"))
+				
+				if Keys[key] then
+					noclipKeybind = key
+					ShowInfo("Noclip bind has been set to ~g~"..key)
+				else
+					ShowInfo("~r~Key "..key.." is not valid!")
+				end
+			elseif WarMenu.CheckBox("Fix Vehicle Keybind:", 0, fixcarKeybind, fixcarKeybind) then
+				local key = string.upper(GetKeyboardInput("Input New Key Name (line 1316)"))
+				
+				if Keys[key] then
+					fixcarKeybind = key
+					ShowInfo("FixVeh bind has been set to ~g~"..key)
+				else
+					ShowInfo("~r~Key "..key.." is not valid!")
+				end
+			elseif WarMenu.CheckBox("Heal Self Keybind:", 0, healplayerKeybind, healplayerKeybind) then
+				local key = string.upper(GetKeyboardInput("Input New Key Name (line 1316)"))
+				
+				if Keys[key] then
+					healplayerKeybind = key
+					ShowInfo("Heal Self bind has been set to ~g~"..key)
+				else
+					ShowInfo("~r~Key "..key.." is not valid!")
+				end
+			end
 		-- WEB RADIO MENU
         elseif WarMenu.IsMenuOpened('webradio') then
             if WarMenu.CheckBox("Classical", ClassicalRadio, "Status: Not Playing", "Status: Playing") then
@@ -4534,8 +4576,21 @@ Citizen.CreateThread(function()
         
         
         -- TOGGLE NOCLIP (KEYBIND)
-        elseif IsDisabledControlJustReleased(0, Keys[noclipKeybind]) then ToggleNoclip() end
+        elseif IsDisabledControlJustReleased(0, Keys[noclipKeybind]) then 
+			ToggleNoclip()
         
+		-- Fix vehicle (keybind)
+		elseif IsDisabledControlJustReleased(0, Keys[fixcarKeybind]) then 
+			FixVeh(GetVehiclePedIsIn(PlayerPedId(), 0)) 
+			ShowInfo("Vehicle ~g~Fixed!")
+		
+		-- Heal self (keybing)
+		elseif IsDisabledControlJustReleased(0, Keys[healplayerKeybind]) then
+			SetEntityHealth(PlayerPedId(), 200.0)
+			ShowInfo("Player ~g~Healed!")
+			
+		end
+		
         WarMenu.Display()
         
         -- LOOP HANDLING
