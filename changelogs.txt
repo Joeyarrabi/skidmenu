@@ -1,6 +1,9 @@
-Last modified: 10/31/2019
+Last modified: 12/16/2019
 
 Skidmenu Changelogs:
+
+# 12/26/2019:
+- Fixed draw functions
 
 # 10/31/2019:
 - You can now change your Hair and the color of it.
