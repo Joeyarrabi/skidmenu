@@ -113,7 +113,7 @@ Skidmenu is a free, open-source lua menu for FiveM.
 > Credits:
 
 > Developers:
-- tommyakshot `Joeyarrabi#7440` - Main Developer
+- tommyakshot `Joeyarrabi#2508` - Main Developer
 
 - Kirtle `Kirtle#0498` - Secondary Developer
 
