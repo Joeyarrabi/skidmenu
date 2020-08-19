@@ -1,5 +1,3 @@
-[This is still a WIP - any updates will be here]
-
 ## Skidmenu
 Skidmenu is a free, open-source lua menu for FiveM.
 
@@ -123,5 +121,3 @@ Skidmenu is a free, open-source lua menu for FiveM.
 
 > Testers:
 - Zach - Helped test the menu extensively and recommended lots of awesome features
-
-> Donations are not required and will not give you anything except my gratitude.  If you still would like to donate, [Click Here](https://www.paypal.com/paypalme2/tommyakshot)
